@@ -37,6 +37,6 @@ public class LandManager
     @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event)
     {
-
+        //TODO: Commands
     }
 }

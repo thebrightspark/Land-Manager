@@ -43,25 +43,33 @@ public class AreasWorldSavedData extends WorldSavedData
         return areas.get(areaName);
     }
 
-    public AddAreaResult addArea(String areaName, Area area)
+    public AddAreaResult addArea(Area area)
     {
-        if(areas.keySet().contains(areaName))
+        if(areas.keySet().contains(area.getName()))
             return AddAreaResult.NAME_EXISTS;
         for(Area a : areas.values())
             if(area.intersects(a))
                 return AddAreaResult.AREA_INTERSECTS;
-        areas.put(areaName, area);
+        areas.put(area.getName(), area);
         return AddAreaResult.SUCCESS;
     }
 
     public List<Area> getNearbyAreas(BlockPos pos)
     {
         List<Area> nearbyAreas = new ArrayList<>();
-        areas.forEach((name, area) -> {
+        areas.values().forEach(area -> {
             if(area.getCenter().getDistance(pos.getX(), pos.getY(), pos.getZ()) <= 16)
                 nearbyAreas.add(area);
         });
         return nearbyAreas;
+    }
+
+    public boolean isIntersectingArea(BlockPos pos)
+    {
+        for(Area area : areas.values())
+            if(area.intersects(pos))
+                return true;
+        return false;
     }
 
     @Override

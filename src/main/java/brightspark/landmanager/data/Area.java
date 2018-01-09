@@ -3,6 +3,7 @@ package brightspark.landmanager.data;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.UUID;
@@ -78,6 +79,11 @@ public class Area implements INBTSerializable<NBTTagCompound>
     public boolean intersects(Area area)
     {
         return new AxisAlignedBB(this.pos1, this.pos2).intersects(new AxisAlignedBB(area.pos1, area.pos2));
+    }
+
+    public boolean intersects(BlockPos pos)
+    {
+        return new AxisAlignedBB(this.pos1, this.pos2).contains(new Vec3d(pos).add(new Vec3d(0.5d, 0.5d, 0.5d)));
     }
 
     @Override

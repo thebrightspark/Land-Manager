@@ -1,6 +1,5 @@
 package brightspark.landmanager.item;
 
-import brightspark.landmanager.item.AdminItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -14,7 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Mod.EventBusSubscriber
 public class LMItems
 {
-    public static final Item adminItem = new AdminItem();
+    public static final Item adminItem = new ItemAdmin();
 
     @SubscribeEvent
     public static void regItems(RegistryEvent.Register<Item> event)

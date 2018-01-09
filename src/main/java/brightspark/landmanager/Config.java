@@ -5,4 +5,6 @@ public class Config
     public static boolean disableClaiming = false;
 
     public static int showAllRadius = 16;
+
+    public static boolean creativeIgnoresProtection = true;
 }
