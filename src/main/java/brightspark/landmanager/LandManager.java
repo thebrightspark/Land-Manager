@@ -1,11 +1,13 @@
 package brightspark.landmanager;
 
+import brightspark.landmanager.gui.GuiHandler;
 import brightspark.landmanager.item.LMItems;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = LandManager.MOD_ID, name = LandManager.MOD_NAME, version = LandManager.VERSION)
@@ -32,6 +34,7 @@ public class LandManager
     public static void preInit(FMLPreInitializationEvent event)
     {
         LOGGER = event.getModLog();
+        NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());
     }
 
     @Mod.EventHandler

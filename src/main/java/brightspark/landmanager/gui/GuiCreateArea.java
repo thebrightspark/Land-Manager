@@ -3,6 +3,7 @@ package brightspark.landmanager.gui;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Position;
 import brightspark.landmanager.item.ItemAdmin;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -16,9 +17,9 @@ import java.io.IOException;
 
 public class GuiCreateArea extends GuiScreen
 {
-    private static final ResourceLocation bgImage = new ResourceLocation(LandManager.MOD_ID, "textures/gui/createAreaGui.png");
-    private static int xSize = 100;
-    private static int ySize = 50;
+    private static final ResourceLocation bgImage = new ResourceLocation(LandManager.MOD_ID, "textures/gui/gui_create_area.png");
+    private static int xSize = 113;
+    private static int ySize = 35;
     private int guiLeft, guiTop;
 
     private GuiCheckBox extendCheck;
@@ -51,10 +52,27 @@ public class GuiCreateArea extends GuiScreen
         guiLeft = (width - xSize) / 2;
         guiTop = (height - ySize) / 2;
 
-        addButton(new GuiButton(0, 100, 100, 30, 10, "Confirm"));
-        extendCheck = addButton(new GuiCheckBox(1, 100, 150, "Extend to min/max height", false));
-        nameInput = new GuiTextField(2, fontRenderer, 100, 60, 100, 50);
+        nameInput = new GuiTextField(0, fontRenderer, guiLeft + 5, guiTop + 5, xSize - 10, fontRenderer.FONT_HEIGHT + 2);
         nameInput.setFocused(true);
+
+        extendCheck = addButton(new GuiCheckBox(1, guiLeft + 5, guiTop + 20, "Min/Max Y", false));
+
+        String text = "Confirm";
+        addButton(new GuiButton(2, guiLeft + 68, guiTop + 20, 40, fontRenderer.FONT_HEIGHT + 2, text)
+        {
+            @Override
+            public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
+            {
+                mc.getTextureManager().bindTexture(bgImage);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+                GlStateManager.enableBlend();
+                GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+                GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+                drawTexturedModalRect(x, y, 0, ySize + (hovered ? 11 : 0), width, height);
+                drawCenteredString(mc.fontRenderer, text, x + width / 2, y + 2, 14737632);
+            }
+        });
     }
 
     @Override
@@ -77,7 +95,7 @@ public class GuiCreateArea extends GuiScreen
     @Override
     protected void actionPerformed(GuiButton button) throws IOException
     {
-        if(button.id == 0)
+        if(button.id == 2)
         {
             //TODO: When confirm button clicked
             //Send packet to server to add new area
