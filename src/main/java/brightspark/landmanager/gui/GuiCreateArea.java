@@ -1,8 +1,10 @@
 package brightspark.landmanager.gui;
 
 import brightspark.landmanager.LandManager;
+import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.Position;
 import brightspark.landmanager.item.ItemAdmin;
+import brightspark.landmanager.message.MessageCreateArea;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -18,8 +20,9 @@ import java.io.IOException;
 public class GuiCreateArea extends GuiScreen
 {
     private static final ResourceLocation bgImage = new ResourceLocation(LandManager.MOD_ID, "textures/gui/gui_create_area.png");
+    private static final int textColour = 14737632;
     private static int xSize = 113;
-    private static int ySize = 35;
+    private static int ySize = 46;
     private int guiLeft, guiTop;
 
     private GuiCheckBox extendCheck;
@@ -27,6 +30,7 @@ public class GuiCreateArea extends GuiScreen
 
     private BlockPos pos1, pos2;
     private int dimId;
+    private boolean sentCreateMessage = false;
 
     public GuiCreateArea(EntityPlayer player, BlockPos pos2)
     {
@@ -41,9 +45,11 @@ public class GuiCreateArea extends GuiScreen
         }
     }
 
+    //Used by MessageCreateAreaReply when the name already exists
     public void clearTextField()
     {
         nameInput.setText("");
+        sentCreateMessage = false;
     }
 
     @Override
@@ -52,13 +58,13 @@ public class GuiCreateArea extends GuiScreen
         guiLeft = (width - xSize) / 2;
         guiTop = (height - ySize) / 2;
 
-        nameInput = new GuiTextField(0, fontRenderer, guiLeft + 5, guiTop + 5, xSize - 10, fontRenderer.FONT_HEIGHT + 2);
+        nameInput = new GuiTextField(0, fontRenderer, guiLeft + 5, guiTop + 16, xSize - 10, fontRenderer.FONT_HEIGHT + 2);
         nameInput.setFocused(true);
 
-        extendCheck = addButton(new GuiCheckBox(1, guiLeft + 5, guiTop + 20, "Min/Max Y", false));
+        extendCheck = addButton(new GuiCheckBox(1, guiLeft + 5, guiTop + 31, "Min/Max Y", false));
 
         String text = "Confirm";
-        addButton(new GuiButton(2, guiLeft + 68, guiTop + 20, 40, fontRenderer.FONT_HEIGHT + 2, text)
+        addButton(new GuiButton(2, guiLeft + 68, guiTop + 31, 40, fontRenderer.FONT_HEIGHT + 2, text)
         {
             @Override
             public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
@@ -70,7 +76,7 @@ public class GuiCreateArea extends GuiScreen
                 GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
                 GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
                 drawTexturedModalRect(x, y, 0, ySize + (hovered ? 11 : 0), width, height);
-                drawCenteredString(mc.fontRenderer, text, x + width / 2, y + 2, 14737632);
+                drawCenteredString(mc.fontRenderer, text, x + width / 2, y + 2, textColour);
             }
         });
     }
@@ -89,18 +95,42 @@ public class GuiCreateArea extends GuiScreen
 
         nameInput.drawTextBox();
 
-        //TODO: Draw text
+        //Draw text
+        drawString(fontRenderer, "Area name:", guiLeft + 5, guiTop + 5, textColour);
+    }
+
+    @Override
+    public void updateScreen()
+    {
+        nameInput.updateCursorCounter();
     }
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException
     {
-        if(button.id == 2)
+        if(button.id == 2 && !sentCreateMessage)
         {
-            //TODO: When confirm button clicked
+            //When confirm button clicked
             //Send packet to server to add new area
-            //Don't close window - let the return packet do it if it was successful
+            //Don't close window - let the return packet do it if successful
+            String areaName = nameInput.getText().trim();
+            if(!areaName.isEmpty())
+            {
+                Area area = new Area(areaName, dimId, pos1, pos2);
+                if(extendCheck.enabled)
+                    area.extendToMinMaxY();
+                sentCreateMessage = true;
+                LandManager.NETWORK.sendToServer(new MessageCreateArea(area));
+            }
         }
         super.actionPerformed(button);
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+        super.keyTyped(typedChar, keyCode);
+        if(nameInput.isFocused())
+            nameInput.textboxKeyTyped(typedChar, keyCode);
     }
 }

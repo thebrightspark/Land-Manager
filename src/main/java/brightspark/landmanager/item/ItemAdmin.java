@@ -31,7 +31,7 @@ public class ItemAdmin extends Item
     public static void setPos(ItemStack stack, Position position)
     {
         if(position == null)
-            stack.removeSubCompound("pos");
+            stack.setTagCompound(new NBTTagCompound());
         else
             stack.setTagInfo("pos", position.serializeNBT());
     }
@@ -86,6 +86,7 @@ public class ItemAdmin extends Item
         {
             //Clear position
             setPos(stack, null);
+            player.sendMessage(new TextComponentString("Cleared saved position"));
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
         return super.onItemRightClick(world, player, hand);

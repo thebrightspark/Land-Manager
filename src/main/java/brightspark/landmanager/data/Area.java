@@ -86,6 +86,12 @@ public class Area implements INBTSerializable<NBTTagCompound>
         return new AxisAlignedBB(this.pos1, this.pos2).contains(new Vec3d(pos).add(new Vec3d(0.5d, 0.5d, 0.5d)));
     }
 
+    public void extendToMinMaxY()
+    {
+        pos1 = new BlockPos(pos1.getX(), 0, pos1.getZ());
+        pos2 = new BlockPos(pos2.getX(), 255, pos2.getZ());
+    }
+
     @Override
     public NBTTagCompound serializeNBT()
     {

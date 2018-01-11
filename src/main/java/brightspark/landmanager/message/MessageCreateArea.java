@@ -32,11 +32,14 @@ public class MessageCreateArea implements IMessage
         ByteBufUtils.writeTag(buf, area.serializeNBT());
     }
 
-    public class Handler implements IMessageHandler<MessageCreateArea, MessageCreateAreaReply>
+    public static class Handler implements IMessageHandler<MessageCreateArea, MessageCreateAreaReply>
     {
+        public Handler() {}
+
         @Override
         public MessageCreateAreaReply onMessage(MessageCreateArea message, MessageContext ctx)
         {
+            //TODO: Test area creation... seems that intersection isn't working as expected
             EntityPlayer player = ctx.getServerHandler().player;
             AreasWorldSavedData wsd = AreasWorldSavedData.get(player.world);
             return wsd == null ? null : new MessageCreateAreaReply(wsd.addArea(message.area));
