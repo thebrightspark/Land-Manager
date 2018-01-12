@@ -1,29 +1,34 @@
-package brightspark.landmanager;
+package brightspark.landmanager.handler;
 
-import brightspark.landmanager.data.AreasWorldSavedData;
+import brightspark.landmanager.Config;
+import brightspark.landmanager.LandManager;
+import brightspark.landmanager.data.CapabilityAreas;
+import brightspark.landmanager.data.CapabilityAreasProvider;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraft.world.World;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@Mod.EventBusSubscriber
-public class EventHandler
+@Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
+public class CommonEventHandler
 {
+    private static final ResourceLocation AREAS_RL = new ResourceLocation(LandManager.MOD_ID, "_areas");
+
     private static boolean handleEvent(Event event, EntityPlayer player, BlockPos pos)
     {
         if(player.world.isRemote || (Config.creativeIgnoresProtection || player.isCreative()) || player.canUseCommand(2, ""))
             return false;
 
         //Check if in protected area
-        AreasWorldSavedData wsd = AreasWorldSavedData.get(player.world);
-        return wsd != null && wsd.isIntersectingArea(pos);
+        CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
+        return cap != null && cap.isIntersectingArea(pos);
     }
 
     @SubscribeEvent
@@ -48,10 +53,11 @@ public class EventHandler
         }
     }
 
-    @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public static void areaRendering(RenderGameOverlayEvent event)
+    public static void attachWorldCap(AttachCapabilitiesEvent<World> event)
     {
-        //TODO: Render areas
+        World world = event.getObject();
+        if(!world.hasCapability(LandManager.CAPABILITY_AREAS, null))
+            event.addCapability(AREAS_RL, new CapabilityAreasProvider());
     }
 }

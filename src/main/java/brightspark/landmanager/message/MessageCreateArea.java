@@ -1,7 +1,8 @@
 package brightspark.landmanager.message;
 
+import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Area;
-import brightspark.landmanager.data.AreasWorldSavedData;
+import brightspark.landmanager.data.CapabilityAreas;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -41,8 +42,8 @@ public class MessageCreateArea implements IMessage
         {
             //TODO: Test area creation... seems that intersection isn't working as expected
             EntityPlayer player = ctx.getServerHandler().player;
-            AreasWorldSavedData wsd = AreasWorldSavedData.get(player.world);
-            return wsd == null ? null : new MessageCreateAreaReply(wsd.addArea(message.area));
+            CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
+            return cap == null ? null : new MessageCreateAreaReply(cap.addArea(message.area));
         }
     }
 }
