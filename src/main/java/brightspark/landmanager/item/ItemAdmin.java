@@ -28,10 +28,16 @@ public class ItemAdmin extends Item
         setMaxStackSize(1);
     }
 
+    @Override
+    public boolean hasEffect(ItemStack stack)
+    {
+        return true;
+    }
+
     public static void setPos(ItemStack stack, Position position)
     {
         if(position == null)
-            stack.setTagCompound(new NBTTagCompound());
+            stack.setTagCompound(null);
         else
             stack.setTagInfo("pos", position.serializeNBT());
     }
@@ -86,7 +92,8 @@ public class ItemAdmin extends Item
         {
             //Clear position
             setPos(stack, null);
-            player.sendMessage(new TextComponentString("Cleared saved position"));
+            if(world.isRemote)
+                player.sendMessage(new TextComponentString("Cleared saved position"));
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
         return super.onItemRightClick(world, player, hand);

@@ -67,7 +67,7 @@ public class ClientEventHandler
         GlStateManager.disableTexture2D();
         GlStateManager.translate(-x, -y, -z);
         float[] rgb = getColour(area).getRGBColorComponents(null);
-        AxisAlignedBB box = new AxisAlignedBB(area.getMinPos(), area.getMaxPos()).grow(0.001d);
+        AxisAlignedBB box = new AxisAlignedBB(area.getMinPos(), area.getMaxPos().add(1, 1, 1)).grow(0.001d);
         RenderGlobal.renderFilledBox(box, rgb[0], rgb[1], rgb[2], 0.2f);
         RenderGlobal.drawSelectionBoundingBox(box, rgb[0], rgb[1], rgb[2], 0.4f);
         GlStateManager.enableTexture2D();

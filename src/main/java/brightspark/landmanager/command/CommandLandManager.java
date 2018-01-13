@@ -59,22 +59,19 @@ public class CommandLandManager extends LMCommand
         String command = args[0].toLowerCase();
 
         String areaName = null;
-        //Only get the area name from the arguments if necessary for the command
+        CapabilityAreas cap = null;
+        //Only get the area name and capability from the arguments if necessary for the command
         if(command.equals("delete") || command.equals("allocate") || command.equals("clearAllocation") || command.equals("area"))
         {
             areaName = argsToString(args, command.equals("allocate") ? 2 : 1);
             if(areaName.isEmpty()) areaName = null;
+            if(areaName != null) cap = getWorldCapWithArea(server, areaName);
         }
-
-        CapabilityAreas cap = null;
-        //Only get the area capability if necessary for the command
-        if(!command.equals("tool"))
-            cap = getWorldCapWithArea(server, areaName);
 
         switch(command)
         {
             case "areas": //lm areas [page]
-                int page = Integer.MAX_VALUE;
+                int page = Integer.MIN_VALUE;
                 if(args.length > 1)
                 {
                     try
@@ -84,7 +81,7 @@ public class CommandLandManager extends LMCommand
                     catch(NumberFormatException e) {}
                 }
 
-                if(args.length == 1 || page != Integer.MAX_VALUE)
+                if(args.length == 1 || page != Integer.MIN_VALUE)
                 {
                     //Show list of all recipes in pages
                     List<Area> areas = getAllAreas(server);
@@ -96,7 +93,7 @@ public class CommandLandManager extends LMCommand
 
                     if(page < 0) page = 0;
                     int numAreas = areas.size();
-                    int areasPerPage = 10;
+                    int areasPerPage = 9;
                     int pageMax = numAreas / areasPerPage;
                     //We reduce the given page number by 1, because we calculate starting from page 0, but is shown to start from page 1.
                     if(page > 0) page--;
@@ -181,7 +178,7 @@ public class CommandLandManager extends LMCommand
             case 1:
                 return getListOfStringsMatchingLastWord(args, "delete", "allocate", "clearAllocation", "tool");
             case 2:
-                switch(args[1])
+                switch(args[0])
                 {
                     case "delete":
                     case "clearAllocation":
@@ -192,7 +189,7 @@ public class CommandLandManager extends LMCommand
                         return Collections.emptyList();
                 }
             case 3:
-                if(args[1].equals("allocate"))
+                if(args[0].equals("allocate"))
                     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
                 else
                     return Collections.emptyList();

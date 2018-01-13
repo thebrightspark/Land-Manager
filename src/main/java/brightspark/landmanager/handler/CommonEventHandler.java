@@ -11,11 +11,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
 public class CommonEventHandler
@@ -32,8 +32,15 @@ public class CommonEventHandler
         return cap != null && cap.isIntersectingArea(pos);
     }
 
+    private static void sendCapToPlayer(EntityPlayer player)
+    {
+        if(!(player instanceof EntityPlayerMP)) return;
+        CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
+        if(cap != null) cap.sendDataToPlayer((EntityPlayerMP) player);
+    }
+
     @SubscribeEvent
-    public static void onBlockStartBreak(PlayerEvent.BreakSpeed event)
+    public static void onBlockStartBreak(net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed event)
     {
         //Stop players from breaking blocks in protected areas
         if(handleEvent(event, event.getEntityPlayer(), event.getPos()))
@@ -63,14 +70,15 @@ public class CommonEventHandler
     }
 
     @SubscribeEvent
-    public static void onPlayerJoin(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event)
+    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event)
     {
         //Send the capability data to the client
-        if(event.player instanceof EntityPlayerMP)
-        {
-            EntityPlayerMP player = (EntityPlayerMP) event.player;
-            CapabilityAreas cap = player.getCapability(LandManager.CAPABILITY_AREAS, null);
-            if(cap != null) cap.sendDataToPlayer(player);
-        }
+        sendCapToPlayer(event.player);
+    }
+
+    public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event)
+    {
+        //Send the capability data to the client
+        sendCapToPlayer(event.player);
     }
 }

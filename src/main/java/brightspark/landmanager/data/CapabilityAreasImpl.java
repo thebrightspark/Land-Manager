@@ -34,6 +34,7 @@ public class CapabilityAreasImpl implements CapabilityAreas
             if(area.intersects(a))
                 return AddAreaResult.AREA_INTERSECTS;
         areas.put(area.getName(), area);
+        dataChanged();
         return AddAreaResult.SUCCESS;
     }
 

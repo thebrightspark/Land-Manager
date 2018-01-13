@@ -3,6 +3,7 @@ package brightspark.landmanager.gui;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.Position;
+import brightspark.landmanager.handler.ClientEventHandler;
 import brightspark.landmanager.item.ItemAdmin;
 import brightspark.landmanager.message.MessageCreateArea;
 import net.minecraft.client.Minecraft;
@@ -117,10 +118,11 @@ public class GuiCreateArea extends GuiScreen
             if(!areaName.isEmpty())
             {
                 Area area = new Area(areaName, dimId, pos1, pos2);
-                if(extendCheck.enabled)
+                if(extendCheck.isChecked())
                     area.extendToMinMaxY();
                 sentCreateMessage = true;
                 LandManager.NETWORK.sendToServer(new MessageCreateArea(area));
+                ClientEventHandler.setRenderArea(areaName);
             }
         }
         super.actionPerformed(button);
