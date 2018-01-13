@@ -1,6 +1,5 @@
 package brightspark.landmanager.command;
 
-import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.CapabilityAreas;
 import brightspark.landmanager.item.LMItems;
@@ -16,12 +15,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class CommandLandManager extends CommandBase
+public class CommandLandManager extends LMCommand
 {
     @Override
     public String getName()
@@ -52,59 +50,6 @@ public class CommandLandManager extends CommandBase
         return 2;
     }
 
-    private CapabilityAreas getWorldCapWithArea(MinecraftServer server, String areaName) throws CommandException
-    {
-        if(areaName == null) throw new WrongUsageException("No area name provided!");
-        for(WorldServer world : server.worlds)
-        {
-            CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-            if(cap == null) throw new CommandException("Failed to get areas from the world with dimension id %s", world.provider.getDimension());
-            Area area = cap.getArea(areaName);
-            if(area != null) return cap;
-        }
-        return null;
-    }
-
-    private List<Area> getAllAreas(MinecraftServer server)
-    {
-        List<Area> areas = new ArrayList<>();
-        for(WorldServer world : server.worlds)
-        {
-            CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-            if(cap != null) areas.addAll(cap.getAllAreas());
-        }
-        areas.sort(Comparator.comparing(Area::getName));
-        return areas;
-    }
-
-    private List<String> getAllAreaNames(MinecraftServer server)
-    {
-        List<String> areaNames = new ArrayList<>();
-        for(WorldServer world : server.worlds)
-        {
-            CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-            if(cap != null) areaNames.addAll(cap.getAllAreaNames());
-        }
-        areaNames.sort(Comparator.naturalOrder());
-        return areaNames;
-    }
-
-    private String getPlayerNameFromUuid(MinecraftServer server, UUID uuid)
-    {
-        String playerName = null;
-        if(uuid != null)
-        {
-            GameProfile profile = server.getPlayerProfileCache().getProfileByUUID(uuid);
-            if(profile != null) playerName = profile.getName();
-        }
-        return playerName;
-    }
-
-    private String posToString(BlockPos pos)
-    {
-        return String.format("%s, %s, %s", pos.getX(), pos.getY(), pos.getZ());
-    }
-
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
@@ -117,11 +62,7 @@ public class CommandLandManager extends CommandBase
         //Only get the area name from the arguments if necessary for the command
         if(command.equals("delete") || command.equals("allocate") || command.equals("clearAllocation") || command.equals("area"))
         {
-            StringBuilder sb = new StringBuilder();
-            int iStart = command.equals("allocate") ? 2 : 1;
-            for(int i = iStart; i < args.length; i++)
-                sb.append(args[i]).append(" ");
-            areaName = sb.toString().trim();
+            areaName = argsToString(args, command.equals("allocate") ? 2 : 1);
             if(areaName.isEmpty()) areaName = null;
         }
 

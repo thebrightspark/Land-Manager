@@ -35,11 +35,12 @@ public class ClientEventHandler
         colourCache.clear();
     }
 
-    public static void setRenderAll(boolean render)
+    public static boolean toggleRenderAll()
     {
-        renderAll = render;
+        renderAll = !renderArea.isEmpty() || !renderAll;
         renderArea = "";
         colourCache.clear();
+        return renderAll;
     }
 
     private static Color getColour(Area area)

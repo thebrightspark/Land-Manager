@@ -1,5 +1,9 @@
 package brightspark.landmanager;
 
+import brightspark.landmanager.command.CommandClaim;
+import brightspark.landmanager.command.CommandLandManager;
+import brightspark.landmanager.command.CommandShow;
+import brightspark.landmanager.command.CommandShowOff;
 import brightspark.landmanager.data.CapStorage;
 import brightspark.landmanager.data.CapabilityAreas;
 import brightspark.landmanager.data.CapabilityAreasImpl;
@@ -62,6 +66,9 @@ public class LandManager
     @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event)
     {
-        //TODO: Commands
+        event.registerServerCommand(new CommandLandManager());
+        event.registerServerCommand(new CommandShow());
+        event.registerServerCommand(new CommandShowOff());
+        event.registerServerCommand(new CommandClaim());
     }
 }
