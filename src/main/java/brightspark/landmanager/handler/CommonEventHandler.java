@@ -5,6 +5,7 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.CapabilityAreas;
 import brightspark.landmanager.data.CapabilityAreasProvider;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -59,5 +60,17 @@ public class CommonEventHandler
         World world = event.getObject();
         if(!world.hasCapability(LandManager.CAPABILITY_AREAS, null))
             event.addCapability(AREAS_RL, new CapabilityAreasProvider());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event)
+    {
+        //Send the capability data to the client
+        if(event.player instanceof EntityPlayerMP)
+        {
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
+            CapabilityAreas cap = player.getCapability(LandManager.CAPABILITY_AREAS, null);
+            if(cap != null) cap.sendDataToPlayer(player);
+        }
     }
 }

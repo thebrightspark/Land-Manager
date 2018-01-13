@@ -76,6 +76,11 @@ public class Area implements INBTSerializable<NBTTagCompound>
         return allocatedPlayer;
     }
 
+    public void setAllocatedPlayer(UUID uuid)
+    {
+        allocatedPlayer = uuid;
+    }
+
     public boolean intersects(Area area)
     {
         return new AxisAlignedBB(this.pos1, this.pos2).intersects(new AxisAlignedBB(area.pos1, area.pos2));
@@ -117,5 +122,16 @@ public class Area implements INBTSerializable<NBTTagCompound>
         pos2 = BlockPos.fromLong(nbt.getLong("position2"));
         if(nbt.hasKey("uuid_most"))
             allocatedPlayer = new UUID(nbt.getLong("uuid_most"), nbt.getLong("uuid_least"));
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if(!(obj instanceof Area)) return false;
+        Area other = (Area) obj;
+        return name.equals(other.name) &&
+                dimensionId == other.dimensionId &&
+                pos1.equals(other.pos1) &&
+                pos2.equals(other.pos2);
     }
 }

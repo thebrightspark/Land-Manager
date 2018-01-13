@@ -2,6 +2,8 @@ package brightspark.landmanager.data;
 
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.message.MessageUpdateCapability;
+import com.google.common.collect.Lists;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
@@ -36,6 +38,38 @@ public class CapabilityAreasImpl implements CapabilityAreas
     }
 
     @Override
+    public boolean removeArea(String areaName)
+    {
+        return areas.remove(areaName) != null;
+    }
+
+    @Override
+    public boolean setAllocation(String areaName, UUID playerUuid)
+    {
+        Area area = getArea(areaName);
+        if(area != null) area.setAllocatedPlayer(playerUuid);
+        return area != null;
+    }
+
+    @Override
+    public boolean clearAllocation(String areaName)
+    {
+        return setAllocation(areaName, null);
+    }
+
+    @Override
+    public List<Area> getAllAreas()
+    {
+        return Lists.newArrayList(areas.values());
+    }
+
+    @Override
+    public List<String> getAllAreaNames()
+    {
+        return Lists.newArrayList(areas.keySet());
+    }
+
+    @Override
     public Set<Area> getNearbyAreas(BlockPos pos)
     {
         Set<Area> nearbyAreas = new HashSet<>();
@@ -59,6 +93,12 @@ public class CapabilityAreasImpl implements CapabilityAreas
     public void dataChanged()
     {
         LandManager.NETWORK.sendToAll(new MessageUpdateCapability(serializeNBT()));
+    }
+
+    @Override
+    public void sendDataToPlayer(EntityPlayerMP player)
+    {
+        LandManager.NETWORK.sendTo(new MessageUpdateCapability(serializeNBT()), player);
     }
 
     @Override
