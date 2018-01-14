@@ -1,14 +1,16 @@
 package brightspark.landmanager.command;
 
+import brightspark.landmanager.LMConfig;
+import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.CapabilityAreas;
-import brightspark.landmanager.item.LMItems;
-import com.mojang.authlib.GameProfile;
+import brightspark.landmanager.handler.ClientEventHandler;
+import brightspark.landmanager.message.MessageShowArea;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -16,37 +18,25 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 public class CommandLandManager extends LMCommand
 {
     @Override
     public String getName()
     {
-        return "landmanager";
-    }
-
-    @Override
-    public List<String> getAliases()
-    {
-        return Collections.singletonList("lm");
+        return "lm";
     }
 
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "lm areas [page]\n" +
+        return "\nlm areas [page]\n" +
                 "lm area <areaName>\n" +
-                "lm delete <areaName>\n" +
-                "lm allocate <playerName> <areaName>\n" +
-                "lm clearAllocation <areaName>\n" +
-                "lm tool\n";
-    }
-
-    @Override
-    public int getRequiredPermissionLevel()
-    {
-        return 2;
+                "lm claim <areaName>\n" +
+                "lm show [areaName]\n" +
+                "lm showOff";
     }
 
     @Override
@@ -57,15 +47,14 @@ public class CommandLandManager extends LMCommand
 
         String command = args[0].toLowerCase();
 
-        String areaName = null;
-        CapabilityAreas cap = null;
-        //Only get the area name and capability from the arguments if necessary for the command
-        if(command.equals("delete") || command.equals("allocate") || command.equals("clearAllocation") || command.equals("area"))
+        if((command.equals("claim") || command.equals("show") || command.equals("showoff")) && !(sender instanceof EntityPlayer))
         {
-            areaName = argsToString(args, command.equals("allocate") ? 2 : 1);
-            if(areaName.isEmpty()) areaName = null;
-            if(areaName != null) cap = getWorldCapWithArea(server, areaName);
+            sender.sendMessage(new TextComponentString("You need to be a player to use this command"));
+            return;
         }
+
+        String areaName;
+        CapabilityAreas cap;
 
         switch(command)
         {
@@ -122,6 +111,11 @@ public class CommandLandManager extends LMCommand
                 }
                 break;
             case "area": //lm area <areaName>
+                areaName = argsToString(args, 1);
+                if(areaName.isEmpty()) areaName = null;
+                if(areaName != null) cap = getWorldCapWithArea(server, areaName);
+                else throw new WrongUsageException(getUsage(sender));
+
                 Area area = cap.getArea(areaName);
                 if(area == null)
                 {
@@ -138,66 +132,94 @@ public class CommandLandManager extends LMCommand
                 text.appendSibling(textComponentWithColour("\n Block Pos Max: ", TextFormatting.GOLD)).appendText(posToString(area.getMaxPos()));
                 sender.sendMessage(text);
                 break;
-            case "delete": //lm delete <areaName>
-                if(cap.removeArea(areaName))
-                    sender.sendMessage(new TextComponentString("Deleted area " + areaName));
-                else
-                    sender.sendMessage(new TextComponentString("Failed to delete area " + areaName));
-                break;
-            case "allocate": //lm allocate <playerName> <areaName>
-                UUID uuid = null;
-                GameProfile profile = server.getPlayerProfileCache().getGameProfileForUsername(args[1]);
-                if(profile != null) uuid = profile.getId();
-                if(uuid == null)
+            case "claim": //lm claim <areaName>
+                if(LMConfig.disableClaiming)
                 {
-                    sender.sendMessage(new TextComponentString("Could not find player " + args[1]));
+                    sender.sendMessage(new TextComponentString("Area claiming is not enabled! Ask an OP to allocate you an area."));
                     return;
                 }
-                if(cap.setAllocation(areaName, uuid))
-                break;
-            case "clearAllocation": //lm clearAllocation <areaName>
-                if(cap.clearAllocation(areaName))
-                    sender.sendMessage(new TextComponentString("Cleared player allocation for area " + areaName));
+
+                if(args.length == 1)
+                {
+                    //TODO: Claim the area the player is standing in
+                    sender.sendMessage(new TextComponentString("Claiming the area you're standing in is still WIP. Please specify an area name instead."));
+                }
                 else
-                    sender.sendMessage(new TextComponentString("Failed to remove player allocation for area " + areaName));
+                {
+                    //Claim the specific area
+                    areaName = argsToString(args, 1);
+                    if(areaName.isEmpty())
+                        sender.sendMessage(new TextComponentString("Invalid area name provided"));
+                    else
+                    {
+                        //TODO: Later and some configs to this
+                        //Make it so you need to request to claim? Then an OP can accept?
+                        //Make it so you can't use this command - only OPs can allocate?
+                        //Integrate with EnderPay to add a daily cost as rent?
+                        cap = getWorldCapWithArea(server, areaName);
+                        if(cap == null)
+                        {
+                            sender.sendMessage(new TextComponentString("Couldn't find area " + areaName));
+                            return;
+                        }
+                        Area areaToClaim = cap.getArea(areaName);
+                        if(areaToClaim != null)
+                        {
+                            if(areaToClaim.getAllocatedPlayer() == null)
+                            {
+                                if(cap.setAllocation(areaName, ((EntityPlayer) sender).getUniqueID()))
+                                    sender.sendMessage(new TextComponentString("Area " + areaName + " claimed"));
+                                else
+                                    sender.sendMessage(new TextComponentString("Failed to claim area " + areaName));
+                            }
+                            else
+                                sender.sendMessage(new TextComponentString("Someone else has already claimed area " + areaName));
+                        }
+                        else
+                            sender.sendMessage(new TextComponentString("Area " + areaName + " does not exist"));
+                    }
+                }
                 break;
-            case "tool": //lm tool
-                if(!(sender instanceof EntityPlayer))
-                    sender.sendMessage(new TextComponentString("Only players can give themselves the admin tool"));
-                else if(!((EntityPlayer) sender).addItemStackToInventory(new ItemStack(LMItems.adminItem)))
-                    sender.sendMessage(new TextComponentString("No room in inventory for tool"));
+            case "show": //lm show [areaName]
+                if(args.length == 1)
+                {
+                    //Toggle showing all nearby areas
+                    LandManager.NETWORK.sendTo(new MessageShowArea(null), (EntityPlayerMP) sender);
+                }
+                else
+                {
+                    //Show specific area
+                    areaName = argsToString(args, 1);
+                    if(areaName.isEmpty())
+                        sender.sendMessage(new TextComponentString("Invalid area name provided"));
+                    else
+                    {
+                        //Make sure it's a valid area name
+                        List<String> areas = getAllAreaNames(server);
+                        if(areas.contains(areaName))
+                        {
+                            LandManager.NETWORK.sendTo(new MessageShowArea(areaName), (EntityPlayerMP) sender);
+                            sender.sendMessage(new TextComponentString("Now showing area " + areaName));
+                        }
+                        else
+                            sender.sendMessage(new TextComponentString("Area " + areaName + " does not exist"));
+                    }
+                }
                 break;
-            default:
-                throw new WrongUsageException(getUsage(sender));
+            case "showoff": //lm showOff
+                ClientEventHandler.setRenderArea("");
+                sender.sendMessage(new TextComponentString("Turned off showing areas"));
+                break;
         }
     }
 
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
     {
-        switch(args.length)
-        {
-            case 1:
-                return getListOfStringsMatchingLastWord(args, "allocate", "area", "areas", "clearAllocation", "delete", "tool");
-            case 2:
-                switch(args[0])
-                {
-                    case "allocate":
-                        return getListOfStringsMatchingLastWord(args, server.getPlayerProfileCache().getUsernames());
-                    case "area":
-                    case "clearAllocation":
-                    case "delete":
-                        return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-                    default:
-                        return Collections.emptyList();
-                }
-            case 3:
-                if(args[0].equals("allocate"))
-                    return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-                else
-                    return Collections.emptyList();
-            default:
-                return Collections.emptyList();
-        }
+        if(args.length == 1)
+            return getListOfStringsMatchingLastWord(args, "area", "areas", "claim", "show", "showOff");
+        else if(args.length == 2 && (args[0].equals("area") || args[0].equals("claim") || args[0].equals("show")))
+            return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+        return Collections.emptyList();
     }
 }
