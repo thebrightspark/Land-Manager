@@ -1,0 +1,24 @@
+{
+    "modListVersion": 2,
+    "modList":
+    [
+        {
+          "modid": "landmanager",
+          "name": "Land Manager",
+          "description": "Manage custom sized areas of the world and allocate them to players!",
+          "version": "${version}",
+          "mcversion": "${mcversion}",
+          "url": "",
+          "updateUrl": "",
+          "authorList": ["bright_spark"],
+          "credits": "",
+          "logoFile": "",
+          "screenshots": [],
+          "parent": "",
+          "dependants": [],
+          "dependencies": [],
+          "requiredMods": [],
+          "useDependencyInformation": true
+        }
+    ]
+}
