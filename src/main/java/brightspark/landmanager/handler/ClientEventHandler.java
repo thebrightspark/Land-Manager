@@ -81,7 +81,15 @@ public class ClientEventHandler
         RenderGlobal.renderFilledBox(box, rgb[0], rgb[1], rgb[2], 0.2f);
         GlStateManager.disableDepth();
         RenderGlobal.drawSelectionBoundingBox(box, rgb[0], rgb[1], rgb[2], 0.4f);
-        renderName(area, box.getCenter());
+        Vec3d playerPos = player.getPositionEyes((float) partialTicks);
+        Vec3d nameRenderPos = box.getCenter();
+        if(playerPos.y < box.minY + 0.5d)
+            nameRenderPos = new Vec3d(nameRenderPos.x, box.minY + 0.5d, nameRenderPos.z);
+        else if(playerPos.y > box.maxY - 0.5d)
+            nameRenderPos = new Vec3d(nameRenderPos.x, box.maxY - 0.5d, nameRenderPos.z);
+        else
+            nameRenderPos = new Vec3d(nameRenderPos.x, playerPos.y, nameRenderPos.z);
+        renderName(area, nameRenderPos);
         GlStateManager.enableTexture2D();
         GlStateManager.enableLighting();
         GlStateManager.enableDepth();
