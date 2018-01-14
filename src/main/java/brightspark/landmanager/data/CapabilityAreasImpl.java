@@ -41,14 +41,20 @@ public class CapabilityAreasImpl implements CapabilityAreas
     @Override
     public boolean removeArea(String areaName)
     {
-        return areas.remove(areaName) != null;
+        boolean result = areas.remove(areaName) != null;
+        dataChanged();
+        return result;
     }
 
     @Override
     public boolean setAllocation(String areaName, UUID playerUuid)
     {
         Area area = getArea(areaName);
-        if(area != null) area.setAllocatedPlayer(playerUuid);
+        if(area != null)
+        {
+            area.setAllocatedPlayer(playerUuid);
+            dataChanged();
+        }
         return area != null;
     }
 
@@ -115,6 +121,7 @@ public class CapabilityAreasImpl implements CapabilityAreas
     @Override
     public void deserializeNBT(NBTTagCompound nbt)
     {
+        areas.clear();
         NBTTagList tagList = nbt.getTagList("areas", Constants.NBT.TAG_COMPOUND);
         tagList.forEach(tag -> {
             Area area = new Area((NBTTagCompound) tag);
