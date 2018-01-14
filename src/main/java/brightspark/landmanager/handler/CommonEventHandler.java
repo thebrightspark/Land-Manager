@@ -22,9 +22,9 @@ public class CommonEventHandler
 {
     private static final ResourceLocation AREAS_RL = new ResourceLocation(LandManager.MOD_ID, "_areas");
 
-    private static boolean handleEvent(Event event, EntityPlayer player, BlockPos pos)
+    private static boolean handleEvent(EntityPlayer player, BlockPos pos)
     {
-        if(player.world.isRemote || (LMConfig.creativeIgnoresProtection || player.isCreative()) || player.canUseCommand(2, ""))
+        if(!LMConfig.creativeIgnoresProtection || player.isCreative() || player.canUseCommand(2, ""))
             return false;
 
         //Check if in protected area
@@ -43,9 +43,11 @@ public class CommonEventHandler
     public static void onBlockStartBreak(net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed event)
     {
         //Stop players from breaking blocks in protected areas
-        if(handleEvent(event, event.getEntityPlayer(), event.getPos()))
+        if(handleEvent(event.getEntityPlayer(), event.getPos()))
         {
-            event.getEntityPlayer().sendMessage(new TextComponentString("Cannot break a block in someone else's protected area!"));
+            if(event.getEntityPlayer().world.isRemote)
+                event.getEntityPlayer().sendMessage(new TextComponentString("Cannot break a block in someone else's protected area!"));
+            event.setNewSpeed(0f);
             event.setCanceled(true);
         }
     }
@@ -54,9 +56,10 @@ public class CommonEventHandler
     public static void onBlockPlace(BlockEvent.PlaceEvent event)
     {
         //Stop players from placing block in procteted areas
-        if(handleEvent(event, event.getPlayer(), event.getPos()))
+        if(handleEvent(event.getPlayer(), event.getPos()))
         {
-            event.getPlayer().sendMessage(new TextComponentString("Cannot place a block in someone else's protected area!"));
+            if(event.getPlayer().world.isRemote)
+                event.getPlayer().sendMessage(new TextComponentString("Cannot place a block in someone else's protected area!"));
             event.setCanceled(true);
         }
     }
