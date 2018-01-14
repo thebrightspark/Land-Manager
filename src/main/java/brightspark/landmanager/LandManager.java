@@ -11,6 +11,7 @@ import brightspark.landmanager.gui.GuiHandler;
 import brightspark.landmanager.item.LMItems;
 import brightspark.landmanager.message.MessageCreateArea;
 import brightspark.landmanager.message.MessageCreateAreaReply;
+import brightspark.landmanager.message.MessageShowArea;
 import brightspark.landmanager.message.MessageUpdateCapability;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
@@ -59,6 +60,7 @@ public class LandManager
         NETWORK.registerMessage(new MessageCreateArea.Handler(), MessageCreateArea.class, 0, Side.SERVER);
         NETWORK.registerMessage(new MessageCreateAreaReply.Handler(), MessageCreateAreaReply.class, 1, Side.CLIENT);
         NETWORK.registerMessage(new MessageUpdateCapability.Handler(), MessageUpdateCapability.class, 2, Side.CLIENT);
+        NETWORK.registerMessage(new MessageShowArea.Handler(), MessageShowArea.class, 3, Side.CLIENT);
 
         CapabilityManager.INSTANCE.register(CapabilityAreas.class, new CapStorage<>(), CapabilityAreasImpl::new);
     }

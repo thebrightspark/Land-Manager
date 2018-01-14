@@ -50,26 +50,32 @@ public class MessageCreateAreaReply implements IMessage
         @Override
         public IMessage onMessage(MessageCreateAreaReply message, MessageContext ctx)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-            EntityPlayer player = mc.player;
-            switch(message.result)
+            Minecraft.getMinecraft().addScheduledTask(new Runnable()
             {
-                case SUCCESS:
-                    player.sendMessage(new TextComponentString("Area added!"));
-                    player.closeScreen();
-                    resetItem(player);
-                    break;
-                case NAME_EXISTS:
-                    player.sendMessage(new TextComponentString("An area with this name already exists!"));
-                    GuiScreen gui = mc.currentScreen;
-                    if(gui != null && gui instanceof GuiCreateArea)
-                        ((GuiCreateArea) gui).clearTextField();
-                    break;
-                case AREA_INTERSECTS:
-                    player.sendMessage(new TextComponentString("Area intersects with an existing area!"));
-                    player.closeScreen();
-                    resetItem(player);
-            }
+                @Override
+                public void run()
+                {
+                    Minecraft mc = Minecraft.getMinecraft();
+                    EntityPlayer player = mc.player;
+                    switch(message.result)
+                    {
+                        case SUCCESS:
+                            player.sendMessage(new TextComponentString("Area added!"));
+                            player.closeScreen();
+                            resetItem(player);
+                            break;
+                        case NAME_EXISTS:
+                            player.sendMessage(new TextComponentString("An area with this name already exists!"));
+                            GuiScreen gui = mc.currentScreen;
+                            if(gui != null && gui instanceof GuiCreateArea) ((GuiCreateArea) gui).clearTextField();
+                            break;
+                        case AREA_INTERSECTS:
+                            player.sendMessage(new TextComponentString("Area intersects with an existing area!"));
+                            player.closeScreen();
+                            resetItem(player);
+                    }
+                }
+            });
             return null;
         }
     }

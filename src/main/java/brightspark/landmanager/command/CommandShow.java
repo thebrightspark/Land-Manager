@@ -1,9 +1,10 @@
 package brightspark.landmanager.command;
 
-import brightspark.landmanager.handler.ClientEventHandler;
+import brightspark.landmanager.LandManager;
+import brightspark.landmanager.message.MessageShowArea;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -29,7 +30,7 @@ public class CommandShow extends LMCommand
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
-        if(!(sender instanceof EntityPlayer))
+        if(!(sender instanceof EntityPlayerMP))
         {
             sender.sendMessage(new TextComponentString("You need to be a player to use this command"));
             return;
@@ -37,11 +38,8 @@ public class CommandShow extends LMCommand
 
         if(args.length == 0)
         {
-            //Show all nearby areas
-            if(ClientEventHandler.toggleRenderAll())
-                sender.sendMessage(new TextComponentString("Now showing all nearby areas"));
-            else
-                sender.sendMessage(new TextComponentString("Turned off showing all nearby areas"));
+            //Toggle showing all nearby areas
+            LandManager.NETWORK.sendTo(new MessageShowArea(null), (EntityPlayerMP) sender);
         }
         else
         {
@@ -55,7 +53,7 @@ public class CommandShow extends LMCommand
                 List<String> areas = getAllAreaNames(server);
                 if(areas.contains(areaName))
                 {
-                    ClientEventHandler.setRenderArea(areaName);
+                    LandManager.NETWORK.sendTo(new MessageShowArea(areaName), (EntityPlayerMP) sender);
                     sender.sendMessage(new TextComponentString("Now showing area " + areaName));
                 }
                 else

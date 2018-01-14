@@ -8,6 +8,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -35,12 +36,15 @@ public class ClientEventHandler
         colourCache.clear();
     }
 
-    public static boolean toggleRenderAll()
+    public static void toggleRenderAll()
     {
         renderAll = !renderArea.isEmpty() || !renderAll;
         renderArea = "";
         colourCache.clear();
-        return renderAll;
+        if(renderAll)
+            mc.player.sendMessage(new TextComponentString("Now showing all nearby areas"));
+        else
+            mc.player.sendMessage(new TextComponentString("Turned off showing all nearby areas"));
     }
 
     private static Color getColour(Area area)
