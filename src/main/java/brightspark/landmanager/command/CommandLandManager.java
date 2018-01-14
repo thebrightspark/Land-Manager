@@ -4,7 +4,6 @@ import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.CapabilityAreas;
 import brightspark.landmanager.item.LMItems;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -131,10 +130,13 @@ public class CommandLandManager extends LMCommand
                 }
                 String playerName = getPlayerNameFromUuid(server, area.getAllocatedPlayer());
                 if(playerName == null) playerName = "None";
-                sender.sendMessage(new TextComponentString(
-                        String.format(
-                                "Area details:\nName: %s\nDim Id: %s\nAllocation: %s\nBlock Pos Min: %s\n Block Pos Max: %s",
-                                area.getName(), area.getDimensionId(), playerName, posToString(area.getMinPos()), posToString(area.getMaxPos()))));
+                ITextComponent text = textComponentWithColour(TextFormatting.YELLOW + "Area details: ", TextFormatting.WHITE);
+                text.appendSibling(textComponentWithColour("\n Name: ", TextFormatting.GOLD)).appendText(area.getName());
+                text.appendSibling(textComponentWithColour("\n Dim Id: ", TextFormatting.GOLD)).appendText(String.valueOf(area.getDimensionId()));
+                text.appendSibling(textComponentWithColour("\n Allocation: ", TextFormatting.GOLD)).appendText(playerName);
+                text.appendSibling(textComponentWithColour("\n Block Pos Min: ", TextFormatting.GOLD)).appendText(posToString(area.getMinPos()));
+                text.appendSibling(textComponentWithColour("\n Block Pos Max: ", TextFormatting.GOLD)).appendText(posToString(area.getMaxPos()));
+                sender.sendMessage(text);
                 break;
             case "delete": //lm delete <areaName>
                 if(cap.removeArea(areaName))
@@ -176,15 +178,16 @@ public class CommandLandManager extends LMCommand
         switch(args.length)
         {
             case 1:
-                return getListOfStringsMatchingLastWord(args, "delete", "allocate", "clearAllocation", "tool");
+                return getListOfStringsMatchingLastWord(args, "allocate", "area", "areas", "clearAllocation", "delete", "tool");
             case 2:
                 switch(args[0])
                 {
-                    case "delete":
-                    case "clearAllocation":
-                        return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
                     case "allocate":
                         return getListOfStringsMatchingLastWord(args, server.getPlayerProfileCache().getUsernames());
+                    case "area":
+                    case "clearAllocation":
+                    case "delete":
+                        return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
                     default:
                         return Collections.emptyList();
                 }

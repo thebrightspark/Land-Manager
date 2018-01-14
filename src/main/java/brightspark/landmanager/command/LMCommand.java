@@ -9,6 +9,9 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 
 import java.util.ArrayList;
@@ -83,5 +86,16 @@ abstract class LMCommand extends CommandBase
         for(int i = startIndex; i < args.length; i++)
             sb.append(args[i]).append(" ");
         return sb.toString().trim();
+    }
+
+    ITextComponent textComponentWithColour(String text, TextFormatting colour)
+    {
+        return textComponentWithColour(new TextComponentString(text), colour);
+    }
+
+    ITextComponent textComponentWithColour(ITextComponent text, TextFormatting colour)
+    {
+        text.getStyle().setColor(colour);
+        return text;
     }
 }
