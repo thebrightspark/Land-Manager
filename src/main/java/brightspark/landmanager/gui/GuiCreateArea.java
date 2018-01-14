@@ -3,7 +3,6 @@ package brightspark.landmanager.gui;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.Position;
-import brightspark.landmanager.handler.ClientEventHandler;
 import brightspark.landmanager.item.ItemAdmin;
 import brightspark.landmanager.message.MessageCreateArea;
 import net.minecraft.client.Minecraft;
