@@ -1,6 +1,6 @@
 package brightspark.landmanager.handler;
 
-import brightspark.landmanager.Config;
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.CapabilityAreas;
 import brightspark.landmanager.data.CapabilityAreasProvider;
@@ -24,7 +24,7 @@ public class CommonEventHandler
 
     private static boolean handleEvent(Event event, EntityPlayer player, BlockPos pos)
     {
-        if(player.world.isRemote || (Config.creativeIgnoresProtection || player.isCreative()) || player.canUseCommand(2, ""))
+        if(player.world.isRemote || (LMConfig.creativeIgnoresProtection || player.isCreative()) || player.canUseCommand(2, ""))
             return false;
 
         //Check if in protected area

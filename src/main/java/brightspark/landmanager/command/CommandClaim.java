@@ -1,5 +1,6 @@
 package brightspark.landmanager.command;
 
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.CapabilityAreas;
 import net.minecraft.command.CommandException;
@@ -33,6 +34,12 @@ public class CommandClaim extends LMCommand
         if(!(sender instanceof EntityPlayer))
         {
             sender.sendMessage(new TextComponentString("You need to be a player to use this command"));
+            return;
+        }
+
+        if(LMConfig.disableClaiming)
+        {
+            sender.sendMessage(new TextComponentString("Area claiming is not enabled! Ask an OP to allocate you an area."));
             return;
         }
 

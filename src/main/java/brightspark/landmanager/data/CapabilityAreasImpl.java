@@ -1,5 +1,6 @@
 package brightspark.landmanager.data;
 
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.message.MessageUpdateCapability;
 import com.google.common.collect.Lists;
@@ -81,7 +82,7 @@ public class CapabilityAreasImpl implements CapabilityAreas
     {
         Set<Area> nearbyAreas = new HashSet<>();
         areas.values().forEach(area -> {
-            if(area.getCenter().getDistance(pos.getX(), pos.getY(), pos.getZ()) <= 16)
+            if(area.getCenter().getDistance(pos.getX(), pos.getY(), pos.getZ()) <= LMConfig.client.showAllRadius)
                 nearbyAreas.add(area);
         });
         return nearbyAreas;

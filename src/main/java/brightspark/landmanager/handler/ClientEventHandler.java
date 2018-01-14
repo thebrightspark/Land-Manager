@@ -1,6 +1,6 @@
 package brightspark.landmanager.handler;
 
-import brightspark.landmanager.Config;
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.CapabilityAreas;
@@ -100,7 +100,7 @@ public class ClientEventHandler
         GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-viewerYaw, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate((float)(isThirdPersonFrontal ? -1 : 1) * viewerPitch, 1.0F, 0.0F, 0.0F);
-        float scale = 0.04f * Config.areaNameScale;
+        float scale = 0.04f * LMConfig.client.areaNameScale;
         GlStateManager.scale(-scale, -scale, scale);
         GlStateManager.disableTexture2D();
 

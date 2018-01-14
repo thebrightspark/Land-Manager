@@ -71,6 +71,6 @@ public class LandManager
         event.registerServerCommand(new CommandLandManager());
         event.registerServerCommand(new CommandShow());
         event.registerServerCommand(new CommandShowOff());
-        event.registerServerCommand(new CommandClaim());
+        if(!LMConfig.disableClaiming) event.registerServerCommand(new CommandClaim());
     }
 }
