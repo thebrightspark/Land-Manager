@@ -83,7 +83,9 @@ public class Area implements INBTSerializable<NBTTagCompound>
 
     public AxisAlignedBB asAABB()
     {
-        return new AxisAlignedBB(new Vec3d(pos1).add(new Vec3d(0.4d, 0.4d, 0.4d)), new Vec3d(pos2).add(new Vec3d(0.6d, 0.6d, 0.6d)));
+        Vec3d p1 = new Vec3d(pos1).add(new Vec3d(0.4d, 0.4d, 0.4d));
+        Vec3d p2 = new Vec3d(pos2).add(new Vec3d(0.6d, 0.6d, 0.6d));
+        return new AxisAlignedBB(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
     }
 
     public boolean intersects(Area area)
