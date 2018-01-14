@@ -49,7 +49,7 @@ public class MessageCreateArea implements IMessage
                     //TODO: Test area creation... seems that intersection isn't working as expected
                     EntityPlayerMP player = ctx.getServerHandler().player;
                     CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
-                    if(cap != null) LandManager.NETWORK.sendTo(new MessageCreateAreaReply(cap.addArea(message.area)), player);
+                    if(cap != null) LandManager.NETWORK.sendTo(new MessageCreateAreaReply(message.area.getName(), cap.addArea(message.area)), player);
                 }
             });
             return null;

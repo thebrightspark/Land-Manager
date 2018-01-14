@@ -53,6 +53,22 @@ public class GuiCreateArea extends GuiScreen
         sentCreateMessage = false;
     }
 
+    private void complete()
+    {
+        //Send packet to server to add new area
+        //Don't close window - let the return packet do it if successful
+        if(sentCreateMessage) return;
+        String areaName = nameInput.getText().trim();
+        if(!areaName.isEmpty())
+        {
+            Area area = new Area(areaName, dimId, pos1, pos2);
+            if(extendCheck.isChecked())
+                area.extendToMinMaxY();
+            sentCreateMessage = true;
+            LandManager.NETWORK.sendToServer(new MessageCreateArea(area));
+        }
+    }
+
     @Override
     public void initGui()
     {
@@ -109,21 +125,10 @@ public class GuiCreateArea extends GuiScreen
     @Override
     protected void actionPerformed(GuiButton button) throws IOException
     {
-        if(button.id == 2 && !sentCreateMessage)
+        if(button.id == 2)
         {
             //When confirm button clicked
-            //Send packet to server to add new area
-            //Don't close window - let the return packet do it if successful
-            String areaName = nameInput.getText().trim();
-            if(!areaName.isEmpty())
-            {
-                Area area = new Area(areaName, dimId, pos1, pos2);
-                if(extendCheck.isChecked())
-                    area.extendToMinMaxY();
-                sentCreateMessage = true;
-                LandManager.NETWORK.sendToServer(new MessageCreateArea(area));
-                ClientEventHandler.setRenderArea(areaName);
-            }
+            complete();
         }
         super.actionPerformed(button);
     }
@@ -132,7 +137,9 @@ public class GuiCreateArea extends GuiScreen
     protected void keyTyped(char typedChar, int keyCode) throws IOException
     {
         super.keyTyped(typedChar, keyCode);
-        if(nameInput.isFocused())
+        if(keyCode == 28) //Enter key
+            complete();
+        else if(nameInput.isFocused())
             nameInput.textboxKeyTyped(typedChar, keyCode);
     }
 }

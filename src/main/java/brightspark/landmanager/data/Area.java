@@ -81,14 +81,19 @@ public class Area implements INBTSerializable<NBTTagCompound>
         allocatedPlayer = uuid;
     }
 
+    public AxisAlignedBB asAABB()
+    {
+        return new AxisAlignedBB(new Vec3d(pos1).add(new Vec3d(0.4d, 0.4d, 0.4d)), new Vec3d(pos2).add(new Vec3d(0.6d, 0.6d, 0.6d)));
+    }
+
     public boolean intersects(Area area)
     {
-        return new AxisAlignedBB(this.pos1, this.pos2).intersects(new AxisAlignedBB(area.pos1, area.pos2));
+        return asAABB().intersects(area.asAABB());
     }
 
     public boolean intersects(BlockPos pos)
     {
-        return new AxisAlignedBB(this.pos1, this.pos2).contains(new Vec3d(pos).add(new Vec3d(0.5d, 0.5d, 0.5d)));
+        return asAABB().contains(new Vec3d(pos).add(new Vec3d(0.5d, 0.5d, 0.5d)));
     }
 
     public void extendToMinMaxY()
