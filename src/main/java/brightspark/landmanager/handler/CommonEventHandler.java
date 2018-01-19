@@ -13,7 +13,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
@@ -22,7 +21,9 @@ public class CommonEventHandler
 {
     private static final ResourceLocation AREAS_RL = new ResourceLocation(LandManager.MOD_ID, "_areas");
 
-    private static boolean handleEvent(EntityPlayer player, BlockPos pos)
+    private static long lastTimeHitProtectedBlock = 0L;
+
+    private static boolean handleProtection(EntityPlayer player, BlockPos pos)
     {
         if(!LMConfig.creativeIgnoresProtection || player.isCreative() || player.canUseCommand(2, ""))
             return false;
@@ -43,10 +44,15 @@ public class CommonEventHandler
     public static void onBlockStartBreak(net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed event)
     {
         //Stop players from breaking blocks in protected areas
-        if(handleEvent(event.getEntityPlayer(), event.getPos()))
+        if(handleProtection(event.getEntityPlayer(), event.getPos()))
         {
             if(event.getEntityPlayer().world.isRemote)
-                event.getEntityPlayer().sendMessage(new TextComponentString("Cannot break a block in someone else's protected area!"));
+            {
+                long worldTime = event.getEntityPlayer().world.getTotalWorldTime();
+                if(worldTime - lastTimeHitProtectedBlock > 10)
+                    event.getEntityPlayer().sendMessage(new TextComponentString("Cannot break a block in someone else's protected area!"));
+                lastTimeHitProtectedBlock = worldTime;
+            }
             event.setNewSpeed(0f);
             event.setCanceled(true);
         }
@@ -56,7 +62,7 @@ public class CommonEventHandler
     public static void onBlockPlace(BlockEvent.PlaceEvent event)
     {
         //Stop players from placing block in procteted areas
-        if(handleEvent(event.getPlayer(), event.getPos()))
+        if(handleProtection(event.getPlayer(), event.getPos()))
         {
             if(event.getPlayer().world.isRemote)
                 event.getPlayer().sendMessage(new TextComponentString("Cannot place a block in someone else's protected area!"));
@@ -79,6 +85,7 @@ public class CommonEventHandler
         sendCapToPlayer(event.player);
     }
 
+    @SubscribeEvent
     public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event)
     {
         //Send the capability data to the client
