@@ -14,8 +14,6 @@ import java.util.*;
 
 public class CapabilityAreasImpl implements CapabilityAreas
 {
-    private static final String NAME = LandManager.MOD_ID + "_areas";
-
     private Map<String, Area> areas = new HashMap<>();
 
     public CapabilityAreasImpl() {}

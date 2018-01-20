@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -77,9 +78,9 @@ public class GuiCreateArea extends GuiScreen
         nameInput = new GuiTextField(0, fontRenderer, guiLeft + 5, guiTop + 16, xSize - 10, fontRenderer.FONT_HEIGHT + 2);
         nameInput.setFocused(true);
 
-        extendCheck = addButton(new GuiCheckBox(1, guiLeft + 5, guiTop + 31, "Min/Max Y", false));
+        extendCheck = addButton(new GuiCheckBox(1, guiLeft + 5, guiTop + 31, I18n.format("gui.component.checkbox"), false));
 
-        String text = "Confirm";
+        String text = I18n.format("message.command.tool.confirm");
         addButton(new GuiButton(2, guiLeft + 68, guiTop + 31, 40, fontRenderer.FONT_HEIGHT + 2, text)
         {
             @Override
@@ -112,7 +113,7 @@ public class GuiCreateArea extends GuiScreen
         nameInput.drawTextBox();
 
         //Draw text
-        drawString(fontRenderer, "Area name:", guiLeft + 5, guiTop + 5, textColour);
+        drawString(fontRenderer, I18n.format("gui.text.area"), guiLeft + 5, guiTop + 5, textColour);
     }
 
     @Override

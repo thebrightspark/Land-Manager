@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -46,9 +46,9 @@ public class ClientEventHandler
         renderArea = "";
         colourCache.clear();
         if(renderAll)
-            mc.player.sendMessage(new TextComponentString("Now showing all nearby areas"));
+            mc.player.sendMessage(new TextComponentTranslation("message.areas.show"));
         else
-            mc.player.sendMessage(new TextComponentString("Turned off showing all nearby areas"));
+            mc.player.sendMessage(new TextComponentTranslation("message.areas.hide"));
     }
 
     private static Color getColour(Area area)

@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -66,18 +66,18 @@ public class MessageCreateAreaReply implements IMessage
                     switch(message.result)
                     {
                         case SUCCESS:
-                            player.sendMessage(new TextComponentString("Added area " + message.areaName));
+                            player.sendMessage(new TextComponentTranslation("message.create.added", message.areaName));
                             player.closeScreen();
                             resetItem(player);
                             ClientEventHandler.setRenderArea(message.areaName);
                             break;
                         case NAME_EXISTS:
-                            player.sendMessage(new TextComponentString("An area with the name " + message.areaName + " already exists!"));
+                            player.sendMessage(new TextComponentTranslation("message.create.name", message.areaName));
                             GuiScreen gui = mc.currentScreen;
                             if(gui != null && gui instanceof GuiCreateArea) ((GuiCreateArea) gui).clearTextField();
                             break;
                         case AREA_INTERSECTS:
-                            player.sendMessage(new TextComponentString("New area intersects with an existing area!"));
+                            player.sendMessage(new TextComponentTranslation("message.create.intersects"));
                             player.closeScreen();
                             resetItem(player);
                     }

@@ -8,7 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -50,7 +50,7 @@ public class CommonEventHandler
             {
                 long worldTime = event.getEntityPlayer().world.getTotalWorldTime();
                 if(worldTime - lastTimeHitProtectedBlock > 10)
-                    event.getEntityPlayer().sendMessage(new TextComponentString("Cannot break a block in someone else's protected area!"));
+                    event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.break"));
                 lastTimeHitProtectedBlock = worldTime;
             }
             event.setNewSpeed(0f);
@@ -65,7 +65,7 @@ public class CommonEventHandler
         if(handleProtection(event.getPlayer(), event.getPos()))
         {
             if(event.getPlayer().world.isRemote)
-                event.getPlayer().sendMessage(new TextComponentString("Cannot place a block in someone else's protected area!"));
+                event.getPlayer().sendMessage(new TextComponentTranslation("message.protection.place"));
             event.setCanceled(true);
         }
     }

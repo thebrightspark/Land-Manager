@@ -2,6 +2,7 @@ package brightspark.landmanager.item;
 
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Position;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -12,7 +13,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -62,14 +63,14 @@ public class ItemAdmin extends Item
             //Store pos in item
             setPos(stack, new Position(player.dimension, actualPos));
             if(world.isRemote)
-                player.sendMessage(new TextComponentString(String.format("Saved block position %s, %s, %s", actualPos.getX(), actualPos.getY(), actualPos.getZ())));
+                player.sendMessage(new TextComponentTranslation("message.tool.saved", actualPos.getX(), actualPos.getY(), actualPos.getZ()));
         }
         else if(position.dimensionId != player.dimension)
         {
             //Stored pos in different dimension! Remove stored pos
             setPos(stack, null);
             if(world.isRemote)
-                player.sendMessage(new TextComponentString("Cannot form area with two positions in different dimensions!"));
+                player.sendMessage(new TextComponentTranslation("message.tool.diffdim"));
         }
         else
         {
@@ -93,17 +94,22 @@ public class ItemAdmin extends Item
             //Clear position
             setPos(stack, null);
             if(world.isRemote)
-                player.sendMessage(new TextComponentString("Cleared saved position"));
+                player.sendMessage(new TextComponentTranslation("message.tool.cleared"));
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
         return super.onItemRightClick(world, player, hand);
+    }
+
+    private String posToString(BlockPos pos)
+    {
+        return String.format("%s, %s, %s", pos.getX(), pos.getY(), pos.getZ());
     }
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
     {
         Position pos = getPos(stack);
-        String posText = pos == null ? "First position not set" : "Dim Id: " + pos.dimensionId + ", Block Pos: " + pos.position;
+        String posText = pos == null ? I18n.format("item.admin.tooltip.notset") : I18n.format("item.admin.tooltip.set", pos.dimensionId, posToString(pos.position));
         tooltip.add(posText);
     }
 }

@@ -6,6 +6,7 @@ import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.CapabilityAreas;
 import brightspark.landmanager.handler.ClientEventHandler;
 import brightspark.landmanager.message.MessageShowArea;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -15,6 +16,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
 import javax.annotation.Nullable;
@@ -49,7 +51,7 @@ public class CommandLandManager extends LMCommand
 
         if((command.equals("claim") || command.equals("show") || command.equals("showoff")) && !(sender instanceof EntityPlayer))
         {
-            sender.sendMessage(new TextComponentString("You need to be a player to use this command"));
+            sender.sendMessage(new TextComponentTranslation("message.command.player"));
             return;
         }
 
@@ -75,7 +77,7 @@ public class CommandLandManager extends LMCommand
                     List<Area> areas = getAllAreas(server);
                     if(areas.size() == 0)
                     {
-                        sender.sendMessage(new TextComponentString("No areas found"));
+                        sender.sendMessage(new TextComponentTranslation("message.command.none"));
                         return;
                     }
 
@@ -94,7 +96,7 @@ public class CommandLandManager extends LMCommand
 
                     //Create the String to send to the player
                     ITextComponent text = new TextComponentString(TextFormatting.YELLOW + "============= ");
-                    TextComponentString titleText = new TextComponentString(String.format("Areas - Page %s / %s", (page + 1), (pageMax + 1)));
+                    ITextComponent titleText = new TextComponentTranslation("message.command.areas.title", (page + 1), (pageMax + 1));
                     titleText.getStyle().setColor(TextFormatting.GOLD);
                     text.appendSibling(titleText);
                     text.appendText(TextFormatting.YELLOW +  " =============");
@@ -119,37 +121,38 @@ public class CommandLandManager extends LMCommand
                 Area area = cap.getArea(areaName);
                 if(area == null)
                 {
-                    sender.sendMessage(new TextComponentString("No area found for name " + areaName));
+                    sender.sendMessage(new TextComponentTranslation("message.command.area.none", areaName));
                     return;
                 }
                 String playerName = getPlayerNameFromUuid(server, area.getAllocatedPlayer());
-                if(playerName == null) playerName = "None";
-                ITextComponent text = textComponentWithColour(TextFormatting.YELLOW + "Area details: ", TextFormatting.WHITE);
-                text.appendSibling(textComponentWithColour("\n Name: ", TextFormatting.GOLD)).appendText(area.getName());
-                text.appendSibling(textComponentWithColour("\n Dim Id: ", TextFormatting.GOLD)).appendText(String.valueOf(area.getDimensionId()));
-                text.appendSibling(textComponentWithColour("\n Allocation: ", TextFormatting.GOLD)).appendText(playerName);
-                text.appendSibling(textComponentWithColour("\n Block Pos Min: ", TextFormatting.GOLD)).appendText(posToString(area.getMinPos()));
-                text.appendSibling(textComponentWithColour("\n Block Pos Max: ", TextFormatting.GOLD)).appendText(posToString(area.getMaxPos()));
+                if(playerName == null) playerName = I18n.format("message.command.area.noplayer");
+                ITextComponent text = new TextComponentString(TextFormatting.YELLOW + I18n.format("message.command.area.name"));
+                text.getStyle().setColor(TextFormatting.WHITE);
+                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.name", area.getName()));
+                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.dim", area.getDimensionId()));
+                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.allocation", playerName));
+                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.posmin",posToString(area.getMinPos())));
+                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.posmax",posToString(area.getMaxPos())));
                 sender.sendMessage(text);
                 break;
             case "claim": //lm claim <areaName>
                 if(LMConfig.disableClaiming)
                 {
-                    sender.sendMessage(new TextComponentString("Area claiming is not enabled! Ask an OP to allocate you an area."));
+                    sender.sendMessage(new TextComponentTranslation("message.command.claim.disabled"));
                     return;
                 }
 
                 if(args.length == 1)
                 {
                     //TODO: Claim the area the player is standing in
-                    sender.sendMessage(new TextComponentString("Claiming the area you're standing in is still WIP. Please specify an area name instead."));
+                    sender.sendMessage(new TextComponentTranslation("message.command.claim.standing"));
                 }
                 else
                 {
                     //Claim the specific area
                     areaName = argsToString(args, 1);
                     if(areaName.isEmpty())
-                        sender.sendMessage(new TextComponentString("Invalid area name provided"));
+                        sender.sendMessage(new TextComponentTranslation("message.command.claim.invalid"));
                     else
                     {
                         //TODO: Later and some configs to this
@@ -159,7 +162,7 @@ public class CommandLandManager extends LMCommand
                         cap = getWorldCapWithArea(server, areaName);
                         if(cap == null)
                         {
-                            sender.sendMessage(new TextComponentString("Couldn't find area " + areaName));
+                            sender.sendMessage(new TextComponentTranslation("message.command.claim.none", areaName));
                             return;
                         }
                         Area areaToClaim = cap.getArea(areaName);
@@ -168,15 +171,15 @@ public class CommandLandManager extends LMCommand
                             if(areaToClaim.getAllocatedPlayer() == null)
                             {
                                 if(cap.setAllocation(areaName, ((EntityPlayer) sender).getUniqueID()))
-                                    sender.sendMessage(new TextComponentString("Area " + areaName + " claimed"));
+                                    sender.sendMessage(new TextComponentTranslation("message.command.claim.claimed", areaName));
                                 else
-                                    sender.sendMessage(new TextComponentString("Failed to claim area " + areaName));
+                                    sender.sendMessage(new TextComponentTranslation("message.command.claim.failed", areaName));
                             }
                             else
-                                sender.sendMessage(new TextComponentString("Someone else has already claimed area " + areaName));
+                                sender.sendMessage(new TextComponentTranslation("message.command.claim.already", areaName));
                         }
                         else
-                            sender.sendMessage(new TextComponentString("Area " + areaName + " does not exist"));
+                            sender.sendMessage(new TextComponentTranslation("message.command.notexist", areaName));
                     }
                 }
                 break;
@@ -191,7 +194,7 @@ public class CommandLandManager extends LMCommand
                     //Show specific area
                     areaName = argsToString(args, 1);
                     if(areaName.isEmpty())
-                        sender.sendMessage(new TextComponentString("Invalid area name provided"));
+                        sender.sendMessage(new TextComponentTranslation("message.command.show.invalid"));
                     else
                     {
                         //Make sure it's a valid area name
@@ -199,16 +202,16 @@ public class CommandLandManager extends LMCommand
                         if(areas.contains(areaName))
                         {
                             LandManager.NETWORK.sendTo(new MessageShowArea(areaName), (EntityPlayerMP) sender);
-                            sender.sendMessage(new TextComponentString("Now showing area " + areaName));
+                            sender.sendMessage(new TextComponentTranslation("message.command.show.showing", areaName));
                         }
                         else
-                            sender.sendMessage(new TextComponentString("Area " + areaName + " does not exist"));
+                            sender.sendMessage(new TextComponentTranslation("message.command.notexist", areaName));
                     }
                 }
                 break;
             case "showoff": //lm showOff
                 ClientEventHandler.setRenderArea("");
-                sender.sendMessage(new TextComponentString("Turned off showing areas"));
+                sender.sendMessage(new TextComponentTranslation("message.command.showoff"));
                 break;
         }
     }

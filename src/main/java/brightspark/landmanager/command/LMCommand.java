@@ -10,7 +10,7 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 
@@ -88,12 +88,12 @@ abstract class LMCommand extends CommandBase
         return sb.toString().trim();
     }
 
-    ITextComponent textComponentWithColour(String text, TextFormatting colour)
+    ITextComponent textComponentWithColour(TextFormatting colour, String text, Object... args)
     {
-        return textComponentWithColour(new TextComponentString(text), colour);
+        return textComponentWithColour(colour, new TextComponentTranslation(text, args));
     }
 
-    ITextComponent textComponentWithColour(ITextComponent text, TextFormatting colour)
+    ITextComponent textComponentWithColour(TextFormatting colour, ITextComponent text)
     {
         text.getStyle().setColor(colour);
         return text;

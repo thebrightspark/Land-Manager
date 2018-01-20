@@ -10,7 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -56,7 +56,7 @@ public class CommandLandManagerOp extends LMCommand
             if(areaName != null) cap = getWorldCapWithArea(server, areaName);
             if(cap == null)
             {
-                sender.sendMessage(new TextComponentString("Couldn't find area " + areaName));
+                sender.sendMessage(new TextComponentTranslation("message.command.lm.none" + areaName));
                 return;
             }
         }
@@ -65,9 +65,9 @@ public class CommandLandManagerOp extends LMCommand
         {
             case "delete": //lm delete <areaName>
                 if(cap.removeArea(areaName))
-                    sender.sendMessage(new TextComponentString("Deleted area " + areaName));
+                    sender.sendMessage(new TextComponentTranslation("message.command.delete.deleted", areaName));
                 else
-                    sender.sendMessage(new TextComponentString("Failed to delete area " + areaName));
+                    sender.sendMessage(new TextComponentTranslation("message.command.delete.failed", areaName));
                 break;
             case "allocate": //lm allocate <playerName> <areaName>
                 UUID uuid = null;
@@ -75,22 +75,22 @@ public class CommandLandManagerOp extends LMCommand
                 if(profile != null) uuid = profile.getId();
                 if(uuid == null)
                 {
-                    sender.sendMessage(new TextComponentString("Could not find player " + args[1]));
+                    sender.sendMessage(new TextComponentTranslation("message.command.allocate.noplayer", args[1]));
                     return;
                 }
                 if(cap.setAllocation(areaName, uuid))
                 break;
             case "clearallocation": //lm clearAllocation <areaName>
                 if(cap.clearAllocation(areaName))
-                    sender.sendMessage(new TextComponentString("Cleared player allocation for area " + areaName));
+                    sender.sendMessage(new TextComponentTranslation("message.command.clear.cleared", areaName));
                 else
-                    sender.sendMessage(new TextComponentString("Failed to remove player allocation for area " + areaName));
+                    sender.sendMessage(new TextComponentTranslation("message.command.clear.failed", areaName));
                 break;
             case "tool": //lm tool
                 if(!(sender instanceof EntityPlayer))
-                    sender.sendMessage(new TextComponentString("Only players can give themselves the admin tool"));
+                    sender.sendMessage(new TextComponentTranslation("message.command.tool.player"));
                 else if(!((EntityPlayer) sender).addItemStackToInventory(new ItemStack(LMItems.adminItem)))
-                    sender.sendMessage(new TextComponentString("No room in inventory for tool"));
+                    sender.sendMessage(new TextComponentTranslation("message.command.tool.inventory"));
                 break;
             default:
                 throw new WrongUsageException(getUsage(sender));
