@@ -80,7 +80,7 @@ public class GuiCreateArea extends GuiScreen
 
         extendCheck = addButton(new GuiCheckBox(1, guiLeft + 5, guiTop + 31, I18n.format("gui.component.checkbox"), false));
 
-        String text = I18n.format("message.command.tool.confirm");
+        String text = I18n.format("gui.component.confirm");
         addButton(new GuiButton(2, guiLeft + 68, guiTop + 31, 40, fontRenderer.FONT_HEIGHT + 2, text)
         {
             @Override
