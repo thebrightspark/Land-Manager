@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
@@ -80,8 +81,19 @@ public class CapabilityAreasImpl implements CapabilityAreas
     {
         Set<Area> nearbyAreas = new HashSet<>();
         areas.values().forEach(area -> {
-            if(area.getCenter().getDistance(pos.getX(), pos.getY(), pos.getZ()) <= LMConfig.client.showAllRadius)
+            if(area.intersects(pos))
                 nearbyAreas.add(area);
+            else
+            {
+                BlockPos min = area.getMinPos();
+                BlockPos max = area.getMaxPos();
+                int closestX = MathHelper.clamp(pos.getX(), min.getX(), max.getX());
+                int closestY = MathHelper.clamp(pos.getY(), min.getY(), max.getY());
+                int closestZ = MathHelper.clamp(pos.getZ(), min.getZ(), max.getZ());
+
+                if(new BlockPos(closestX, closestY, closestZ).getDistance(pos.getX(), pos.getY(), pos.getZ()) <= LMConfig.client.showAllRadius)
+                    nearbyAreas.add(area);
+            }
         });
         return nearbyAreas;
     }
