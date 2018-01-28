@@ -56,7 +56,7 @@ public class CommandLandManagerOp extends LMCommand
             if(areaName != null) cap = getWorldCapWithArea(server, areaName);
             if(cap == null)
             {
-                sender.sendMessage(new TextComponentTranslation("message.command.lm.none" + areaName));
+                sender.sendMessage(new TextComponentTranslation("message.command.none", areaName));
                 return;
             }
         }

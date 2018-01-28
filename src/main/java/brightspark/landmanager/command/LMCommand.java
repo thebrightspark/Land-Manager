@@ -88,14 +88,15 @@ abstract class LMCommand extends CommandBase
         return sb.toString().trim();
     }
 
-    ITextComponent textComponentWithColour(TextFormatting colour, String text, Object... args)
+    ITextComponent goldTextComponent(String text, Object... args)
     {
-        return textComponentWithColour(colour, new TextComponentTranslation(text, args));
+        return textComponentWithColour(TextFormatting.GOLD, text, args);
     }
 
-    ITextComponent textComponentWithColour(TextFormatting colour, ITextComponent text)
+    ITextComponent textComponentWithColour(TextFormatting colour, String text, Object... args)
     {
-        text.getStyle().setColor(colour);
-        return text;
+        ITextComponent textComponent = new TextComponentTranslation(text, args);
+        textComponent.getStyle().setColor(colour);
+        return textComponent;
     }
 }

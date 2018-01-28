@@ -4,9 +4,7 @@ import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.Area;
 import brightspark.landmanager.data.CapabilityAreas;
-import brightspark.landmanager.handler.ClientEventHandler;
 import brightspark.landmanager.message.MessageShowArea;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -118,21 +116,24 @@ public class CommandLandManager extends LMCommand
                 if(areaName != null) cap = getWorldCapWithArea(server, areaName);
                 else throw new WrongUsageException(getUsage(sender));
 
-                Area area = cap.getArea(areaName);
+                Area area = cap != null ? cap.getArea(areaName) : null;
                 if(area == null)
                 {
-                    sender.sendMessage(new TextComponentTranslation("message.command.area.none", areaName));
+                    sender.sendMessage(new TextComponentTranslation("message.command.none", areaName));
                     return;
                 }
                 String playerName = getPlayerNameFromUuid(server, area.getAllocatedPlayer());
-                if(playerName == null) playerName = I18n.format("message.command.area.noplayer");
-                ITextComponent text = new TextComponentString(TextFormatting.YELLOW + I18n.format("message.command.area.name"));
+                if(playerName == null) playerName = "message.command.area.noplayer";
+                ITextComponent text = new TextComponentString("");
                 text.getStyle().setColor(TextFormatting.WHITE);
-                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.name", area.getName()));
-                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.dim", area.getDimensionId()));
-                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.allocation", playerName));
-                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.posmin",posToString(area.getMinPos())));
-                text.appendText("\n ").appendSibling(textComponentWithColour(TextFormatting.GOLD, "message.command.area.posmax",posToString(area.getMaxPos())));
+                ITextComponent areaNameComponent = new TextComponentTranslation("message.command.area.name");
+                areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
+                text.appendSibling(areaNameComponent);
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.name", area.getName()));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.dim", area.getDimensionId()));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.allocation")).appendSibling(goldTextComponent(playerName));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmin",posToString(area.getMinPos())));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmax",posToString(area.getMaxPos())));
                 sender.sendMessage(text);
                 break;
             case "claim": //lm claim <areaName>
@@ -162,7 +163,7 @@ public class CommandLandManager extends LMCommand
                         cap = getWorldCapWithArea(server, areaName);
                         if(cap == null)
                         {
-                            sender.sendMessage(new TextComponentTranslation("message.command.claim.none", areaName));
+                            sender.sendMessage(new TextComponentTranslation("message.command.none", areaName));
                             return;
                         }
                         Area areaToClaim = cap.getArea(areaName);
@@ -205,12 +206,12 @@ public class CommandLandManager extends LMCommand
                             sender.sendMessage(new TextComponentTranslation("message.command.show.showing", areaName));
                         }
                         else
-                            sender.sendMessage(new TextComponentTranslation("message.command.notexist", areaName));
+                            sender.sendMessage(new TextComponentTranslation("message.command.none", areaName));
                     }
                 }
                 break;
             case "showoff": //lm showOff
-                ClientEventHandler.setRenderArea("");
+                LandManager.NETWORK.sendTo(new MessageShowArea(""), (EntityPlayerMP) sender);
                 sender.sendMessage(new TextComponentTranslation("message.command.showoff"));
                 break;
         }
