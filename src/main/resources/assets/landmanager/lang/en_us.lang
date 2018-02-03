@@ -38,10 +38,20 @@ message.command.showoff=Turned off showing areas
 message.command.delete.deleted=Deleted area %s
 message.command.delete.failed=Failed to delete area %s
 message.command.allocate.noplayer=Could not find player
+message.command.allocate.success=Allocated area %s to player %s
+message.command.allocate.failed=Could not allocate area %s to player %s
 message.command.clear.cleared=Cleared player allocation for area %s
 message.command.clear.failed=Failed to remove player allocation for area %s
 message.command.tool.player=Only players can give themselves the admin tool
 message.command.tool.inventory=No room in inventory for tool
+
+arealog.type.create=CREATE
+arealog.type.delete=DELETE
+arealog.type.allocate=ALLOCATE
+arealog.type.clear_allocation=CLEAR_ALLOCATION
+arealog.type.claim=CLAIM
+arealog.type.place=PLACE
+arealog.type.break=BREAK
 
 gui.component.checkbox=Min/Max Y
 gui.component.confirm=Confirm

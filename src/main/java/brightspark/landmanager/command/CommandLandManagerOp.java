@@ -1,12 +1,15 @@
 package brightspark.landmanager.command;
 
-import brightspark.landmanager.data.CapabilityAreas;
+import brightspark.landmanager.LandManager;
+import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.item.LMItems;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -65,7 +68,10 @@ public class CommandLandManagerOp extends LMCommand
         {
             case "delete": //lm delete <areaName>
                 if(cap.removeArea(areaName))
+                {
                     sender.sendMessage(new TextComponentTranslation("message.command.delete.deleted", areaName));
+                    LandManager.areaLog(AreaLogType.DELETE, areaName, (EntityPlayerMP) sender);
+                }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.delete.failed", areaName));
                 break;
@@ -79,10 +85,19 @@ public class CommandLandManagerOp extends LMCommand
                     return;
                 }
                 if(cap.setAllocation(areaName, uuid))
+                {
+                    sender.sendMessage(new TextComponentTranslation("message.command.allocate.success", areaName, profile.getName()));
+                    LandManager.areaLog(AreaLogType.ALLOCATE, areaName, (EntityPlayerMP) sender);
+                }
+                else
+                    sender.sendMessage(new TextComponentTranslation("message.command.allocate.failed", areaName, profile.getName()));
                 break;
             case "clearallocation": //lm clearAllocation <areaName>
                 if(cap.clearAllocation(areaName))
+                {
                     sender.sendMessage(new TextComponentTranslation("message.command.clear.cleared", areaName));
+                    LandManager.areaLog(AreaLogType.CLEAR_ALLOCATION, areaName, (EntityPlayerMP) sender);
+                }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.clear.failed", areaName));
                 break;

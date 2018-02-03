@@ -2,8 +2,8 @@ package brightspark.landmanager.handler;
 
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.data.Area;
-import brightspark.landmanager.data.CapabilityAreas;
+import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.CapabilityAreas;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;

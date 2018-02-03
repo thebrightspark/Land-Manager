@@ -1,6 +1,6 @@
 package brightspark.landmanager.message;
 
-import brightspark.landmanager.data.AddAreaResult;
+import brightspark.landmanager.data.areas.AddAreaResult;
 import brightspark.landmanager.gui.GuiCreateArea;
 import brightspark.landmanager.handler.ClientEventHandler;
 import brightspark.landmanager.item.ItemAdmin;
@@ -44,8 +44,6 @@ public class MessageCreateAreaReply implements IMessage
 
     public static class Handler implements IMessageHandler<MessageCreateAreaReply, IMessage>
     {
-        public Handler() {}
-
         private static void resetItem(EntityPlayer player)
         {
             ItemStack stack = player.getHeldItemMainhand();

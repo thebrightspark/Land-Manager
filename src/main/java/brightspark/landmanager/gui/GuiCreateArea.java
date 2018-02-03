@@ -1,8 +1,8 @@
 package brightspark.landmanager.gui;
 
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.data.Area;
-import brightspark.landmanager.data.Position;
+import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.Position;
 import brightspark.landmanager.item.ItemAdmin;
 import brightspark.landmanager.message.MessageCreateArea;
 import net.minecraft.client.Minecraft;

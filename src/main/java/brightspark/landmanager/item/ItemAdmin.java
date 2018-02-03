@@ -1,7 +1,7 @@
 package brightspark.landmanager.item;
 
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.data.Position;
+import brightspark.landmanager.data.areas.Position;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;

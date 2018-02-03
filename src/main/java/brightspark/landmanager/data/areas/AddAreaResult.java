@@ -1,4 +1,4 @@
-package brightspark.landmanager.data;
+package brightspark.landmanager.data.areas;
 
 public enum AddAreaResult
 {

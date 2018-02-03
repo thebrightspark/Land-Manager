@@ -1,4 +1,4 @@
-package brightspark.landmanager.data;
+package brightspark.landmanager.data.areas;
 
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
@@ -99,12 +99,12 @@ public class CapabilityAreasImpl implements CapabilityAreas
     }
 
     @Override
-    public boolean isIntersectingArea(BlockPos pos)
+    public Area intersectingArea(BlockPos pos)
     {
         for(Area area : areas.values())
             if(area.intersects(pos))
-                return true;
-        return false;
+                return area;
+        return null;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package brightspark.landmanager.data;
+package brightspark.landmanager.data.areas;
 
 import brightspark.landmanager.LandManager;
 import net.minecraft.nbt.NBTTagCompound;

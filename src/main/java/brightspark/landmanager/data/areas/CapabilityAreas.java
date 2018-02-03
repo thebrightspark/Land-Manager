@@ -1,4 +1,4 @@
-package brightspark.landmanager.data;
+package brightspark.landmanager.data.areas;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -27,7 +27,7 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
 
     Set<Area> getNearbyAreas(BlockPos pos);
 
-    boolean isIntersectingArea(BlockPos pos);
+    Area intersectingArea(BlockPos pos);
 
     void dataChanged();
 

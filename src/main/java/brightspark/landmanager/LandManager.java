@@ -1,16 +1,16 @@
 package brightspark.landmanager;
 
 import brightspark.landmanager.command.*;
-import brightspark.landmanager.data.CapStorage;
-import brightspark.landmanager.data.CapabilityAreas;
-import brightspark.landmanager.data.CapabilityAreasImpl;
+import brightspark.landmanager.data.areas.CapStorage;
+import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.data.areas.CapabilityAreasImpl;
+import brightspark.landmanager.data.logs.AreaLogType;
+import brightspark.landmanager.data.logs.LogsWorldSavedData;
 import brightspark.landmanager.gui.GuiHandler;
 import brightspark.landmanager.item.LMItems;
-import brightspark.landmanager.message.MessageCreateArea;
-import brightspark.landmanager.message.MessageCreateAreaReply;
-import brightspark.landmanager.message.MessageShowArea;
-import brightspark.landmanager.message.MessageUpdateCapability;
+import brightspark.landmanager.message.*;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -58,6 +58,7 @@ public class LandManager
         NETWORK.registerMessage(new MessageCreateAreaReply.Handler(), MessageCreateAreaReply.class, 1, Side.CLIENT);
         NETWORK.registerMessage(new MessageUpdateCapability.Handler(), MessageUpdateCapability.class, 2, Side.CLIENT);
         NETWORK.registerMessage(new MessageShowArea.Handler(), MessageShowArea.class, 3, Side.CLIENT);
+        NETWORK.registerMessage(new MessageChatLog.Handler(), MessageChatLog.class, 4, Side.CLIENT);
 
         CapabilityManager.INSTANCE.register(CapabilityAreas.class, new CapStorage<>(), CapabilityAreasImpl::new);
     }
@@ -67,5 +68,12 @@ public class LandManager
     {
         event.registerServerCommand(new CommandLandManagerOp());
         event.registerServerCommand(new CommandLandManager());
+        //TODO: Add logs command
+    }
+
+    public static void areaLog(AreaLogType type, String areaName, EntityPlayerMP player)
+    {
+        LogsWorldSavedData logData = LogsWorldSavedData.get(player.world);
+        if(logData != null) logData.addLog(type, areaName, player);
     }
 }

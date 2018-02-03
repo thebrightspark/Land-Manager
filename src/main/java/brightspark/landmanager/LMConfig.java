@@ -16,6 +16,9 @@ public class LMConfig
     @Config.Comment("Whether non-op players in creative can break/place blocks in any area")
     public static boolean creativeIgnoresProtection = true;
 
+    @Config.Comment("Max number of logs stored")
+    public static int logStorageSize = 50;
+
     public static final Client client = new Client();
 
     public static class Client
@@ -25,6 +28,9 @@ public class LMConfig
 
         @Config.Comment("The scale of the area label that's rendered")
         public float areaNameScale = 1f;
+
+        @Config.Comment("Whether OPs will see area changes in their chat")
+        public boolean showChatLogs = true;
     }
 
     @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)

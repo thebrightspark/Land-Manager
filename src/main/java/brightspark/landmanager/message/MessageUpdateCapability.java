@@ -1,7 +1,7 @@
 package brightspark.landmanager.message;
 
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.data.CapabilityAreas;
+import brightspark.landmanager.data.areas.CapabilityAreas;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;

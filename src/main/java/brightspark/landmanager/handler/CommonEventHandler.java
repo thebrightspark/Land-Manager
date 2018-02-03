@@ -2,8 +2,10 @@ package brightspark.landmanager.handler;
 
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.data.CapabilityAreas;
-import brightspark.landmanager.data.CapabilityAreasProvider;
+import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.data.areas.CapabilityAreasProvider;
+import brightspark.landmanager.data.logs.AreaLogType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
@@ -23,14 +25,14 @@ public class CommonEventHandler
 
     private static long lastTimeHitProtectedBlock = 0L;
 
-    private static boolean handleProtection(EntityPlayer player, BlockPos pos)
+    private static Area handleProtection(EntityPlayer player, BlockPos pos)
     {
         if(!LMConfig.creativeIgnoresProtection || player.isCreative() || player.canUseCommand(2, ""))
-            return false;
+            return null;
 
         //Check if in protected area
         CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
-        return cap != null && cap.isIntersectingArea(pos);
+        return cap != null ? cap.intersectingArea(pos) : null;
     }
 
     private static void sendCapToPlayer(EntityPlayer player)
@@ -44,15 +46,19 @@ public class CommonEventHandler
     public static void onBlockStartBreak(net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed event)
     {
         //Stop players from breaking blocks in protected areas
-        if(handleProtection(event.getEntityPlayer(), event.getPos()))
+        EntityPlayer player = event.getEntityPlayer();
+        Area area = handleProtection(player, event.getPos());
+        if(area != null)
         {
-            if(event.getEntityPlayer().world.isRemote)
+            if(player.world.isRemote)
             {
-                long worldTime = event.getEntityPlayer().world.getTotalWorldTime();
+                long worldTime = player.world.getTotalWorldTime();
                 if(worldTime - lastTimeHitProtectedBlock > 10)
-                    event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.break"));
+                    player.sendMessage(new TextComponentTranslation("message.protection.break"));
                 lastTimeHitProtectedBlock = worldTime;
             }
+            else
+                LandManager.areaLog(AreaLogType.BREAK, area.getName(), (EntityPlayerMP) player);
             event.setNewSpeed(0f);
             event.setCanceled(true);
         }
@@ -62,10 +68,14 @@ public class CommonEventHandler
     public static void onBlockPlace(BlockEvent.PlaceEvent event)
     {
         //Stop players from placing block in procteted areas
-        if(handleProtection(event.getPlayer(), event.getPos()))
+        EntityPlayer player = event.getPlayer();
+        Area area = handleProtection(player, event.getPos());
+        if(area != null)
         {
-            if(event.getPlayer().world.isRemote)
-                event.getPlayer().sendMessage(new TextComponentTranslation("message.protection.place"));
+            if(player.world.isRemote)
+                player.sendMessage(new TextComponentTranslation("message.protection.place"));
+            else
+                LandManager.areaLog(AreaLogType.PLACE, area.getName(), (EntityPlayerMP) player);
             event.setCanceled(true);
         }
     }

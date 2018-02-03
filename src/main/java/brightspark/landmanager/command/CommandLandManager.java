@@ -2,8 +2,9 @@ package brightspark.landmanager.command;
 
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.data.Area;
-import brightspark.landmanager.data.CapabilityAreas;
+import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.message.MessageShowArea;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -172,7 +173,10 @@ public class CommandLandManager extends LMCommand
                             if(areaToClaim.getAllocatedPlayer() == null)
                             {
                                 if(cap.setAllocation(areaName, ((EntityPlayer) sender).getUniqueID()))
+                                {
                                     sender.sendMessage(new TextComponentTranslation("message.command.claim.claimed", areaName));
+                                    LandManager.areaLog(AreaLogType.CLAIM, areaName, (EntityPlayerMP) sender);
+                                }
                                 else
                                     sender.sendMessage(new TextComponentTranslation("message.command.claim.failed", areaName));
                             }

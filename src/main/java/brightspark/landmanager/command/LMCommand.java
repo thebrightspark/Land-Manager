@@ -1,8 +1,8 @@
 package brightspark.landmanager.command;
 
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.data.Area;
-import brightspark.landmanager.data.CapabilityAreas;
+import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.CapabilityAreas;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;

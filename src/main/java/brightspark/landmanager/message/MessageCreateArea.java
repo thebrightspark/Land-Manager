@@ -1,8 +1,10 @@
 package brightspark.landmanager.message;
 
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.data.Area;
-import brightspark.landmanager.data.CapabilityAreas;
+import brightspark.landmanager.data.areas.AddAreaResult;
+import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.data.logs.AreaLogType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
@@ -46,10 +48,15 @@ public class MessageCreateArea implements IMessage
                 @Override
                 public void run()
                 {
-                    //TODO: Test area creation... seems that intersection isn't working as expected
                     EntityPlayerMP player = ctx.getServerHandler().player;
                     CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
-                    if(cap != null) LandManager.NETWORK.sendTo(new MessageCreateAreaReply(message.area.getName(), cap.addArea(message.area)), player);
+                    if(cap != null)
+                    {
+                        AddAreaResult result = cap.addArea(message.area);
+                        if(result == AddAreaResult.SUCCESS)
+                            LandManager.areaLog(AreaLogType.CREATE, message.area.getName(), player);
+                        LandManager.NETWORK.sendTo(new MessageCreateAreaReply(message.area.getName(), result), player);
+                    }
                 }
             });
             return null;
