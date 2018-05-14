@@ -32,6 +32,7 @@ public class CommandLandManagerOp extends LMCommand
         return "\nlmop delete <areaName>\n" +
                 "lmop allocate <playerName> <areaName>\n" +
                 "lmop clearAllocation <areaName>\n" +
+                "lmop spawning <areaName> [true/false]\n" +
                 "lmop tool";
     }
 
@@ -52,7 +53,7 @@ public class CommandLandManagerOp extends LMCommand
         String areaName = null;
         CapabilityAreas cap = null;
         //Only get the area name and capability from the arguments if necessary for the command
-        if(command.equals("delete") || command.equals("allocate") || command.equals("clearallocation"))
+        if(command.equals("delete") || command.equals("allocate") || command.equals("clearallocation") || command.equals("spawning"))
         {
             areaName = argsToString(args, command.equals("allocate") ? 2 : 1);
             if(areaName.isEmpty()) areaName = null;
@@ -66,7 +67,7 @@ public class CommandLandManagerOp extends LMCommand
 
         switch(command)
         {
-            case "delete": //lm delete <areaName>
+            case "delete": //lmop delete <areaName>
                 if(cap.removeArea(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.delete.deleted", areaName));
@@ -75,7 +76,7 @@ public class CommandLandManagerOp extends LMCommand
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.delete.failed", areaName));
                 break;
-            case "allocate": //lm allocate <playerName> <areaName>
+            case "allocate": //lmop allocate <playerName> <areaName>
                 UUID uuid = null;
                 GameProfile profile = server.getPlayerProfileCache().getGameProfileForUsername(args[1]);
                 if(profile != null) uuid = profile.getId();
@@ -92,7 +93,7 @@ public class CommandLandManagerOp extends LMCommand
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.allocate.failed", areaName, profile.getName()));
                 break;
-            case "clearallocation": //lm clearAllocation <areaName>
+            case "clearallocation": //lmop clearAllocation <areaName>
                 if(cap.clearAllocation(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.clear.cleared", areaName));
@@ -101,7 +102,25 @@ public class CommandLandManagerOp extends LMCommand
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.clear.failed", areaName));
                 break;
-            case "tool": //lm tool
+            case "spawning": //lmop spawning <areaName> [true/false]
+                Boolean spawning = null;
+                if(args.length >= 2)
+                {
+                    String arg2 = args[1];
+                    if(arg2.equalsIgnoreCase("true") || arg2.equalsIgnoreCase("t"))
+                        spawning = true;
+                    else if(arg2.equalsIgnoreCase("false") || arg2.equalsIgnoreCase("f"))
+                        spawning = false;
+                }
+                if(cap.setSpawning(areaName, spawning))
+                {
+                    sender.sendMessage(new TextComponentTranslation("message.command.spawning.success", cap.getArea(areaName).getStopsEntitySpawning(), areaName));
+                    LandManager.areaLog(AreaLogType.SET_SPAWNING, areaName, (EntityPlayerMP) sender);
+                }
+                else
+                    sender.sendMessage(new TextComponentTranslation("message.command.spawning.failed", areaName));
+                break;
+            case "tool": //lmop tool
                 if(!(sender instanceof EntityPlayer))
                     sender.sendMessage(new TextComponentTranslation("message.command.tool.player"));
                 else if(!((EntityPlayer) sender).addItemStackToInventory(new ItemStack(LMItems.adminItem)))
@@ -118,7 +137,7 @@ public class CommandLandManagerOp extends LMCommand
         switch(args.length)
         {
             case 1:
-                return getListOfStringsMatchingLastWord(args, "allocate", "clearAllocation", "delete", "tool");
+                return getListOfStringsMatchingLastWord(args, "allocate", "clearAllocation", "delete", "spawning", "tool");
             case 2:
                 switch(args[0])
                 {
@@ -126,13 +145,21 @@ public class CommandLandManagerOp extends LMCommand
                         return getListOfStringsMatchingLastWord(args, server.getPlayerProfileCache().getUsernames());
                     case "clearAllocation":
                     case "delete":
+                    case "spawning":
                         return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
                     default:
                         return Collections.emptyList();
                 }
             case 3:
-                if(args[0].equals("allocate"))
-                    return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+                switch(args[0])
+                {
+                    case "allocate":
+                        return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+                    case "spawning":
+                        return getListOfStringsMatchingLastWord(args, "t", "true", "f", "false");
+                    default:
+                        return Collections.emptyList();
+                }
             default:
                 return Collections.emptyList();
         }

@@ -1,11 +1,10 @@
 package brightspark.landmanager.data.logs;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 public class AreaLogList
 {
-    private List<AreaLog> logs = new ArrayList<>();
+    private LinkedList<AreaLog> logs = new LinkedList<>();
     private final int length;
 
     public AreaLogList(int length)
@@ -15,12 +14,12 @@ public class AreaLogList
 
     public void add(AreaLog log)
     {
-        logs.add(log);
+        logs.addLast(log);
         if(logs.size() > length)
-            logs.remove(0);
+            logs.removeFirst();
     }
 
-    public List<AreaLog> getLogs()
+    public LinkedList<AreaLog> getLogs()
     {
         return logs;
     }

@@ -133,8 +133,9 @@ public class CommandLandManager extends LMCommand
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.name", area.getName()));
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.dim", area.getDimensionId()));
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.allocation")).appendSibling(goldTextComponent(playerName));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmin",posToString(area.getMinPos())));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmax",posToString(area.getMaxPos())));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmin", posToString(area.getMinPos())));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmax", posToString(area.getMaxPos())));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.spawning", area.getStopsEntitySpawning() ? "True" : "False"));
                 sender.sendMessage(text);
                 break;
             case "claim": //lm claim <areaName>

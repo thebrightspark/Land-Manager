@@ -12,6 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CapabilityAreasImpl implements CapabilityAreas
 {
@@ -65,6 +66,20 @@ public class CapabilityAreasImpl implements CapabilityAreas
     }
 
     @Override
+    public boolean setSpawning(String areaName, Boolean stopSpawning)
+    {
+        Area area = getArea(areaName);
+        if(area != null)
+        {
+            if(stopSpawning == null)
+                stopSpawning = !area.getStopsEntitySpawning();
+            area.setStopEntitySpawning(stopSpawning);
+            dataChanged();
+        }
+        return area != null;
+    }
+
+    @Override
     public List<Area> getAllAreas()
     {
         return Lists.newArrayList(areas.values());
@@ -101,10 +116,13 @@ public class CapabilityAreasImpl implements CapabilityAreas
     @Override
     public Area intersectingArea(BlockPos pos)
     {
-        for(Area area : areas.values())
-            if(area.intersects(pos))
-                return area;
-        return null;
+        return areas.values().stream().filter(area -> area.intersects(pos)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Set<Area> intersectingAreas(BlockPos pos)
+    {
+        return areas.values().stream().filter(area -> area.intersects(pos)).collect(Collectors.toSet());
     }
 
     @Override

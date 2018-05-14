@@ -13,10 +13,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+
+import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
 public class CommonEventHandler
@@ -100,5 +104,16 @@ public class CommonEventHandler
     {
         //Send the capability data to the client
         sendCapToPlayer(event.player);
+    }
+
+    @SubscribeEvent
+    public static void onEntitySpawn(LivingSpawnEvent.CheckSpawn event)
+    {
+        //Stop entity spawning if it's within an area that's preventing the spawning
+        CapabilityAreas cap = event.getWorld().getCapability(LandManager.CAPABILITY_AREAS, null);
+        if(cap == null) return;
+        Set<Area> areas = cap.intersectingAreas(new BlockPos(event.getX(), event.getY(), event.getZ()));
+        if(areas.stream().anyMatch(Area::getStopsEntitySpawning))
+            event.setResult(Event.Result.DENY);
     }
 }

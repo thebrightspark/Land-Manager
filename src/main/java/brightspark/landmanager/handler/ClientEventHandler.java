@@ -31,7 +31,7 @@ public class ClientEventHandler
     private static final Random rand = new Random();
     private static boolean renderAll = false;
     private static String renderArea = "";
-    private static Map<Area, Color> colourCache = new HashMap<>();
+    private static Map<String, Color> colourCache = new HashMap<>();
 
     public static void setRenderArea(String areaName)
     {
@@ -51,11 +51,11 @@ public class ClientEventHandler
             mc.player.sendMessage(new TextComponentTranslation("message.areas.hide"));
     }
 
-    private static Color getColour(Area area)
+    private static Color getColour(String areaName)
     {
-        Color colour = colourCache.get(area);
+        Color colour = colourCache.get(areaName);
         if(colour == null)
-            colourCache.put(area, colour = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 255));
+            colourCache.put(areaName, colour = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 255));
         return colour;
     }
 
@@ -75,7 +75,7 @@ public class ClientEventHandler
         GlStateManager.disableTexture2D();
         GlStateManager.disableLighting();
         GlStateManager.translate(-x, -y, -z);
-        float[] rgb = getColour(area).getRGBColorComponents(null);
+        float[] rgb = getColour(area.getName()).getRGBColorComponents(null);
         AxisAlignedBB box = new AxisAlignedBB(area.getMinPos(), area.getMaxPos().add(1, 1, 1)).grow(0.001d);
         GlStateManager.enableDepth();
         RenderGlobal.renderFilledBox(box, rgb[0], rgb[1], rgb[2], 0.2f);

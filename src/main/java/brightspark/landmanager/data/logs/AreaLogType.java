@@ -8,6 +8,7 @@ public enum AreaLogType
     DELETE,
     ALLOCATE,
     CLEAR_ALLOCATION,
+    SET_SPAWNING,
     CLAIM,
     PLACE,
     BREAK;
@@ -25,6 +26,7 @@ public enum AreaLogType
             case DELETE:            return TextFormatting.RED;
             case ALLOCATE:          return TextFormatting.DARK_AQUA;
             case CLEAR_ALLOCATION:  return TextFormatting.DARK_BLUE;
+            case SET_SPAWNING:      return TextFormatting.LIGHT_PURPLE;
             case CLAIM:             return TextFormatting.AQUA;
             case PLACE:             return TextFormatting.YELLOW;
             case BREAK:             return TextFormatting.GOLD;

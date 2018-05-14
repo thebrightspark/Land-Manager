@@ -14,6 +14,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
     private int dimensionId;
     private BlockPos pos1, pos2, center;
     private UUID allocatedPlayer;
+    private boolean stopEntitySpawning;
 
     public Area(String name, int dimensionId, BlockPos position1, BlockPos position2)
     {
@@ -81,6 +82,16 @@ public class Area implements INBTSerializable<NBTTagCompound>
         allocatedPlayer = uuid;
     }
 
+    public boolean getStopsEntitySpawning()
+    {
+        return stopEntitySpawning;
+    }
+
+    public void setStopEntitySpawning(boolean stop)
+    {
+        stopEntitySpawning = stop;
+    }
+
     public AxisAlignedBB asAABB()
     {
         Vec3d p1 = new Vec3d(pos1).add(new Vec3d(0.4d, 0.4d, 0.4d));
@@ -117,6 +128,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
             nbt.setLong("uuid_most", allocatedPlayer.getMostSignificantBits());
             nbt.setLong("uuid_least", allocatedPlayer.getLeastSignificantBits());
         }
+        nbt.setBoolean("spawning", stopEntitySpawning);
         return nbt;
     }
 
@@ -129,6 +141,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
         pos2 = BlockPos.fromLong(nbt.getLong("position2"));
         if(nbt.hasKey("uuid_most"))
             allocatedPlayer = new UUID(nbt.getLong("uuid_most"), nbt.getLong("uuid_least"));
+        stopEntitySpawning = nbt.getBoolean("spawning");
     }
 
     @Override
