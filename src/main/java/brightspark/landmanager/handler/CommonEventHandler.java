@@ -76,10 +76,8 @@ public class CommonEventHandler
         Area area = handleProtection(player, event.getPos());
         if(area != null)
         {
-            if(player.world.isRemote)
-                player.sendMessage(new TextComponentTranslation("message.protection.place"));
-            else
-                LandManager.areaLog(AreaLogType.PLACE, area.getName(), (EntityPlayerMP) player);
+            player.sendMessage(new TextComponentTranslation("message.protection.place"));
+            LandManager.areaLog(AreaLogType.PLACE, area.getName(), (EntityPlayerMP) player);
             event.setCanceled(true);
         }
     }
