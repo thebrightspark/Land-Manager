@@ -102,17 +102,8 @@ public class CommandLandManagerOp extends LMCommand
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.clear.failed", areaName));
                 break;
-            case "spawning": //lmop spawning <areaName> [true/false]
-                Boolean spawning = null;
-                if(args.length >= 2)
-                {
-                    String arg2 = args[1];
-                    if(arg2.equalsIgnoreCase("true") || arg2.equalsIgnoreCase("t"))
-                        spawning = true;
-                    else if(arg2.equalsIgnoreCase("false") || arg2.equalsIgnoreCase("f"))
-                        spawning = false;
-                }
-                if(cap.setSpawning(areaName, spawning))
+            case "spawning": //lmop spawning <areaName>
+                if(cap.toggleSpawning(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.spawning.success", cap.getArea(areaName).getStopsEntitySpawning(), areaName));
                     LandManager.areaLog(AreaLogType.SET_SPAWNING, areaName, (EntityPlayerMP) sender);

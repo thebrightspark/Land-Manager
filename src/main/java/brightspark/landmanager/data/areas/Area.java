@@ -87,9 +87,9 @@ public class Area implements INBTSerializable<NBTTagCompound>
         return stopEntitySpawning;
     }
 
-    public void setStopEntitySpawning(boolean stop)
+    public void toggleStopEntitySpawning()
     {
-        stopEntitySpawning = stop;
+        stopEntitySpawning = !stopEntitySpawning;
     }
 
     public AxisAlignedBB asAABB()

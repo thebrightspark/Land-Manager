@@ -66,14 +66,12 @@ public class CapabilityAreasImpl implements CapabilityAreas
     }
 
     @Override
-    public boolean setSpawning(String areaName, Boolean stopSpawning)
+    public boolean toggleSpawning(String areaName)
     {
         Area area = getArea(areaName);
         if(area != null)
         {
-            if(stopSpawning == null)
-                stopSpawning = !area.getStopsEntitySpawning();
-            area.setStopEntitySpawning(stopSpawning);
+            area.toggleStopEntitySpawning();
             dataChanged();
         }
         return area != null;
