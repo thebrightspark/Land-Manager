@@ -21,12 +21,6 @@ import java.util.UUID;
 
 abstract class LMCommand extends CommandBase
 {
-    @Override
-    public int getRequiredPermissionLevel()
-    {
-        return 0;
-    }
-
     CapabilityAreas getWorldCapWithArea(MinecraftServer server, String areaName) throws CommandException
     {
         if(areaName == null) throw new WrongUsageException("No area name provided!");
