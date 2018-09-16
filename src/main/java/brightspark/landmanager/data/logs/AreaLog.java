@@ -10,9 +10,9 @@ public class AreaLog implements INBTSerializable<NBTTagCompound>
 {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-    public long timestamp;
-    public AreaLogType type;
-    public String areaName, playerName;
+    private long timestamp;
+    private AreaLogType type;
+    private String areaName, playerName;
 
     public AreaLog(AreaLogType type, String areaName, String playerName)
     {
@@ -25,6 +25,26 @@ public class AreaLog implements INBTSerializable<NBTTagCompound>
     public AreaLog(NBTTagCompound nbt)
     {
         deserializeNBT(nbt);
+    }
+
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
+
+    public AreaLogType getType()
+    {
+        return type;
+    }
+
+    public String getAreaName()
+    {
+        return areaName;
+    }
+
+    public String getPlayerName()
+    {
+        return playerName;
     }
 
     public String getTimeString()

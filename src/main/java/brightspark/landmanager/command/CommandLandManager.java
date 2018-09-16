@@ -6,6 +6,7 @@ import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.message.MessageShowArea;
+import brightspark.landmanager.util.ListView;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
@@ -82,32 +83,21 @@ public class CommandLandManager extends LMCommand
                     List<Area> areas = getAllAreas(server);
                     if(areas.size() == 0)
                     {
-                        sender.sendMessage(new TextComponentTranslation("message.command.none"));
+                        sender.sendMessage(new TextComponentTranslation("message.command.areas.none"));
                         return;
                     }
 
-                    if(page < 0) page = 0;
-                    int numAreas = areas.size();
-                    int areasPerPage = 9;
-                    int pageMax = numAreas / areasPerPage;
-                    //We reduce the given page number by 1, because we calculate starting from page 0, but is shown to start from page 1.
-                    if(page > 0) page--;
-                    if(page * areasPerPage > numAreas) page = pageMax;
-
-                    //Work out the range to display on the page
-                    int min = page * areasPerPage;
-                    int max = min + areasPerPage;
-                    if(numAreas < max) max = numAreas;
+                    ListView<Area> view = getListView(areas, page, 9);
+                    page = view.getPage();
 
                     //Create the String to send to the player
                     ITextComponent text = new TextComponentString(TextFormatting.YELLOW + "============= ");
-                    ITextComponent titleText = new TextComponentTranslation("message.command.areas.title", (page + 1), (pageMax + 1));
+                    ITextComponent titleText = new TextComponentTranslation("message.command.areas.title", (page + 1), (view.getPageMax() + 1));
                     titleText.getStyle().setColor(TextFormatting.GOLD);
                     text.appendSibling(titleText);
                     text.appendText(TextFormatting.YELLOW +  " =============");
-                    for(int i = min; i < max; i++)
+                    for(Area area : view.getList())
                     {
-                        Area area = areas.get(i);
                         String playerName = getPlayerNameFromUuid(server, area.getAllocatedPlayer());
                         if(playerName == null)
                             text.appendText("\n  " + area.getName());
@@ -133,10 +123,9 @@ public class CommandLandManager extends LMCommand
                 if(playerName == null) playerName = "message.command.area.noplayer";
                 ITextComponent text = new TextComponentString("");
                 text.getStyle().setColor(TextFormatting.WHITE);
-                ITextComponent areaNameComponent = new TextComponentTranslation("message.command.area.name");
+                ITextComponent areaNameComponent = new TextComponentTranslation("message.command.area.name", area.getName());
                 areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
                 text.appendSibling(areaNameComponent);
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.name", area.getName()));
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.dim", area.getDimensionId()));
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.allocation")).appendSibling(goldTextComponent(playerName));
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmin", posToString(area.getMinPos())));
@@ -191,7 +180,7 @@ public class CommandLandManager extends LMCommand
                                 sender.sendMessage(new TextComponentTranslation("message.command.claim.already", areaName));
                         }
                         else
-                            sender.sendMessage(new TextComponentTranslation("message.command.notexist", areaName));
+                            sender.sendMessage(new TextComponentTranslation("message.command.claim.notexist", areaName));
                     }
                 }
                 break;

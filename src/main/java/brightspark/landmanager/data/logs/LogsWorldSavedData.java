@@ -72,17 +72,17 @@ public class LogsWorldSavedData extends WorldSavedData
 
     public List<AreaLog> getLogsByType(AreaLogType type)
     {
-        return getLogs(log -> log.type == type);
+        return getLogs(log -> log.getType() == type);
     }
 
     public List<AreaLog> getLogsByArea(String areaName)
     {
-        return getLogs(log -> log.areaName.equals(areaName));
+        return getLogs(log -> log.getAreaName().equals(areaName));
     }
 
     public List<AreaLog> getLogsByPlayer(String playerName)
     {
-        return getLogs(log -> log.playerName.equals(playerName));
+        return getLogs(log -> log.getPlayerName().equals(playerName));
     }
 
     @Override

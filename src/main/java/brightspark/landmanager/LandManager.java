@@ -23,6 +23,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
 
+import java.util.regex.Pattern;
+
 @Mod(modid = LandManager.MOD_ID, name = LandManager.MOD_NAME, version = LandManager.VERSION)
 public class LandManager
 {
@@ -47,6 +49,8 @@ public class LandManager
         }
     };
 
+    //public static final Pattern INVALID_AREA_NAME = Pattern.compile("(^\\d .*|^\\d$)");
+
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event)
     {
@@ -68,7 +72,7 @@ public class LandManager
     {
         event.registerServerCommand(new CommandLandManagerOp());
         event.registerServerCommand(new CommandLandManager());
-        //TODO: Add logs command
+        //event.registerServerCommand(new CommandLandManagerLogs());
     }
 
     public static void areaLog(AreaLogType type, String areaName, EntityPlayerMP player)

@@ -51,14 +51,14 @@ public class MessageChatLog implements IMessage
                         AreaLog log = message.log;
                         ITextComponent text = new TextComponentString(log.getTimeString());
                         text.getStyle().setColor(TextFormatting.GRAY);
-                        ITextComponent typeComp = new TextComponentTranslation(log.type.getUnlocalisedName());
-                        typeComp.getStyle().setColor(log.type.colour());
+                        ITextComponent typeComp = new TextComponentTranslation(log.getType().getUnlocalisedName());
+                        typeComp.getStyle().setColor(log.getType().colour());
                         text.appendText("<")
                                 .appendSibling(typeComp)
                                 .appendText("> ")
-                                .appendText(log.areaName)
+                                .appendText(log.getAreaName())
                                 .appendText(" -> ")
-                                .appendText(log.playerName);
+                                .appendText(log.getPlayerName());
 
                         Minecraft.getMinecraft().player.sendMessage(text);
                     }

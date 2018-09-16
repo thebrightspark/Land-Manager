@@ -3,6 +3,7 @@ package brightspark.landmanager.command;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.util.ListView;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -92,5 +93,21 @@ abstract class LMCommand extends CommandBase
         ITextComponent textComponent = new TextComponentTranslation(text, args);
         textComponent.getStyle().setColor(colour);
         return textComponent;
+    }
+
+    <T> ListView<T> getListView(List<T> list, int page, int maxPerPage)
+    {
+        page = Math.max(0, page);
+        int size = list.size();
+        int pageMax = size / maxPerPage;
+        //We reduce the given page number by 1, because we calculate starting from page 0, but is shown to start from page 1.
+        if(page > 0) page--;
+        if(page * maxPerPage > size) page = pageMax;
+        //Work out the range to get from the list
+        int min = page * maxPerPage;
+        int max = min + maxPerPage;
+        if(size < max) max = size;
+
+        return new ListView<>(list.subList(min, max), page, pageMax);
     }
 }
