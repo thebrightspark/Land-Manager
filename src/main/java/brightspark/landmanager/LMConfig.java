@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Config.LangKey(LandManager.MOD_ID + ".config.title")
 public class LMConfig
 {
-    @Config.Comment("Whether non-op players can claim chunks using /lmClaim")
+    @Config.Comment("Whether non-op players can claim chunks using '/lm claim'")
     public static boolean disableClaiming = false;
 
     @Config.Comment("Whether non-op players in creative can break/place blocks in any area")
