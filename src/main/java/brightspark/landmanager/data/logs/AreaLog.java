@@ -24,9 +24,7 @@ public class AreaLog implements INBTSerializable<NBTTagCompound>
 
     public AreaLog(NBTTagCompound nbt)
     {
-        type = AreaLogType.valueOf(nbt.getString("type"));
-        areaName = nbt.getString("area");
-        playerName = nbt.getString("player");
+        deserializeNBT(nbt);
     }
 
     public String getTimeString()

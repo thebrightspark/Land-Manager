@@ -76,7 +76,7 @@ public class CommonEventHandler
     @SubscribeEvent
     public static void onBlockPlace(BlockEvent.PlaceEvent event)
     {
-        //Stop players from placing block in procteted areas
+        //Stop players from placing block in protected areas
         EntityPlayer player = event.getPlayer();
         Area area = getProtectedArea(player, event.getPos());
         if(area != null)
