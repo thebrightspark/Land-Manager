@@ -29,14 +29,19 @@ public class CommonEventHandler
 
     private static long lastTimeHitProtectedBlock = 0L;
 
-    private static Area handleProtection(EntityPlayer player, BlockPos pos)
+    private static Area getProtectedArea(EntityPlayer player, BlockPos pos)
     {
-        if(!LMConfig.creativeIgnoresProtection || player.isCreative() || player.canUseCommand(2, ""))
+        if((LMConfig.creativeIgnoresProtection && player.isCreative()) || player.canUseCommand(2, ""))
             return null;
 
         //Check if in protected area
         CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
-        return cap != null ? cap.intersectingArea(pos) : null;
+        if(cap == null) return null;
+        Area area = cap.intersectingArea(pos);
+        if(area != null && !area.getAllocatedPlayer().equals(player.getUniqueID()))
+            //Area is protected against this player
+            return area;
+        return null;
     }
 
     private static void sendCapToPlayer(EntityPlayer player)
@@ -51,7 +56,7 @@ public class CommonEventHandler
     {
         //Stop players from breaking blocks in protected areas
         EntityPlayer player = event.getEntityPlayer();
-        Area area = handleProtection(player, event.getPos());
+        Area area = getProtectedArea(player, event.getPos());
         if(area != null)
         {
             if(player.world.isRemote)
@@ -73,7 +78,7 @@ public class CommonEventHandler
     {
         //Stop players from placing block in procteted areas
         EntityPlayer player = event.getPlayer();
-        Area area = handleProtection(player, event.getPos());
+        Area area = getProtectedArea(player, event.getPos());
         if(area != null)
         {
             player.sendMessage(new TextComponentTranslation("message.protection.place"));
