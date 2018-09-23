@@ -66,12 +66,36 @@ public class CapabilityAreasImpl implements CapabilityAreas
     }
 
     @Override
-    public boolean toggleSpawning(String areaName)
+    public boolean togglePassives(String areaName)
     {
         Area area = getArea(areaName);
         if(area != null)
         {
-            area.toggleStopEntitySpawning();
+            area.togglePassiveSpawning();
+            dataChanged();
+        }
+        return area != null;
+    }
+
+    @Override
+    public boolean toggleHostiles(String areaName)
+    {
+        Area area = getArea(areaName);
+        if(area != null)
+        {
+            area.toggleHostileSpawning();
+            dataChanged();
+        }
+        return area != null;
+    }
+
+    @Override
+    public boolean toggleExplosions(String areaName)
+    {
+        Area area = getArea(areaName);
+        if(area != null)
+        {
+            area.toggleExplosions();
             dataChanged();
         }
         return area != null;

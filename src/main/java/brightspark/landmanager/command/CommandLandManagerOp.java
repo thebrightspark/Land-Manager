@@ -16,10 +16,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class CommandLandManagerOp extends LMCommand
 {
+    private static final String[] argNames = new String[] {"allocate", "clearAllocation", "delete", "passives", "hostiles", "explosions", "tool"};
+
     @Override
     public String getName()
     {
@@ -32,7 +36,9 @@ public class CommandLandManagerOp extends LMCommand
         return "\nlmop delete <areaName>\n" +
                 "lmop allocate <playerName> <areaName>\n" +
                 "lmop clearAllocation <areaName>\n" +
-                "lmop spawning <areaName> [true/false]\n" +
+                "lmop passives <areaName>\n" +
+                "lmop hostiles <areaName>\n" +
+                "lmop explosions <areaName>\n" +
                 "lmop tool";
     }
 
@@ -53,7 +59,7 @@ public class CommandLandManagerOp extends LMCommand
         String areaName = null;
         CapabilityAreas cap = null;
         //Only get the area name and capability from the arguments if necessary for the command
-        if(command.equals("delete") || command.equals("allocate") || command.equals("clearallocation") || command.equals("spawning"))
+        if(!command.equals("tool"))
         {
             areaName = argsToString(args, command.equals("allocate") ? 2 : 1);
             if(areaName.isEmpty()) areaName = null;
@@ -102,14 +108,32 @@ public class CommandLandManagerOp extends LMCommand
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.clear.failed", areaName));
                 break;
-            case "spawning": //lmop spawning <areaName>
-                if(cap.toggleSpawning(areaName))
+            case "passives": //lmop passives <areaName>
+                if(cap.togglePassives(areaName))
                 {
-                    sender.sendMessage(new TextComponentTranslation("message.command.spawning.success", cap.getArea(areaName).getStopsEntitySpawning(), areaName));
-                    LandManager.areaLog(AreaLogType.SET_SPAWNING, areaName, (EntityPlayerMP) sender);
+                    sender.sendMessage(new TextComponentTranslation("message.command.passives.success", cap.getArea(areaName).canPassiveSpawn(), areaName));
+                    LandManager.areaLog(AreaLogType.SET_PASSIVES, areaName, (EntityPlayerMP) sender);
                 }
                 else
-                    sender.sendMessage(new TextComponentTranslation("message.command.spawning.failed", areaName));
+                    sender.sendMessage(new TextComponentTranslation("message.command.passives.failed", areaName));
+                break;
+            case "hostiles": //lmop hostiles <areaName>
+                if(cap.toggleHostiles(areaName))
+                {
+                    sender.sendMessage(new TextComponentTranslation("message.command.hostiles.success", cap.getArea(areaName).canHostileSpawn(), areaName));
+                    LandManager.areaLog(AreaLogType.SET_HOSTILES, areaName, (EntityPlayerMP) sender);
+                }
+                else
+                    sender.sendMessage(new TextComponentTranslation("message.command.hostiles.failed", areaName));
+                break;
+            case "explosions": //lmop explosions <areaName>
+                if(cap.toggleExplosions(areaName))
+                {
+                    sender.sendMessage(new TextComponentTranslation("message.command.explosions.success", cap.getArea(areaName).canExplosionsCauseDamage(), areaName));
+                    LandManager.areaLog(AreaLogType.SET_EXPLOSIONS, areaName, (EntityPlayerMP) sender);
+                }
+                else
+                    sender.sendMessage(new TextComponentTranslation("message.command.explosions.failed", areaName));
                 break;
             case "tool": //lmop tool
                 if(!(sender instanceof EntityPlayer))
@@ -128,7 +152,7 @@ public class CommandLandManagerOp extends LMCommand
         switch(args.length)
         {
             case 1:
-                return getListOfStringsMatchingLastWord(args, "allocate", "clearAllocation", "delete", "spawning", "tool");
+                return getListOfStringsMatchingLastWord(args, argNames);
             case 2:
                 switch(args[0])
                 {
@@ -136,7 +160,9 @@ public class CommandLandManagerOp extends LMCommand
                         return getListOfStringsMatchingLastWord(args, server.getPlayerProfileCache().getUsernames());
                     case "clearAllocation":
                     case "delete":
-                    case "spawning":
+                    case "passives":
+                    case "hostiles":
+                    case "explosions":
                         return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
                     default:
                         return Collections.emptyList();
@@ -146,8 +172,6 @@ public class CommandLandManagerOp extends LMCommand
                 {
                     case "allocate":
                         return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-                    case "spawning":
-                        return getListOfStringsMatchingLastWord(args, "t", "true", "f", "false");
                     default:
                         return Collections.emptyList();
                 }

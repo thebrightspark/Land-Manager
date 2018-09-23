@@ -4,5 +4,6 @@ public enum AddAreaResult
 {
     SUCCESS,
     NAME_EXISTS,
-    AREA_INTERSECTS
+    AREA_INTERSECTS,
+    INVALID
 }

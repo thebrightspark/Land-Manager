@@ -119,18 +119,24 @@ public class CommandLandManager extends LMCommand
                     sender.sendMessage(new TextComponentTranslation("message.command.none", areaName));
                     return;
                 }
-                String playerName = getPlayerNameFromUuid(server, area.getAllocatedPlayer());
-                if(playerName == null) playerName = "message.command.area.noplayer";
+                ITextComponent playerName;
+                String playerNameString = getPlayerNameFromUuid(server, area.getAllocatedPlayer());
+                if(playerNameString == null)
+                    playerName = new TextComponentTranslation("message.command.area.noplayer");
+                else
+                    playerName = new TextComponentString(playerNameString);
                 ITextComponent text = new TextComponentString("");
                 text.getStyle().setColor(TextFormatting.WHITE);
-                ITextComponent areaNameComponent = new TextComponentTranslation("message.command.area.name", area.getName());
+                ITextComponent areaNameComponent = new TextComponentTranslation("message.command.area.name");
                 areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
-                text.appendSibling(areaNameComponent);
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.dim", area.getDimensionId()));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.allocation")).appendSibling(goldTextComponent(playerName));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmin", posToString(area.getMinPos())));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmax", posToString(area.getMaxPos())));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.spawning", area.getStopsEntitySpawning() ? "True" : "False"));
+                text.appendSibling(areaNameComponent).appendText(" " +  area.getName());
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.dim")).appendText(" " + String.valueOf(area.getDimensionId()));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.allocation")).appendText(" ").appendSibling(playerName);
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmin")).appendText(" " + posToString(area.getMinPos()));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmax")).appendText(" " + posToString(area.getMaxPos()));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.passives")).appendText(" ").appendSibling(new TextComponentTranslation(area.canPassiveSpawn() ? "True" : "False"));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.hostiles")).appendText(" ").appendSibling(new TextComponentTranslation(area.canHostileSpawn() ? "True" : "False"));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.explosions")).appendText(" ").appendSibling(new TextComponentTranslation(area.canHostileSpawn() ? "True" : "False"));
                 sender.sendMessage(text);
                 break;
             case "claim": //lm claim <areaName>

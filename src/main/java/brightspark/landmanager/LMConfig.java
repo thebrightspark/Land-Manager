@@ -19,7 +19,11 @@ public class LMConfig
     @Config.Comment("Max number of logs stored")
     public static int logStorageSize = 50;
 
+    @Config.Comment("Client side configurations")
     public static final Client client = new Client();
+
+//    @Config.Comment("Non-OP player permissions for what they can change in their areas")
+//    public static final Permissions permissions = new Permissions();
 
     public static class Client
     {
@@ -32,6 +36,18 @@ public class LMConfig
         @Config.Comment("Whether OPs will see area changes in their chat")
         public boolean showChatLogs = true;
     }
+
+//    public static class Permissions
+//    {
+//        @Config.Comment("If passive entities can spawn in the area")
+//        public boolean passiveSpawning = false;
+//
+//        @Config.Comment("If hostile entities can spawn in the area")
+//        public boolean hostileSpawning = false;
+//
+//        @Config.Comment("If explosions can destroy blocks in the area")
+//        public boolean explosions = false;
+//    }
 
     @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
     private static class Handler

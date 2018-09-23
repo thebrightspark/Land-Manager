@@ -6,6 +6,7 @@ import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.areas.CapabilityAreasProvider;
 import brightspark.landmanager.data.logs.AreaLogType;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
@@ -15,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -116,7 +118,18 @@ public class CommonEventHandler
         CapabilityAreas cap = event.getWorld().getCapability(LandManager.CAPABILITY_AREAS, null);
         if(cap == null) return;
         Set<Area> areas = cap.intersectingAreas(new BlockPos(event.getX(), event.getY(), event.getZ()));
-        if(areas.stream().anyMatch(Area::getStopsEntitySpawning))
+        boolean hostile = event.getEntityLiving().isCreatureType(EnumCreatureType.MONSTER, false);
+        if(areas.stream().anyMatch(area -> !(hostile ? area.canHostileSpawn() : area.canPassiveSpawn())))
             event.setResult(Event.Result.DENY);
+    }
+
+    @SubscribeEvent
+    public static void onExplosion(ExplosionEvent.Detonate event)
+    {
+        CapabilityAreas cap = event.getWorld().getCapability(LandManager.CAPABILITY_AREAS, null);
+        if(cap == null) return;
+        event.getAffectedBlocks().removeIf(pos ->
+                cap.intersectingAreas(pos).stream().anyMatch(area ->
+                        !area.canExplosionsCauseDamage()));
     }
 }

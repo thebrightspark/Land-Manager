@@ -72,7 +72,10 @@ abstract class LMCommand extends CommandBase
 
     String posToString(BlockPos pos)
     {
-        return String.format("%s, %s, %s", pos.getX(), pos.getY(), pos.getZ());
+        return String.format("%sX: %s%s, %sY: %s%s, %sZ: %s%s",
+                TextFormatting.YELLOW, TextFormatting.RESET, pos.getX(),
+                TextFormatting.YELLOW, TextFormatting.RESET, pos.getY(),
+                TextFormatting.YELLOW, TextFormatting.RESET, pos.getZ());
     }
 
     String argsToString(String[] args, int startIndex)

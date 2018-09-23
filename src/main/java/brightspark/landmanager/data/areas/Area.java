@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.UUID;
@@ -14,7 +15,10 @@ public class Area implements INBTSerializable<NBTTagCompound>
     private int dimensionId;
     private BlockPos pos1, pos2, center;
     private UUID allocatedPlayer;
-    private boolean stopEntitySpawning;
+    private boolean
+            canPassiveSpawn = true,
+            canHostileSpawn = true,
+            explosions = true;
 
     public Area(String name, int dimensionId, BlockPos position1, BlockPos position2)
     {
@@ -82,14 +86,34 @@ public class Area implements INBTSerializable<NBTTagCompound>
         allocatedPlayer = uuid;
     }
 
-    public boolean getStopsEntitySpawning()
+    public boolean canPassiveSpawn()
     {
-        return stopEntitySpawning;
+        return canPassiveSpawn;
     }
 
-    public void toggleStopEntitySpawning()
+    public void togglePassiveSpawning()
     {
-        stopEntitySpawning = !stopEntitySpawning;
+        canPassiveSpawn = !canPassiveSpawn;
+    }
+
+    public boolean canHostileSpawn()
+    {
+        return canHostileSpawn;
+    }
+
+    public void toggleHostileSpawning()
+    {
+        canHostileSpawn = !canHostileSpawn;
+    }
+
+    public boolean canExplosionsCauseDamage()
+    {
+        return explosions;
+    }
+
+    public void toggleExplosions()
+    {
+        explosions = !explosions;
     }
 
     public AxisAlignedBB asAABB()
@@ -109,10 +133,10 @@ public class Area implements INBTSerializable<NBTTagCompound>
         return asAABB().contains(new Vec3d(pos).add(new Vec3d(0.5d, 0.5d, 0.5d)));
     }
 
-    public void extendToMinMaxY()
+    public void extendToMinMaxY(World world)
     {
         pos1 = new BlockPos(pos1.getX(), 0, pos1.getZ());
-        pos2 = new BlockPos(pos2.getX(), 255, pos2.getZ());
+        pos2 = new BlockPos(pos2.getX(), world.getHeight(), pos2.getZ());
     }
 
     @Override
@@ -124,11 +148,10 @@ public class Area implements INBTSerializable<NBTTagCompound>
         nbt.setLong("position1", pos1.toLong());
         nbt.setLong("position2", pos2.toLong());
         if(allocatedPlayer != null)
-        {
-            nbt.setLong("uuid_most", allocatedPlayer.getMostSignificantBits());
-            nbt.setLong("uuid_least", allocatedPlayer.getLeastSignificantBits());
-        }
-        nbt.setBoolean("spawning", stopEntitySpawning);
+            nbt.setUniqueId("player", allocatedPlayer);
+        nbt.setBoolean("passive", canPassiveSpawn);
+        nbt.setBoolean("hostile", canHostileSpawn);
+        nbt.setBoolean("explosions", explosions);
         return nbt;
     }
 
@@ -139,9 +162,11 @@ public class Area implements INBTSerializable<NBTTagCompound>
         dimensionId = nbt.getInteger("dimension");
         pos1 = BlockPos.fromLong(nbt.getLong("position1"));
         pos2 = BlockPos.fromLong(nbt.getLong("position2"));
-        if(nbt.hasKey("uuid_most"))
-            allocatedPlayer = new UUID(nbt.getLong("uuid_most"), nbt.getLong("uuid_least"));
-        stopEntitySpawning = nbt.getBoolean("spawning");
+        if(nbt.hasUniqueId("player"))
+            allocatedPlayer = nbt.getUniqueId("player");
+        canPassiveSpawn = nbt.getBoolean("passive");
+        canHostileSpawn = nbt.getBoolean("hostile");
+        explosions = nbt.getBoolean("explosions");
     }
 
     @Override

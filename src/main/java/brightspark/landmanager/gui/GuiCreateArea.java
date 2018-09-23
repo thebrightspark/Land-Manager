@@ -63,7 +63,7 @@ public class GuiCreateArea extends GuiScreen
         {
             Area area = new Area(areaName, dimId, pos1, pos2);
             if(extendCheck.isChecked())
-                area.extendToMinMaxY();
+                area.extendToMinMaxY(mc.world);
             sentCreateMessage = true;
             LandManager.NETWORK.sendToServer(new MessageCreateArea(area));
         }

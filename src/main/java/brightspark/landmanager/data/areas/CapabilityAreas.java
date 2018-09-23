@@ -21,7 +21,11 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
 
     boolean clearAllocation(String areaName);
 
-    boolean toggleSpawning(String areaName);
+    boolean togglePassives(String areaName);
+
+    boolean toggleHostiles(String areaName);
+
+    boolean toggleExplosions(String areaName);
 
     List<Area> getAllAreas();
 

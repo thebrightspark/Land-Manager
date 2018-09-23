@@ -48,15 +48,23 @@ public class MessageCreateArea implements IMessage
                 @Override
                 public void run()
                 {
+                    AddAreaResult result = AddAreaResult.INVALID;
+                    Area area = message.area;
                     EntityPlayerMP player = ctx.getServerHandler().player;
-                    CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
-                    if(cap != null)
+                    if(area.getDimensionId() == player.dimension &&
+                            area.getMinPos().getY() >= 0 &&
+                            area.getMaxPos().getY() <= player.world.getHeight())
                     {
-                        AddAreaResult result = cap.addArea(message.area);
-                        if(result == AddAreaResult.SUCCESS)
-                            LandManager.areaLog(AreaLogType.CREATE, message.area.getName(), player);
-                        LandManager.NETWORK.sendTo(new MessageCreateAreaReply(message.area.getName(), result), player);
+                        CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
+                        if(cap != null)
+                        {
+                            result = cap.addArea(area);
+                            if(result == AddAreaResult.SUCCESS)
+                                LandManager.areaLog(AreaLogType.CREATE, area.getName(), player);
+                        }
                     }
+
+                    LandManager.NETWORK.sendTo(new MessageCreateAreaReply(area.getName(), result), player);
                 }
             });
             return null;

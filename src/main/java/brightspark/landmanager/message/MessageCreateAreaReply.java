@@ -72,10 +72,15 @@ public class MessageCreateAreaReply implements IMessage
                         case NAME_EXISTS:
                             player.sendMessage(new TextComponentTranslation("message.create.name", message.areaName));
                             GuiScreen gui = mc.currentScreen;
-                            if(gui != null && gui instanceof GuiCreateArea) ((GuiCreateArea) gui).clearTextField();
+                            if(gui instanceof GuiCreateArea) ((GuiCreateArea) gui).clearTextField();
                             break;
                         case AREA_INTERSECTS:
                             player.sendMessage(new TextComponentTranslation("message.create.intersects"));
+                            player.closeScreen();
+                            resetItem(player);
+                            break;
+                        case INVALID:
+                            player.sendMessage(new TextComponentTranslation("message.create.invalid"));
                             player.closeScreen();
                             resetItem(player);
                     }
