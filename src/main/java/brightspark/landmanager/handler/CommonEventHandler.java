@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
@@ -40,7 +41,7 @@ public class CommonEventHandler
         CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
         if(cap == null) return null;
         Area area = cap.intersectingArea(pos);
-        if(area != null && !area.getAllocatedPlayer().equals(player.getUniqueID()))
+        if(area != null && !Objects.equals(area.getAllocatedPlayer(), player.getUniqueID()))
             //Area is protected against this player
             return area;
         return null;
