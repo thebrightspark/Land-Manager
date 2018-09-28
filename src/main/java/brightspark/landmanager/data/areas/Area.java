@@ -18,7 +18,8 @@ public class Area implements INBTSerializable<NBTTagCompound>
     private boolean
             canPassiveSpawn = true,
             canHostileSpawn = true,
-            explosions = true;
+            explosions = true,
+            interact = true;
 
     public Area(String name, int dimensionId, BlockPos position1, BlockPos position2)
     {
@@ -116,6 +117,16 @@ public class Area implements INBTSerializable<NBTTagCompound>
         explosions = !explosions;
     }
 
+    public boolean canInteract()
+    {
+        return interact;
+    }
+
+    public void toggleInteract()
+    {
+        interact = !interact;
+    }
+
     public AxisAlignedBB asAABB()
     {
         Vec3d p1 = new Vec3d(pos1).add(new Vec3d(0.4d, 0.4d, 0.4d));
@@ -152,6 +163,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
         nbt.setBoolean("passive", canPassiveSpawn);
         nbt.setBoolean("hostile", canHostileSpawn);
         nbt.setBoolean("explosions", explosions);
+        nbt.setBoolean("interact", interact);
         return nbt;
     }
 
@@ -167,6 +179,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
         canPassiveSpawn = nbt.getBoolean("passive");
         canHostileSpawn = nbt.getBoolean("hostile");
         explosions = nbt.getBoolean("explosions");
+        interact = nbt.getBoolean("interact");
     }
 
     @Override

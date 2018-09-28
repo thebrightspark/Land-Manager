@@ -13,7 +13,8 @@ public enum AreaLogType
     BREAK,
     SET_PASSIVES,
     SET_HOSTILES,
-    SET_EXPLOSIONS;
+    SET_EXPLOSIONS,
+    SET_INTERACTIONS;
 
     public String getUnlocalisedName()
     {
@@ -33,7 +34,8 @@ public enum AreaLogType
             case BREAK:             return TextFormatting.GOLD;
             case SET_PASSIVES:
             case SET_HOSTILES:
-            case SET_EXPLOSIONS:    return TextFormatting.LIGHT_PURPLE;
+            case SET_EXPLOSIONS:
+            case SET_INTERACTIONS:  return TextFormatting.LIGHT_PURPLE;
             default:                return TextFormatting.WHITE;
         }
     }

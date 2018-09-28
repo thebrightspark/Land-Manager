@@ -15,6 +15,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -31,6 +32,11 @@ public class CommonEventHandler
     private static final ResourceLocation AREAS_RL = new ResourceLocation(LandManager.MOD_ID, "_areas");
 
     private static long lastTimeHitProtectedBlock = 0L;
+
+    private static CapabilityAreas getAreas(World world)
+    {
+        return world.getCapability(LandManager.CAPABILITY_AREAS, null);
+    }
 
     private static Area getProtectedArea(EntityPlayer player, BlockPos pos)
     {
@@ -50,7 +56,7 @@ public class CommonEventHandler
     private static void sendCapToPlayer(EntityPlayer player)
     {
         if(!(player instanceof EntityPlayerMP)) return;
-        CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
+        CapabilityAreas cap = getAreas(player.world);
         if(cap != null) cap.sendDataToPlayer((EntityPlayerMP) player);
     }
 
@@ -116,7 +122,7 @@ public class CommonEventHandler
     public static void onEntitySpawn(LivingSpawnEvent.CheckSpawn event)
     {
         //Stop entity spawning if it's within an area that's preventing the spawning
-        CapabilityAreas cap = event.getWorld().getCapability(LandManager.CAPABILITY_AREAS, null);
+        CapabilityAreas cap = getAreas(event.getWorld());
         if(cap == null) return;
         Set<Area> areas = cap.intersectingAreas(new BlockPos(event.getX(), event.getY(), event.getZ()));
         boolean hostile = event.getEntityLiving().isCreatureType(EnumCreatureType.MONSTER, false);
@@ -127,10 +133,23 @@ public class CommonEventHandler
     @SubscribeEvent
     public static void onExplosion(ExplosionEvent.Detonate event)
     {
-        CapabilityAreas cap = event.getWorld().getCapability(LandManager.CAPABILITY_AREAS, null);
+        CapabilityAreas cap = getAreas(event.getWorld());
         if(cap == null) return;
         event.getAffectedBlocks().removeIf(pos ->
                 cap.intersectingAreas(pos).stream().anyMatch(area ->
                         !area.canExplosionsCauseDamage()));
+    }
+
+    @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event)
+    {
+        CapabilityAreas cap = getAreas(event.getWorld());
+        if(cap == null) return;
+        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area -> !area.canInteract()))
+        {
+            if(event.getWorld().isRemote)
+                event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.interact"));
+            event.setCanceled(true);
+        }
     }
 }

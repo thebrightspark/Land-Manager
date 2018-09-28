@@ -27,6 +27,8 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
 
     boolean toggleExplosions(String areaName);
 
+    boolean toggleInteract(String areaName);
+
     List<Area> getAllAreas();
 
     List<String> getAllAreaNames();

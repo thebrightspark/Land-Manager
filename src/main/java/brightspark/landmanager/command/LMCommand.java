@@ -113,4 +113,9 @@ abstract class LMCommand extends CommandBase
 
         return new ListView<>(list.subList(min, max), page, pageMax);
     }
+
+    String booleanToUnlocString(boolean bool)
+    {
+        return bool ? "message.misc.true" : "message.misc.false";
+    }
 }

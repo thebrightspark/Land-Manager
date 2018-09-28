@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public class CommandLandManagerOp extends LMCommand
 {
-    private static final String[] argNames = new String[] {"allocate", "clearAllocation", "delete", "passives", "hostiles", "explosions", "tool"};
+    private static final String[] argNames = new String[] {"allocate", "clearAllocation", "delete", "passives", "hostiles", "explosions", "interactions", "tool"};
 
     @Override
     public String getName()
@@ -39,6 +39,7 @@ public class CommandLandManagerOp extends LMCommand
                 "lmop passives <areaName>\n" +
                 "lmop hostiles <areaName>\n" +
                 "lmop explosions <areaName>\n" +
+                "lmop interactions <areaName>\n" +
                 "lmop tool";
     }
 
@@ -135,6 +136,15 @@ public class CommandLandManagerOp extends LMCommand
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.explosions.failed", areaName));
                 break;
+            case "interactions": //lmop interactions <areaName>
+                if(cap.toggleInteract(areaName))
+                {
+                    sender.sendMessage(new TextComponentTranslation("message.command.interactions.success", cap.getArea(areaName).canInteract(), areaName));
+                    LandManager.areaLog(AreaLogType.SET_EXPLOSIONS, areaName, (EntityPlayerMP) sender);
+                }
+                else
+                    sender.sendMessage(new TextComponentTranslation("message.command.interactions.failed", areaName));
+                break;
             case "tool": //lmop tool
                 if(!(sender instanceof EntityPlayer))
                     sender.sendMessage(new TextComponentTranslation("message.command.tool.player"));
@@ -163,6 +173,7 @@ public class CommandLandManagerOp extends LMCommand
                     case "passives":
                     case "hostiles":
                     case "explosions":
+                    case "interactions":
                         return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
                     default:
                         return Collections.emptyList();

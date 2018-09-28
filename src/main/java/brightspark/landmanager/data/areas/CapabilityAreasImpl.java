@@ -12,6 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CapabilityAreasImpl implements CapabilityAreas
@@ -68,34 +69,33 @@ public class CapabilityAreasImpl implements CapabilityAreas
     @Override
     public boolean togglePassives(String areaName)
     {
-        Area area = getArea(areaName);
-        if(area != null)
-        {
-            area.togglePassiveSpawning();
-            dataChanged();
-        }
-        return area != null;
+        return toggle(areaName, Area::togglePassiveSpawning);
     }
 
     @Override
     public boolean toggleHostiles(String areaName)
     {
-        Area area = getArea(areaName);
-        if(area != null)
-        {
-            area.toggleHostileSpawning();
-            dataChanged();
-        }
-        return area != null;
+        return toggle(areaName, Area::toggleHostileSpawning);
     }
 
     @Override
     public boolean toggleExplosions(String areaName)
     {
+        return toggle(areaName, Area::toggleExplosions);
+    }
+
+    @Override
+    public boolean toggleInteract(String areaName)
+    {
+        return toggle(areaName, Area::toggleInteract);
+    }
+
+    private boolean toggle(String areaName, Consumer<Area> consumer)
+    {
         Area area = getArea(areaName);
         if(area != null)
         {
-            area.toggleExplosions();
+            consumer.accept(area);
             dataChanged();
         }
         return area != null;

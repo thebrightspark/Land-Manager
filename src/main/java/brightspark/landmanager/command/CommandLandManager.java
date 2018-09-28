@@ -134,9 +134,10 @@ public class CommandLandManager extends LMCommand
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.allocation")).appendText(" ").appendSibling(playerName);
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmin")).appendText(" " + posToString(area.getMinPos()));
                 text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.posmax")).appendText(" " + posToString(area.getMaxPos()));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.passives")).appendText(" ").appendSibling(new TextComponentTranslation(area.canPassiveSpawn() ? "True" : "False"));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.hostiles")).appendText(" ").appendSibling(new TextComponentTranslation(area.canHostileSpawn() ? "True" : "False"));
-                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.explosions")).appendText(" ").appendSibling(new TextComponentTranslation(area.canHostileSpawn() ? "True" : "False"));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.passives")).appendText(" ").appendSibling(new TextComponentTranslation(booleanToUnlocString(area.canPassiveSpawn())));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.hostiles")).appendText(" ").appendSibling(new TextComponentTranslation(booleanToUnlocString(area.canHostileSpawn())));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.explosions")).appendText(" ").appendSibling(new TextComponentTranslation(booleanToUnlocString(area.canHostileSpawn())));
+                text.appendText("\n ").appendSibling(goldTextComponent("message.command.area.interactions")).appendText(" ").appendSibling(new TextComponentTranslation(booleanToUnlocString(area.canInteract())));
                 sender.sendMessage(text);
                 break;
             case "claim": //lm claim <areaName>
