@@ -30,6 +30,7 @@ message.command.area.posmax=Block Pos Max:
 message.command.area.passives=Can Passive Entities Spawn:
 message.command.area.hostiles=Can Hostile Entities Spawn:
 message.command.area.explosions=Explosions:
+message.command.area.interactions=Block Interactions:
 message.command.claim.disabled=Area claiming is not enabled! Ask an OP to allocate you an area.
 message.command.claim.standing=Claiming the area you're standing in is still WIP. Please specify an area name instead.
 message.command.claim.invalid=Invalid area name provided

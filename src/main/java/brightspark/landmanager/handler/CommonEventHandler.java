@@ -9,6 +9,7 @@ import brightspark.landmanager.data.logs.AreaLogType;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -38,16 +39,26 @@ public class CommonEventHandler
         return world.getCapability(LandManager.CAPABILITY_AREAS, null);
     }
 
+    private static boolean isPlayerCreativeOrOP(EntityPlayer player)
+    {
+        return (LMConfig.creativeIgnoresProtection && player.isCreative()) || player.canUseCommand(2, "");
+    }
+
+    private static boolean playerOwnsArea(Area area, EntityPlayer player)
+    {
+        return Objects.equals(area.getAllocatedPlayer(), player.getUniqueID());
+    }
+
     private static Area getProtectedArea(EntityPlayer player, BlockPos pos)
     {
-        if((LMConfig.creativeIgnoresProtection && player.isCreative()) || player.canUseCommand(2, ""))
+        if(isPlayerCreativeOrOP(player))
             return null;
 
         //Check if in protected area
         CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
         if(cap == null) return null;
         Area area = cap.intersectingArea(pos);
-        if(area != null && !Objects.equals(area.getAllocatedPlayer(), player.getUniqueID()))
+        if(area != null && !playerOwnsArea(area, player))
             //Area is protected against this player
             return area;
         return null;
@@ -97,6 +108,22 @@ public class CommonEventHandler
     }
 
     @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event)
+    {
+        //Stop players from right clicking blocks in areas that prevent it
+        if(isPlayerCreativeOrOP(event.getEntityPlayer())) return;
+        CapabilityAreas cap = getAreas(event.getWorld());
+        if(cap == null) return;
+        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area ->
+                !area.canInteract() && !playerOwnsArea(area, event.getEntityPlayer())))
+        {
+            if(event.getWorld().isRemote && event.getHand() == EnumHand.MAIN_HAND)
+                event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.interact"));
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
     public static void attachWorldCap(AttachCapabilitiesEvent<World> event)
     {
         World world = event.getObject();
@@ -133,23 +160,11 @@ public class CommonEventHandler
     @SubscribeEvent
     public static void onExplosion(ExplosionEvent.Detonate event)
     {
+        //Prevent blocks from being destroyed by explosions if it's an area that prevents it
         CapabilityAreas cap = getAreas(event.getWorld());
         if(cap == null) return;
         event.getAffectedBlocks().removeIf(pos ->
                 cap.intersectingAreas(pos).stream().anyMatch(area ->
                         !area.canExplosionsCauseDamage()));
-    }
-
-    @SubscribeEvent
-    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event)
-    {
-        CapabilityAreas cap = getAreas(event.getWorld());
-        if(cap == null) return;
-        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area -> !area.canInteract()))
-        {
-            if(event.getWorld().isRemote)
-                event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.interact"));
-            event.setCanceled(true);
-        }
     }
 }

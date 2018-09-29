@@ -19,7 +19,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
             canPassiveSpawn = true,
             canHostileSpawn = true,
             explosions = true,
-            interact = true;
+            interact = false;
 
     public Area(String name, int dimensionId, BlockPos position1, BlockPos position2)
     {

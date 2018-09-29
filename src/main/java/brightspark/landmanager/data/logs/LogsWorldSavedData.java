@@ -3,6 +3,7 @@ package brightspark.landmanager.data.logs;
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.message.MessageChatLog;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -44,17 +45,17 @@ public class LogsWorldSavedData extends WorldSavedData
         return instance;
     }
 
-    public void addLog(AreaLogType type, String areaName, EntityPlayerMP player)
+    public void addLog(AreaLogType type, String areaName, ICommandSender sender)
     {
-        AreaLog newLog = new AreaLog(type, areaName, player.getName());
+        AreaLog newLog = new AreaLog(type, areaName, sender.getName());
         logs.add(newLog);
 
         //Send chat log to all OPs
-        String[] ops = player.getServerWorld().getMinecraftServer().getPlayerList().getOppedPlayers().getKeys();
+        String[] ops = sender.getEntityWorld().getMinecraftServer().getPlayerList().getOppedPlayers().getKeys();
         for(String op : ops)
         {
-            EntityPlayer playerOp = player.world.getPlayerEntityByName(op);
-            if(playerOp != null && !playerOp.equals(player)) LandManager.NETWORK.sendTo(new MessageChatLog(newLog), (EntityPlayerMP) playerOp);
+            EntityPlayer playerOp = sender.getEntityWorld().getPlayerEntityByName(op);
+            if(playerOp != null && !playerOp.equals(sender)) LandManager.NETWORK.sendTo(new MessageChatLog(newLog), (EntityPlayerMP) playerOp);
         }
 
         markDirty();

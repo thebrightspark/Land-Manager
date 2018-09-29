@@ -9,7 +9,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -78,7 +77,7 @@ public class CommandLandManagerOp extends LMCommand
                 if(cap.removeArea(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.delete.deleted", areaName));
-                    LandManager.areaLog(AreaLogType.DELETE, areaName, (EntityPlayerMP) sender);
+                    LandManager.areaLog(AreaLogType.DELETE, areaName, sender);
                 }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.delete.failed", areaName));
@@ -95,7 +94,7 @@ public class CommandLandManagerOp extends LMCommand
                 if(cap.setAllocation(areaName, uuid))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.allocate.success", areaName, profile.getName()));
-                    LandManager.areaLog(AreaLogType.ALLOCATE, areaName, (EntityPlayerMP) sender);
+                    LandManager.areaLog(AreaLogType.ALLOCATE, areaName, sender);
                 }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.allocate.failed", areaName, profile.getName()));
@@ -104,7 +103,7 @@ public class CommandLandManagerOp extends LMCommand
                 if(cap.clearAllocation(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.clear.cleared", areaName));
-                    LandManager.areaLog(AreaLogType.CLEAR_ALLOCATION, areaName, (EntityPlayerMP) sender);
+                    LandManager.areaLog(AreaLogType.CLEAR_ALLOCATION, areaName, sender);
                 }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.clear.failed", areaName));
@@ -113,7 +112,7 @@ public class CommandLandManagerOp extends LMCommand
                 if(cap.togglePassives(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.passives.success", cap.getArea(areaName).canPassiveSpawn(), areaName));
-                    LandManager.areaLog(AreaLogType.SET_PASSIVES, areaName, (EntityPlayerMP) sender);
+                    LandManager.areaLog(AreaLogType.SET_PASSIVES, areaName, sender);
                 }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.passives.failed", areaName));
@@ -122,7 +121,7 @@ public class CommandLandManagerOp extends LMCommand
                 if(cap.toggleHostiles(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.hostiles.success", cap.getArea(areaName).canHostileSpawn(), areaName));
-                    LandManager.areaLog(AreaLogType.SET_HOSTILES, areaName, (EntityPlayerMP) sender);
+                    LandManager.areaLog(AreaLogType.SET_HOSTILES, areaName, sender);
                 }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.hostiles.failed", areaName));
@@ -131,7 +130,7 @@ public class CommandLandManagerOp extends LMCommand
                 if(cap.toggleExplosions(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.explosions.success", cap.getArea(areaName).canExplosionsCauseDamage(), areaName));
-                    LandManager.areaLog(AreaLogType.SET_EXPLOSIONS, areaName, (EntityPlayerMP) sender);
+                    LandManager.areaLog(AreaLogType.SET_EXPLOSIONS, areaName, sender);
                 }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.explosions.failed", areaName));
@@ -140,7 +139,7 @@ public class CommandLandManagerOp extends LMCommand
                 if(cap.toggleInteract(areaName))
                 {
                     sender.sendMessage(new TextComponentTranslation("message.command.interactions.success", cap.getArea(areaName).canInteract(), areaName));
-                    LandManager.areaLog(AreaLogType.SET_EXPLOSIONS, areaName, (EntityPlayerMP) sender);
+                    LandManager.areaLog(AreaLogType.SET_EXPLOSIONS, areaName, sender);
                 }
                 else
                     sender.sendMessage(new TextComponentTranslation("message.command.interactions.failed", areaName));

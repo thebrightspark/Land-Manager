@@ -1,6 +1,7 @@
 package brightspark.landmanager;
 
-import brightspark.landmanager.command.*;
+import brightspark.landmanager.command.CommandLandManager;
+import brightspark.landmanager.command.CommandLandManagerOp;
 import brightspark.landmanager.data.areas.CapStorage;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.areas.CapabilityAreasImpl;
@@ -9,8 +10,8 @@ import brightspark.landmanager.data.logs.LogsWorldSavedData;
 import brightspark.landmanager.gui.GuiHandler;
 import brightspark.landmanager.item.LMItems;
 import brightspark.landmanager.message.*;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -22,8 +23,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
-
-import java.util.regex.Pattern;
 
 @Mod(modid = LandManager.MOD_ID, name = LandManager.MOD_NAME, version = LandManager.VERSION)
 public class LandManager
@@ -75,9 +74,9 @@ public class LandManager
         //event.registerServerCommand(new CommandLandManagerLogs());
     }
 
-    public static void areaLog(AreaLogType type, String areaName, EntityPlayerMP player)
+    public static void areaLog(AreaLogType type, String areaName, ICommandSender sender)
     {
-        LogsWorldSavedData logData = LogsWorldSavedData.get(player.world);
-        if(logData != null) logData.addLog(type, areaName, player);
+        LogsWorldSavedData logData = LogsWorldSavedData.get(sender.getEntityWorld());
+        if(logData != null) logData.addLog(type, areaName, sender);
     }
 }
