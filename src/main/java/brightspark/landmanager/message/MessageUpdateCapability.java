@@ -46,7 +46,8 @@ public class MessageUpdateCapability implements IMessage
                 {
                     World world = Minecraft.getMinecraft().world;
                     CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-                    if(cap != null) cap.deserializeNBT(message.nbt);
+                    if(cap != null)
+                        cap.deserializeNBT(message.nbt);
                 }
             });
             return null;

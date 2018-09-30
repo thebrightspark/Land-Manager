@@ -110,7 +110,7 @@ public class ClientEventHandler
         GlStateManager.translate(center.x, center.y, center.z);
         GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-viewerYaw, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate((float)(isThirdPersonFrontal ? -1 : 1) * viewerPitch, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate((float) (isThirdPersonFrontal ? -1 : 1) * viewerPitch, 1.0F, 0.0F, 0.0F);
         float scale = 0.04f * LMConfig.client.areaNameScale;
         GlStateManager.scale(-scale, -scale, scale);
         GlStateManager.disableTexture2D();
@@ -121,10 +121,10 @@ public class ClientEventHandler
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        bufferbuilder.pos((double)(-i - 1), -1D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-        bufferbuilder.pos((double)(-i - 1), 8D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-        bufferbuilder.pos((double)(i + 1), 8D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-        bufferbuilder.pos((double)(i + 1), -1D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        bufferbuilder.pos((double) (-i - 1), -1D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        bufferbuilder.pos((double) (-i - 1), 8D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        bufferbuilder.pos((double) (i + 1), 8D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
+        bufferbuilder.pos((double) (i + 1), -1D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
         tessellator.draw();
         GlStateManager.enableTexture2D();
         fr.drawString(name, -i, 0, -1);
@@ -134,10 +134,12 @@ public class ClientEventHandler
     @SubscribeEvent
     public static void areaRendering(RenderWorldLastEvent event)
     {
-        if(!renderAll && renderArea.isEmpty()) return;
+        if(!renderAll && renderArea.isEmpty())
+            return;
 
         CapabilityAreas cap = mc.world.getCapability(LandManager.CAPABILITY_AREAS, null);
-        if(cap == null) return;
+        if(cap == null)
+            return;
 
         if(renderAll)
         {
@@ -147,7 +149,8 @@ public class ClientEventHandler
         else if(!renderArea.isEmpty())
         {
             Area area = cap.getArea(renderArea);
-            if(area != null) renderBox(area, event.getPartialTicks());
+            if(area != null)
+                renderBox(area, event.getPartialTicks());
         }
     }
 }

@@ -56,7 +56,8 @@ public class CommonEventHandler
 
         //Check if in protected area
         CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
-        if(cap == null) return null;
+        if(cap == null)
+            return null;
         Area area = cap.intersectingArea(pos);
         if(area != null && !playerOwnsArea(area, player))
             //Area is protected against this player
@@ -66,9 +67,11 @@ public class CommonEventHandler
 
     private static void sendCapToPlayer(EntityPlayer player)
     {
-        if(!(player instanceof EntityPlayerMP)) return;
+        if(!(player instanceof EntityPlayerMP))
+            return;
         CapabilityAreas cap = getAreas(player.world);
-        if(cap != null) cap.sendDataToPlayer((EntityPlayerMP) player);
+        if(cap != null)
+            cap.sendDataToPlayer((EntityPlayerMP) player);
     }
 
     @SubscribeEvent
@@ -111,11 +114,12 @@ public class CommonEventHandler
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event)
     {
         //Stop players from right clicking blocks in areas that prevent it
-        if(isPlayerCreativeOrOP(event.getEntityPlayer())) return;
+        if(isPlayerCreativeOrOP(event.getEntityPlayer()))
+            return;
         CapabilityAreas cap = getAreas(event.getWorld());
-        if(cap == null) return;
-        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area ->
-                !area.canInteract() && !playerOwnsArea(area, event.getEntityPlayer())))
+        if(cap == null)
+            return;
+        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area -> !area.canInteract() && !playerOwnsArea(area, event.getEntityPlayer())))
         {
             if(event.getWorld().isRemote && event.getHand() == EnumHand.MAIN_HAND)
                 event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.interact"));
@@ -150,7 +154,8 @@ public class CommonEventHandler
     {
         //Stop entity spawning if it's within an area that's preventing the spawning
         CapabilityAreas cap = getAreas(event.getWorld());
-        if(cap == null) return;
+        if(cap == null)
+            return;
         Set<Area> areas = cap.intersectingAreas(new BlockPos(event.getX(), event.getY(), event.getZ()));
         boolean hostile = event.getEntityLiving().isCreatureType(EnumCreatureType.MONSTER, false);
         if(areas.stream().anyMatch(area -> !(hostile ? area.canHostileSpawn() : area.canPassiveSpawn())))
@@ -162,9 +167,8 @@ public class CommonEventHandler
     {
         //Prevent blocks from being destroyed by explosions if it's an area that prevents it
         CapabilityAreas cap = getAreas(event.getWorld());
-        if(cap == null) return;
-        event.getAffectedBlocks().removeIf(pos ->
-                cap.intersectingAreas(pos).stream().anyMatch(area ->
-                        !area.canExplosionsCauseDamage()));
+        if(cap == null)
+            return;
+        event.getAffectedBlocks().removeIf(pos -> cap.intersectingAreas(pos).stream().anyMatch(area -> !area.canExplosionsCauseDamage()));
     }
 }

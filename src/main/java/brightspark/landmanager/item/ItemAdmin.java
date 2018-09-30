@@ -53,7 +53,8 @@ public class ItemAdmin extends Item
     public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
     {
         //Only work in main hand!
-        if(hand == EnumHand.OFF_HAND) return super.onItemUseFirst(player, world, pos, side, hitX, hitY, hitZ, hand);
+        if(hand == EnumHand.OFF_HAND)
+            return super.onItemUseFirst(player, world, pos, side, hitX, hitY, hitZ, hand);
 
         ItemStack stack = player.getHeldItem(hand);
         Position position = getPos(stack);
@@ -86,7 +87,8 @@ public class ItemAdmin extends Item
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
     {
         //Only work in main hand!
-        if(hand == EnumHand.OFF_HAND) return super.onItemRightClick(world, player, hand);
+        if(hand == EnumHand.OFF_HAND)
+            return super.onItemRightClick(world, player, hand);
 
         ItemStack stack = player.getHeldItem(hand);
         if(player.isSneaking() && getPos(stack) != null)

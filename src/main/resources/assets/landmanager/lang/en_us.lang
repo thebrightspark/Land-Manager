@@ -1,8 +1,14 @@
+#Creative Tab
+
 itemGroup.landmanager=Land Manager
+
+#Item
 
 item.admin.name=Admin Tool
 item.admin.tooltip.notset=First position not set
 item.admin.tooltip.set=Dim Id: %d, BlockPos: %s
+
+#Messages
 
 message.tool.saved=Saved block position %d, %d, %d
 message.tool.diffdim=Cannot form area with two positions in different dimensions!
@@ -16,50 +22,44 @@ message.areas.hide=Turned off showing all nearby areas
 message.protection.break=Cannot break a block in someone else's protected area!
 message.protection.place=Cannot place a block in someone else's protected area!
 message.protection.interact=Cannot interact with blocks in this area!
-message.command.none=Couldn't find area '%s'
-message.command.player=You need to be a player to use this command
-message.command.areas.none=No areas found
-message.command.areas.title=Areas - Page %s / %s
-message.command.area.noplayer=None
-message.command.area.details=Area details:
-message.command.area.name=Area Name:
-message.command.area.dim=Dimension ID:
-message.command.area.allocation=Allocation:
-message.command.area.posmin=Block Pos Min:
-message.command.area.posmax=Block Pos Max:
-message.command.area.passives=Can Passive Entities Spawn:
-message.command.area.hostiles=Can Hostile Entities Spawn:
-message.command.area.explosions=Explosions:
-message.command.area.interactions=Block Interactions:
-message.command.claim.disabled=Area claiming is not enabled! Ask an OP to allocate you an area.
-message.command.claim.standing=Claiming the area you're standing in is still WIP. Please specify an area name instead.
-message.command.claim.invalid=Invalid area name provided
-message.command.claim.claimed=Area '%s' claimed
-message.command.claim.failed=Failed to claim area '%s'
-message.command.claim.already=Someone else has already claimed area '%s'
-message.command.claim.notexist=Area '%s' does not exist
-message.command.show.invalid=Invalid area name provided
-message.command.show.showing=Now showing area
-message.command.showoff=Turned off showing areas
-message.command.delete.deleted=Deleted area '%s'
-message.command.delete.failed=Failed to delete area '%s'
-message.command.allocate.noplayer=Could not find player
-message.command.allocate.success=Allocated area '%s' to player %s
-message.command.allocate.failed=Could not allocate area '%s' to player %s
-message.command.clear.cleared=Cleared player allocation for area '%s'
-message.command.clear.failed=Failed to remove player allocation for area '%s'
-message.command.passives.success=Set passive entity spawning to %s for area '%s'
-message.command.passives.failed=Failed to set passive entity spawning for area '%s'
-message.command.hostiles.success=Set hostile entity spawning to %s for area '%s'
-message.command.hostiles.failed=Failed to set hostile entity spawning for area '%s'
-message.command.explosions.success=Set explosions to %s for area '%s'
-message.command.explosions.failed=Failed to set explosions for area '%s'
-message.command.interactions.success=Set interactions to %s for area '%s'
-message.command.interactions.failed=Failed to set interactions for area '%s'
-message.command.tool.player=Only players can give themselves the admin tool
-message.command.tool.inventory=No room in inventory for tool
 message.misc.true=True
 message.misc.false=False
+
+#Commands
+
+lm.command.none=Couldn't find area '%s'
+lm.command.player=You need to be a player to use this command
+lm.command.areas.none=No areas found
+lm.command.areas.title=Areas - Page %s / %s
+lm.command.area.noplayer=None
+lm.command.area.name=Area Name:
+lm.command.area.dim=Dimension ID:
+lm.command.area.allocation=Allocation:
+lm.command.area.posmin=Block Pos Min:
+lm.command.area.posmax=Block Pos Max:
+lm.command.area.passives=Can Passive Entities Spawn:
+lm.command.area.hostiles=Can Hostile Entities Spawn:
+lm.command.area.explosions=Explosions:
+lm.command.area.interactions=Block Interactions:
+lm.command.claim.disabled=Area claiming is not enabled! Ask an OP to allocate you an area.
+lm.command.claim.standing=Claiming the area you're standing in is still WIP. Please specify an area name instead.
+lm.command.claim.claimed=Area '%s' claimed
+lm.command.claim.already=Someone else has already claimed area '%s'
+lm.command.show.showing=Now showing area
+lm.command.showoff=Turned off showing areas
+lm.command.delete.deleted=Deleted area '%s'
+lm.command.delete.failed=Failed to delete area '%s'
+lm.command.allocate.noplayer=Could not find player
+lm.command.allocate.success=Allocated area '%s' to player %s
+lm.command.allocate.failed=Could not allocate area '%s' to player %s
+lm.command.clear.cleared=Cleared player allocation for area '%s'
+lm.command.passives.success=Set passive entity spawning to %s for area '%s'
+lm.command.hostiles.success=Set hostile entity spawning to %s for area '%s'
+lm.command.explosions.success=Set explosions to %s for area '%s'
+lm.command.interactions.success=Set interactions to %s for area '%s'
+lm.command.tool.inventory=No room in inventory for tool
+
+#Log Types
 
 arealog.type.create=CREATE
 arealog.type.delete=DELETE
@@ -71,6 +71,8 @@ arealog.type.break=BREAK
 arealog.type.set_passives=SET_PASSIVES
 arealog.type.set_hostiles=SET_HOSTILES
 arealog.type.set_explosions=SET_EXPLOSIONS
+
+#Gui
 
 gui.component.checkbox=Min/Max Y
 gui.component.confirm=Confirm

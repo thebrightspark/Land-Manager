@@ -57,7 +57,8 @@ public class GuiCreateArea extends GuiScreen
     {
         //Send packet to server to add new area
         //Don't close window - let the return packet do it if successful
-        if(sentCreateMessage) return;
+        if(sentCreateMessage)
+            return;
         String areaName = nameInput.getText().trim();
         if(!areaName.isEmpty())
         {

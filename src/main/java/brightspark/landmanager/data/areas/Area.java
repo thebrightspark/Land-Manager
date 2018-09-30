@@ -19,7 +19,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
             canPassiveSpawn = true,
             canHostileSpawn = true,
             explosions = true,
-            interact = false;
+            interactions = false;
 
     public Area(String name, int dimensionId, BlockPos position1, BlockPos position2)
     {
@@ -119,12 +119,12 @@ public class Area implements INBTSerializable<NBTTagCompound>
 
     public boolean canInteract()
     {
-        return interact;
+        return interactions;
     }
 
-    public void toggleInteract()
+    public void toggleInteractions()
     {
-        interact = !interact;
+        interactions = !interactions;
     }
 
     public AxisAlignedBB asAABB()
@@ -163,7 +163,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
         nbt.setBoolean("passive", canPassiveSpawn);
         nbt.setBoolean("hostile", canHostileSpawn);
         nbt.setBoolean("explosions", explosions);
-        nbt.setBoolean("interact", interact);
+        nbt.setBoolean("interact", interactions);
         return nbt;
     }
 
@@ -179,13 +179,14 @@ public class Area implements INBTSerializable<NBTTagCompound>
         canPassiveSpawn = nbt.getBoolean("passive");
         canHostileSpawn = nbt.getBoolean("hostile");
         explosions = nbt.getBoolean("explosions");
-        interact = nbt.getBoolean("interact");
+        interactions = nbt.getBoolean("interact");
     }
 
     @Override
     public boolean equals(Object obj)
     {
-        if(!(obj instanceof Area)) return false;
+        if(!(obj instanceof Area))
+            return false;
         Area other = (Area) obj;
         return name.equals(other.name) &&
                 dimensionId == other.dimensionId &&

@@ -24,14 +24,16 @@ public class MessageShowArea implements IMessage
     public void fromBytes(ByteBuf buf)
     {
         toggleShowAll = buf.readBoolean();
-        if(!toggleShowAll) showArea = ByteBufUtils.readUTF8String(buf);
+        if(!toggleShowAll)
+            showArea = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
         buf.writeBoolean(toggleShowAll);
-        if(!toggleShowAll) ByteBufUtils.writeUTF8String(buf, showArea);
+        if(!toggleShowAll)
+            ByteBufUtils.writeUTF8String(buf, showArea);
     }
 
     public static class Handler implements IMessageHandler<MessageShowArea, IMessage>

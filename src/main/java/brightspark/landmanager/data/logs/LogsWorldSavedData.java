@@ -35,7 +35,8 @@ public class LogsWorldSavedData extends WorldSavedData
     public static LogsWorldSavedData get(World world)
     {
         MapStorage storage = world.getMapStorage();
-        if(storage == null) return null;
+        if(storage == null)
+            return null;
         LogsWorldSavedData instance = (LogsWorldSavedData) storage.getOrLoadData(LogsWorldSavedData.class, NAME);
         if(instance == null)
         {
@@ -55,7 +56,8 @@ public class LogsWorldSavedData extends WorldSavedData
         for(String op : ops)
         {
             EntityPlayer playerOp = sender.getEntityWorld().getPlayerEntityByName(op);
-            if(playerOp != null && !playerOp.equals(sender)) LandManager.NETWORK.sendTo(new MessageChatLog(newLog), (EntityPlayerMP) playerOp);
+            if(playerOp != null && !playerOp.equals(sender))
+                LandManager.NETWORK.sendTo(new MessageChatLog(newLog), (EntityPlayerMP) playerOp);
         }
 
         markDirty();

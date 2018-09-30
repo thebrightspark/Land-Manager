@@ -1,7 +1,6 @@
 package brightspark.landmanager;
 
-import brightspark.landmanager.command.CommandLandManager;
-import brightspark.landmanager.command.CommandLandManagerOp;
+import brightspark.landmanager.command.CommandLM;
 import brightspark.landmanager.data.areas.CapStorage;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.areas.CapabilityAreasImpl;
@@ -69,14 +68,14 @@ public class LandManager
     @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event)
     {
-        event.registerServerCommand(new CommandLandManagerOp());
-        event.registerServerCommand(new CommandLandManager());
+        event.registerServerCommand(new CommandLM());
         //event.registerServerCommand(new CommandLandManagerLogs());
     }
 
     public static void areaLog(AreaLogType type, String areaName, ICommandSender sender)
     {
         LogsWorldSavedData logData = LogsWorldSavedData.get(sender.getEntityWorld());
-        if(logData != null) logData.addLog(type, areaName, sender);
+        if(logData != null)
+            logData.addLog(type, areaName, sender);
     }
 }

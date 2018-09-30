@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
 {
+    boolean hasArea(String areaName);
+
     Area getArea(String areaName);
 
     AddAreaResult addArea(Area area);
@@ -18,16 +20,6 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
     boolean removeArea(String areaName);
 
     boolean setAllocation(String areaName, UUID playerUuid);
-
-    boolean clearAllocation(String areaName);
-
-    boolean togglePassives(String areaName);
-
-    boolean toggleHostiles(String areaName);
-
-    boolean toggleExplosions(String areaName);
-
-    boolean toggleInteract(String areaName);
 
     List<Area> getAllAreas();
 

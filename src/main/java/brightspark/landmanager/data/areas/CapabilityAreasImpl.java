@@ -12,7 +12,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CapabilityAreasImpl implements CapabilityAreas
@@ -20,6 +19,12 @@ public class CapabilityAreasImpl implements CapabilityAreas
     private Map<String, Area> areas = new HashMap<>();
 
     public CapabilityAreasImpl() {}
+
+    @Override
+    public boolean hasArea(String areaName)
+    {
+        return areas.containsKey(areaName);
+    }
 
     @Override
     public Area getArea(String areaName)
@@ -44,7 +49,8 @@ public class CapabilityAreasImpl implements CapabilityAreas
     public boolean removeArea(String areaName)
     {
         boolean result = areas.remove(areaName) != null;
-        dataChanged();
+        if(result)
+            dataChanged();
         return result;
     }
 
@@ -55,47 +61,6 @@ public class CapabilityAreasImpl implements CapabilityAreas
         if(area != null)
         {
             area.setAllocatedPlayer(playerUuid);
-            dataChanged();
-        }
-        return area != null;
-    }
-
-    @Override
-    public boolean clearAllocation(String areaName)
-    {
-        return setAllocation(areaName, null);
-    }
-
-    @Override
-    public boolean togglePassives(String areaName)
-    {
-        return toggle(areaName, Area::togglePassiveSpawning);
-    }
-
-    @Override
-    public boolean toggleHostiles(String areaName)
-    {
-        return toggle(areaName, Area::toggleHostileSpawning);
-    }
-
-    @Override
-    public boolean toggleExplosions(String areaName)
-    {
-        return toggle(areaName, Area::toggleExplosions);
-    }
-
-    @Override
-    public boolean toggleInteract(String areaName)
-    {
-        return toggle(areaName, Area::toggleInteract);
-    }
-
-    private boolean toggle(String areaName, Consumer<Area> consumer)
-    {
-        Area area = getArea(areaName);
-        if(area != null)
-        {
-            consumer.accept(area);
             dataChanged();
         }
         return area != null;
