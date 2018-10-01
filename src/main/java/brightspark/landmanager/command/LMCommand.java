@@ -23,16 +23,15 @@ import java.util.UUID;
 
 public abstract class LMCommand extends CommandBase
 {
-    //TODO: Fix these translations
     protected CapabilityAreas getWorldCapWithArea(MinecraftServer server, String areaName) throws CommandException
     {
         if(areaName == null)
-            throw new WrongUsageException("No area name provided!");
+            throw new WrongUsageException("lm.command.areaName");
         for(WorldServer world : server.worlds)
         {
             CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
             if(cap == null)
-                throw new CommandException("Failed to get areas from the world with dimension id %s", world.provider.getDimension());
+                throw new CommandException("lm.command.data", world.provider.getDimension());
             if(cap.hasArea(areaName))
                 return cap;
         }

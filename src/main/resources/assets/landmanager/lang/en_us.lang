@@ -29,6 +29,8 @@ message.misc.false=False
 
 lm.command.none=Couldn't find area '%s'
 lm.command.player=You need to be a player to use this command
+lm.command.areaName=No area name provided!
+lm.command.data=Failed to get areas from the world with dimension id %s
 lm.command.areas.none=No areas found
 lm.command.areas.title=Areas - Page %s / %s
 lm.command.area.noplayer=None
