@@ -20,6 +20,7 @@ public class CommandOp extends CommandTreeBase
         addSubcommand(new CommandTool());
         addSubcommand(new CommandRequests());
         addSubcommand(new CommandApprove());
+        addSubcommand(new CommandDisapprove());
 
         if(!LMConfig.permissions.passiveSpawning)
             addSubcommand(new CommandPassives());

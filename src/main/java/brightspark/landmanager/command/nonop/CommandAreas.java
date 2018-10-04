@@ -26,7 +26,7 @@ public class CommandAreas extends LMCommand
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args)
     {
-        int page = args.length > 0 ? getPageFromArg(args[0], 0) : 0;
+        int page = args.length > 0 ? parseIntWithDefault(args[0], 0) : 0;
 
         //Show list of all recipes in pages
         List<Area> areas = getAllAreas(server);

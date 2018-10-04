@@ -11,19 +11,19 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 
-//lm op approve <requestId>
-public class CommandApprove extends LMCommand
+//lm op disapprove <requestId>
+public class CommandDisapprove extends LMCommand
 {
 	@Override
 	public String getName()
 	{
-		return "approve";
+		return "disapprove";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender)
 	{
-		return "lm.command.approve.usage";
+		return "lm.command.disapprove.usage";
 	}
 
 	@Override
@@ -42,25 +42,23 @@ public class CommandApprove extends LMCommand
 
 		int finalId = id;
 		Request request = requests.getAllRequests().stream().filter(req ->
-			req.getId() == finalId).findFirst().orElseThrow(() -> new CommandException("lm.command.approve.noRequest", finalId));
+			req.getId() == finalId).findFirst().orElseThrow(() -> new CommandException("lm.command.disapprove.noRequest", finalId));
 
-		//Approve the claim request
+		//Disapprove the claim request
 		String areaName = request.getAreaName();
 		CapabilityAreas areas = getWorldCapWithArea(server, areaName);
 		Area area = areas.getArea(areaName);
 		if(area == null)
 		{
-			sender.sendMessage(new TextComponentTranslation("lm.command.approve.noArea", areaName));
+			sender.sendMessage(new TextComponentTranslation("lm.command.disapprove.noArea", areaName));
 			requests.deleteAllForArea(areaName);
 			return;
 		}
-		area.setAllocatedPlayer(request.getPlayerUuid());
-		areas.dataChanged();
 		requests.deleteRequest(areaName, id);
 
 		//Notify the player if they're online
 		EntityPlayerMP player = server.getPlayerList().getPlayerByUUID(request.getPlayerUuid());
 		if(player != null)
-			player.sendMessage(new TextComponentTranslation("lm.command.approve.playerMessage", areaName, sender.getDisplayName()));
+			player.sendMessage(new TextComponentTranslation("lm.command.disapprove.playerMessage", areaName, sender.getDisplayName()));
 	}
 }

@@ -87,15 +87,7 @@ lm.command.allocate.failed=Area '%s' does not exist
 lm.command.approve.usage=Use /lm op approve <requestId> to approve a claim request. Check for requests using the 'requests' command
 lm.command.approve.noRequest=No request with id %s
 lm.command.approve.noArea=Area '%s' does not exist
-lm.command.approve.playerMessage=Your request for area '%s' has been approved by %s!
-
-#Requests
-lm.command.requests.usage=Use /lm op requests [page] [areaName]. You can display requests for an area without providing the page
-lm.command.requests.title=Requests - Page %s / %s
-
-#Tool
-lm.command.tool.usage=Use /lm op tool to give yourself the admin tool
-lm.command.tool.inventory=No room in inventory for tool
+lm.command.approve.playerMessage=§2Your request for area '%s' has been approved by %s!
 
 #Clear Allocation
 lm.command.clear.usage=Use /lm op clearAllocation <areaName>
@@ -105,6 +97,20 @@ lm.command.clear.cleared=Cleared player allocation for area '%s'
 lm.command.delete.usage=Use /lm op delete
 lm.command.delete.deleted=Deleted area '%s'
 lm.command.delete.failed=Failed to delete area '%s'
+
+#Disapprove
+lm.command.disapprove.usage=Use /lm op disapprove <requestId> to disapprove a claim request. Check for requests using the 'requests' command
+lm.command.disapprove.noRequest=No request with id %s
+lm.command.disapprove.noArea=Area '%s' does not exist
+lm.command.disapprove.playerMessage=§4Your request for area '%s' has been disapproved by %s!
+
+#Requests
+lm.command.requests.usage=Use /lm op requests [page] [areaName]. You can display requests for an area without providing the page
+lm.command.requests.title=Requests - Page %s / %s
+
+#Tool
+lm.command.tool.usage=Use /lm op tool to give yourself the admin tool
+lm.command.tool.inventory=No room in inventory for tool
 
 ##Optional Commands
 

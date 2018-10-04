@@ -141,13 +141,18 @@ public abstract class LMCommand extends CommandBase
         return op != null;
     }
 
-    protected int getPageFromArg(String arg, int pageDefault)
+    protected Integer parseIntWithDefault(String arg)
+    {
+        return parseIntWithDefault(arg, null);
+    }
+
+    protected Integer parseIntWithDefault(String arg, Integer pageDefault)
     {
         try
         {
             return Integer.valueOf(arg);
         }
-        catch(NumberFormatException ignored)
+        catch(NumberFormatException e)
 		{
 			return pageDefault;
 		}

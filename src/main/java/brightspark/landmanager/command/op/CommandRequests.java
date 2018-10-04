@@ -33,7 +33,7 @@ public class CommandRequests extends LMCommand
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
 	{
-		int page = args.length > 0 ? getPageFromArg(args[0], Integer.MIN_VALUE) : Integer.MIN_VALUE;
+		int page = args.length > 0 ? parseIntWithDefault(args[0], Integer.MIN_VALUE) : Integer.MIN_VALUE;
 
 		String areaName = null;
 		if(page == Integer.MIN_VALUE)
