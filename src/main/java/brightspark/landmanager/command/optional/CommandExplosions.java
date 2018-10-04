@@ -5,6 +5,7 @@ import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -27,8 +28,10 @@ public class CommandExplosions extends LMCommandArea
     }
 
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap)
+    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException
     {
+        checkCanEditArea(server, sender, area);
+
         area.toggleExplosions();
         cap.dataChanged();
         sender.sendMessage(new TextComponentTranslation("lm.command.explosions.success", area.canExplosionsCauseDamage(), area.getName()));

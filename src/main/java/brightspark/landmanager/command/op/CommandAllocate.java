@@ -58,7 +58,7 @@ public class CommandAllocate extends LMCommand
             LandManager.areaLog(AreaLogType.ALLOCATE, areaName, sender);
         }
         else
-            sender.sendMessage(new TextComponentTranslation("lm.command.allocate.failed", areaName, profile.getName()));
+            sender.sendMessage(new TextComponentTranslation("lm.command.allocate.failed", areaName));
     }
 
     @Override

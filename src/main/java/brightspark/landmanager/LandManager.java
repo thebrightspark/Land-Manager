@@ -11,7 +11,11 @@ import brightspark.landmanager.item.LMItems;
 import brightspark.landmanager.message.*;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -19,9 +23,14 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
+
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Mod(modid = LandManager.MOD_ID, name = LandManager.MOD_NAME, version = LandManager.VERSION)
 public class LandManager
@@ -77,5 +86,26 @@ public class LandManager
         LogsWorldSavedData logData = LogsWorldSavedData.get(sender.getEntityWorld());
         if(logData != null)
             logData.addLog(type, areaName, sender);
+    }
+
+    public static void sendToOPs(MinecraftServer server, Supplier<IMessage> message, @Nullable EntityPlayer sender)
+    {
+        doForEachOP(server, op -> LandManager.NETWORK.sendTo(message.get(), op), sender);
+    }
+
+    public static void sendChatMessageToOPs(MinecraftServer server, ITextComponent message, @Nullable EntityPlayer sender)
+    {
+        doForEachOP(server, op -> op.sendMessage(message), sender);
+    }
+
+    private static void doForEachOP(MinecraftServer server, Consumer<EntityPlayerMP> toDoForOP, @Nullable EntityPlayer sender)
+    {
+        String[] ops = server.getPlayerList().getOppedPlayers().getKeys();
+        for(String op : ops)
+        {
+            EntityPlayerMP playerOp = server.getPlayerList().getPlayerByUsername(op);
+            if(playerOp != null && !playerOp.equals(sender))
+                toDoForOP.accept(playerOp);
+        }
     }
 }

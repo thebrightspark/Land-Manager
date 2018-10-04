@@ -1,14 +1,14 @@
-#Creative Tab
+####Creative Tab
 
 itemGroup.landmanager=Land Manager
 
-#Item
+####Item
 
 item.admin.name=Admin Tool
 item.admin.tooltip.notset=First position not set
 item.admin.tooltip.set=Dim Id: %d, BlockPos: %s
 
-#Messages
+####Messages
 
 message.tool.saved=Saved block position %d, %d, %d
 message.tool.diffdim=Cannot form area with two positions in different dimensions!
@@ -25,14 +25,22 @@ message.protection.interact=Cannot interact with blocks in this area!
 message.misc.true=True
 message.misc.false=False
 
-#Commands
+####Commands
+
+##Misc command translations
 
 lm.command.none=Couldn't find area '%s'
 lm.command.player=You need to be a player to use this command
 lm.command.areaName=No area name provided!
 lm.command.data=Failed to get areas from the world with dimension id %s
-lm.command.areas.none=No areas found
-lm.command.areas.title=Areas - Page %s / %s
+lm.command.reqdata=Failed to get requests data
+lm.command.page=Page: %s
+lm.command.noPerm=You do not have permission to edit the area '%s''!
+
+##Non-op Commands
+
+#Area
+lm.command.area.usage=Use /lm area <areaName> to see details about the area
 lm.command.area.noplayer=None
 lm.command.area.name=Area Name:
 lm.command.area.dim=Dimension ID:
@@ -43,25 +51,80 @@ lm.command.area.passives=Can Passive Entities Spawn:
 lm.command.area.hostiles=Can Hostile Entities Spawn:
 lm.command.area.explosions=Explosions:
 lm.command.area.interactions=Block Interactions:
+
+#Areas
+lm.command.areas.usage=Use /areas [page]
+lm.command.areas.none=No areas found
+lm.command.areas.title=Areas - Page %s / %s
+
+#Claim
+lm.command.claim.usage=Use /lm claim [areaName] to claim an area. Providing no area will try claiming the area you're standing in
 lm.command.claim.disabled=Area claiming is not enabled! Ask an OP to allocate you an area.
-lm.command.claim.standing=Claiming the area you're standing in is still WIP. Please specify an area name instead.
+lm.command.claim.none=There is no area where you are standing!
 lm.command.claim.claimed=Area '%s' claimed
 lm.command.claim.already=Someone else has already claimed area '%s'
-lm.command.show.showing=Now showing area
-lm.command.showoff=Turned off showing areas
-lm.command.delete.deleted=Deleted area '%s'
-lm.command.delete.failed=Failed to delete area '%s'
-lm.command.allocate.noplayer=Could not find player
+lm.command.claim.request.success=Claim request successfully created for area '%s'
+lm.command.claim.request.failed=Claim request failed - you already have one for the area '%s'!
+lm.command.claim.request.opMessage=§7New claim request (%s) from %s for area '%s'
+
+#Show
+lm.command.show.usage=Use /lm show [areaName]. Providing no area will show all areas nearby
+lm.command.show.showing=Now showing area '%s'
+
+#Showoff
+lm.command.showoff.usage= Use /lm showoff
+lm.command.showoff=Not showing any areas
+
+##Op Commands
+
+#Allocate
+lm.command.allocate.usage=Use /lm op allocate <playerName> <areaName> to allocate the area to the player
+lm.command.allocate.noplayer=Could not find player %s
 lm.command.allocate.success=Allocated area '%s' to player %s
-lm.command.allocate.failed=Could not allocate area '%s' to player %s
-lm.command.clear.cleared=Cleared player allocation for area '%s'
-lm.command.passives.success=Set passive entity spawning to %s for area '%s'
-lm.command.hostiles.success=Set hostile entity spawning to %s for area '%s'
-lm.command.explosions.success=Set explosions to %s for area '%s'
-lm.command.interactions.success=Set interactions to %s for area '%s'
+lm.command.allocate.failed=Area '%s' does not exist
+
+#Approve
+lm.command.approve.usage=Use /lm op approve <requestId> to approve a claim request. Check for requests using the 'requests' command
+lm.command.approve.noRequest=No request with id %s
+lm.command.approve.noArea=Area '%s' does not exist
+lm.command.approve.playerMessage=Your request for area '%s' has been approved by %s!
+
+#Requests
+lm.command.requests.usage=Use /lm op requests [page] [areaName]. You can display requests for an area without providing the page
+lm.command.requests.title=Requests - Page %s / %s
+
+#Tool
+lm.command.tool.usage=Use /lm op tool to give yourself the admin tool
 lm.command.tool.inventory=No room in inventory for tool
 
-#Log Types
+#Clear Allocation
+lm.command.clear.usage=Use /lm op clearAllocation <areaName>
+lm.command.clear.cleared=Cleared player allocation for area '%s'
+
+#Delete
+lm.command.delete.usage=Use /lm op delete
+lm.command.delete.deleted=Deleted area '%s'
+lm.command.delete.failed=Failed to delete area '%s'
+
+##Optional Commands
+
+#Explosions
+lm.command.explosions.usage=Use /lm%s explosions <areaName> to toggle explosion damage
+lm.command.explosions.success=Set explosions to %s for area '%s'
+
+#Hostiles
+lm.command.hostiles.usage=Use /lm%s hostiles <areaName> to toggle hostile entity spawning
+lm.command.hostiles.success=Set hostile entity spawning to %s for area '%s'
+
+#Interactions
+lm.command.interactions.usage=Use /lm%s interactions <areaName> to toggle player interactions (right clicking) with blocks
+lm.command.interactions.success=Set interactions to %s for area '%s'
+
+#Passives
+lm.command.passives.usage=Use /lm%s passives <areaName> to toggle passive entity spawning
+lm.command.passives.success=Set passive entity spawning to %s for area '%s'
+
+####Log Types
 
 arealog.type.create=CREATE
 arealog.type.delete=DELETE
@@ -74,7 +137,7 @@ arealog.type.set_passives=SET_PASSIVES
 arealog.type.set_hostiles=SET_HOSTILES
 arealog.type.set_explosions=SET_EXPLOSIONS
 
-#Gui
+####Gui
 
 gui.component.checkbox=Min/Max Y
 gui.component.confirm=Confirm

@@ -6,9 +6,12 @@ import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
+import brightspark.landmanager.data.requests.RequestsWorldSavedData;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 
 //lm claim [areaName]
@@ -32,7 +35,7 @@ public class CommandClaim extends LMCommandArea
     }
 
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap)
+    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException
     {
         if(!(sender instanceof EntityPlayer))
         {
@@ -40,34 +43,65 @@ public class CommandClaim extends LMCommandArea
             return;
         }
 
+        EntityPlayer player = (EntityPlayer) sender;
+
         if(LMConfig.disableClaiming)
         {
-            sender.sendMessage(new TextComponentTranslation("lm.command.claim.disabled"));
+            player.sendMessage(new TextComponentTranslation("lm.command.claim.disabled"));
             return;
         }
 
         if(area == null)
         {
-            //TODO: Claim the area the player is standing in
-            sender.sendMessage(new TextComponentTranslation("lm.command.claim.standing"));
+            //Get the area the player is standing in
+            BlockPos playerPos = player.getPosition();
+            area = cap.intersectingArea(playerPos);
+            if(area == null)
+            {
+                player.sendMessage(new TextComponentTranslation("lm.command.claim.none"));
+                return;
+            }
+        }
+
+        String areaName = area.getName();
+
+        if(area.getAllocatedPlayer() != null)
+        {
+            //Area already claimed
+            player.sendMessage(new TextComponentTranslation("lm.command.claim.already", areaName));
+            return;
+        }
+
+        //TODO: If configured to, integrate claiming with EnderPay
+
+        if(LMConfig.permissions.claimRequest)
+        {
+            //Make this a "request" instead of immediately claiming
+            RequestsWorldSavedData requests = getRequestsData(server);
+            Integer reqId = requests.addRequest(areaName, player.getUniqueID());
+            if(reqId != null)
+            {
+                //Request added
+                player.sendMessage(new TextComponentTranslation("lm.command.claim.request.success", areaName));
+                //Send chat notification to OPs
+                LandManager.sendChatMessageToOPs(server, new TextComponentTranslation("lm.command.claim.request.opMessage", reqId, player.getName(), areaName), player);
+            }
+            else
+                //Request failed
+                player.sendMessage(new TextComponentTranslation("lm.command.claim.request.failed", areaName));
         }
         else
         {
-            //Claim the specific area
-
-            //TODO: Later and some configs to this
-            //Make it so you need to request to claim? Then an OP can accept?
-            //Make it so you can't use this command - only OPs can allocate?
-            //Integrate with EnderPay to add a daily cost as rent?
-            if(area.getAllocatedPlayer() == null)
-            {
-                area.setAllocatedPlayer(((EntityPlayer) sender).getUniqueID());
-                cap.dataChanged();
-                sender.sendMessage(new TextComponentTranslation("lm.command.claim.claimed", area.getName()));
-                LandManager.areaLog(AreaLogType.CLAIM, area.getName(), sender);
-            }
-            else
-                sender.sendMessage(new TextComponentTranslation("lm.command.claim.already", area.getName()));
+            //Claim the area
+            claimArea(player, area, cap);
         }
+    }
+
+    public static void claimArea(EntityPlayer player, Area area, CapabilityAreas cap)
+    {
+        area.setAllocatedPlayer(player.getUniqueID());
+        cap.dataChanged();
+        player.sendMessage(new TextComponentTranslation("lm.command.claim.claimed", area.getName()));
+        LandManager.areaLog(AreaLogType.CLAIM, area.getName(), player);
     }
 }

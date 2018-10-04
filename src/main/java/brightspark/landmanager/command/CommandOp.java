@@ -1,10 +1,7 @@
 package brightspark.landmanager.command;
 
 import brightspark.landmanager.LMConfig;
-import brightspark.landmanager.command.op.CommandAllocate;
-import brightspark.landmanager.command.op.CommandClearAllocation;
-import brightspark.landmanager.command.op.CommandDelete;
-import brightspark.landmanager.command.op.CommandTool;
+import brightspark.landmanager.command.op.*;
 import brightspark.landmanager.command.optional.CommandExplosions;
 import brightspark.landmanager.command.optional.CommandHostiles;
 import brightspark.landmanager.command.optional.CommandInteractions;
@@ -21,6 +18,8 @@ public class CommandOp extends CommandTreeBase
         addSubcommand(new CommandAllocate());
         addSubcommand(new CommandClearAllocation());
         addSubcommand(new CommandTool());
+        addSubcommand(new CommandRequests());
+        addSubcommand(new CommandApprove());
 
         if(!LMConfig.permissions.passiveSpawning)
             addSubcommand(new CommandPassives());

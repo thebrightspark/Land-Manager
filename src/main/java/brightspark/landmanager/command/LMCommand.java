@@ -3,23 +3,32 @@ package brightspark.landmanager.command;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.data.requests.RequestsWorldSavedData;
 import brightspark.landmanager.util.ListView;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.WorldServer;
+import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 public abstract class LMCommand extends CommandBase
 {
@@ -36,6 +45,14 @@ public abstract class LMCommand extends CommandBase
                 return cap;
         }
         throw new CommandException("lm.command.none", areaName);
+    }
+
+    protected RequestsWorldSavedData getRequestsData(MinecraftServer server) throws CommandException
+    {
+        RequestsWorldSavedData data = RequestsWorldSavedData.get(server.getEntityWorld());
+        if(data == null)
+            throw new CommandException("lm.command.reqdata");
+        return data;
     }
 
     protected List<Area> getAllAreas(MinecraftServer server)
@@ -106,7 +123,77 @@ public abstract class LMCommand extends CommandBase
         return textComponent;
     }
 
-    protected <T> ListView<T> getListView(List<T> list, int page, int maxPerPage)
+    protected TextComponentTranslation booleanToText(boolean bool)
+    {
+        return new TextComponentTranslation(bool ? "message.misc.true" : "message.misc.false");
+    }
+
+    protected void throwWrongUsage(ICommandSender sender) throws WrongUsageException
+    {
+        throw new WrongUsageException(getUsage(sender));
+    }
+
+    protected boolean isOP(MinecraftServer server, ICommandSender sender)
+    {
+        if(!(sender instanceof EntityPlayer))
+            return false;
+        UserListOpsEntry op = server.getPlayerList().getOppedPlayers().getEntry(((EntityPlayer) sender).getGameProfile());
+        return op != null;
+    }
+
+    protected int getPageFromArg(String arg, int pageDefault)
+    {
+        try
+        {
+            return Integer.valueOf(arg);
+        }
+        catch(NumberFormatException ignored)
+		{
+			return pageDefault;
+		}
+    }
+
+    //----====|||||||||||||====----//
+    //----==== Paged Lists ====----//
+    //----====|||||||||||||====----//
+
+    protected <T> ITextComponent createListMessage(ICommandSender sender, List<T> list, @Nullable Function<T, String> entryToString, int page, String titleKey, Function<Integer, String> arrowsCommandToRun)
+    {
+        if(entryToString == null)
+            entryToString = T::toString;
+        Function<T, String> finalEntryToString = entryToString;
+
+        //Get the list of exactly what to show
+        ListView<T> view = getListView(list, page, 8);
+        page = view.getPage();
+        int maxPage = view.getPageMax();
+
+        boolean isPlayer = sender instanceof EntityPlayer;
+
+        //Create the text to send back
+        ITextComponent text;
+        if(isPlayer)
+            text = createPageTitle(titleKey, page, maxPage);
+        else
+        {
+            //Print on a new line in the server console for readability
+            text = new TextComponentString("\n");
+            text.appendSibling(createPageTitle(titleKey, page, maxPage));
+        }
+
+        view.getList().forEach(entry -> text.appendText("\n").appendText(finalEntryToString.apply(entry)));
+
+        //Don't need to add the arrows when sending back to a server console
+        if(isPlayer)
+        {
+            ITextComponent arrows = createPageArrows(page, maxPage, arrowsCommandToRun);
+            if(arrows != null)
+                text.appendText("\n").appendSibling(arrows);
+        }
+        return text;
+    }
+
+    private <T> ListView<T> getListView(List<T> list, int page, int maxPerPage)
     {
         page = Math.max(0, page);
         int size = list.size();
@@ -125,13 +212,63 @@ public abstract class LMCommand extends CommandBase
         return new ListView<>(list.subList(min, max), page, pageMax);
     }
 
-    protected TextComponentTranslation booleanToText(boolean bool)
+    private ITextComponent createPageTitle(String titleTranslationKey, int curPage, int maxPage)
     {
-        return new TextComponentTranslation(bool ? "message.misc.true" : "message.misc.false");
+        ITextComponent text = new TextComponentString(TextFormatting.YELLOW + "============= ");
+        ITextComponent titleText = new TextComponentTranslation(titleTranslationKey, (curPage + 1), (maxPage + 1));
+        titleText.getStyle().setColor(TextFormatting.GOLD);
+        text.appendSibling(titleText);
+        text.appendText(TextFormatting.YELLOW + " =============");
+        return text;
     }
 
-    protected void throwWrongUsage(ICommandSender sender) throws WrongUsageException
+    private static final int paddingAmount = 2;
+    private static final String padding = StringUtils.repeat(' ', paddingAmount);
+    private static final int arrowSize = 4;
+    private static final String arrowLeft = StringUtils.repeat('<', arrowSize);
+    private static final String arrowRight = StringUtils.repeat('>', arrowSize);
+    private static final String blank = StringUtils.repeat('-', arrowSize);
+
+    private ITextComponent createPageArrows(int curPage, int pageMax, Function<Integer, String> commandToRun)
     {
-        throw new WrongUsageException(getUsage(sender));
+        ITextComponent text = null;
+        if(curPage > 0 || curPage < pageMax)
+        {
+            //Add arrows at the bottom so the player can easily click between pages
+            text = new TextComponentString(padding);
+            if(curPage > 0)
+                //Left arrow
+                text.appendSibling(createArrow(true, curPage, commandToRun));
+            else
+                text.appendSibling(createBlank());
+
+            text.appendText(padding);
+
+            if(curPage < pageMax)
+                //Right arrow
+                text.appendSibling(createArrow(false, curPage, commandToRun));
+            else
+                text.appendSibling(createBlank());
+        }
+        return text;
+    }
+
+    private ITextComponent createArrow(boolean left, int curPage, Function<Integer, String> commandToRun)
+    {
+        int nextPage = left ? curPage : curPage + 2;
+        ITextComponent arrow = new TextComponentString(left ? arrowLeft : arrowRight);
+        arrow.getStyle()
+            .setBold(true)
+            .setColor(TextFormatting.YELLOW)
+            .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentTranslation("lm.command.page", nextPage)))
+            .setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandToRun.apply(nextPage)));
+        return arrow;
+    }
+
+    private ITextComponent createBlank()
+    {
+        ITextComponent text = new TextComponentString(blank);
+        text.getStyle().setColor(TextFormatting.GOLD);
+        return text;
     }
 }

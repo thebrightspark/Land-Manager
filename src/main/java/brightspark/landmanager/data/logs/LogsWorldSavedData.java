@@ -4,7 +4,6 @@ import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.message.MessageChatLog;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -52,13 +51,8 @@ public class LogsWorldSavedData extends WorldSavedData
         logs.add(newLog);
 
         //Send chat log to all OPs
-        String[] ops = sender.getEntityWorld().getMinecraftServer().getPlayerList().getOppedPlayers().getKeys();
-        for(String op : ops)
-        {
-            EntityPlayer playerOp = sender.getEntityWorld().getPlayerEntityByName(op);
-            if(playerOp != null && !playerOp.equals(sender))
-                LandManager.NETWORK.sendTo(new MessageChatLog(newLog), (EntityPlayerMP) playerOp);
-        }
+        LandManager.sendToOPs(sender.getServer(), () -> new MessageChatLog(newLog),
+            sender instanceof EntityPlayerMP ? (EntityPlayerMP) sender : null);
 
         markDirty();
     }

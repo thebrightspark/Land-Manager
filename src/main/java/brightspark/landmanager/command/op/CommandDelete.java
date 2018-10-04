@@ -5,6 +5,7 @@ import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
+import brightspark.landmanager.data.requests.RequestsWorldSavedData;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -31,6 +32,9 @@ public class CommandDelete extends LMCommandArea
         {
             sender.sendMessage(new TextComponentTranslation("lm.command.delete.deleted", area.getName()));
             LandManager.areaLog(AreaLogType.DELETE, area.getName(), sender);
+            RequestsWorldSavedData requests = RequestsWorldSavedData.get(server.getEntityWorld());
+            if(requests != null)
+                requests.deleteAllForArea(area.getName());
         }
         else
             sender.sendMessage(new TextComponentTranslation("lm.command.delete.failed", area.getName()));

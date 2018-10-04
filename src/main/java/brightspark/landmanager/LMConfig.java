@@ -39,16 +39,24 @@ public class LMConfig
 
     public static class Permissions
     {
+        @Config.Comment({"If true then the 'claim' command will create a request rather than take instant effect",
+                "An OP will then need to use the 'approve' command to accept the request"})
+        public boolean claimRequest = false;
+
         @Config.Comment("If passive entities can spawn in the area")
+        @Config.RequiresMcRestart
         public boolean passiveSpawning = false;
 
         @Config.Comment("If hostile entities can spawn in the area")
+        @Config.RequiresMcRestart
         public boolean hostileSpawning = false;
 
         @Config.Comment("If explosions can destroy blocks in the area")
+        @Config.RequiresMcRestart
         public boolean explosions = false;
 
         @Config.Comment("If other players can interact (right click) with blocks in the area")
+        @Config.RequiresMcRestart
         public boolean interactions = false;
     }
 
