@@ -13,7 +13,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-//lm op requests [page] [areaName]
+//lm op requests [page] [areaNameRegex]
 public class CommandRequests extends LMCommand
 {
 	@Override
@@ -60,7 +60,7 @@ public class CommandRequests extends LMCommand
 		}
 		requests.sort(Comparator.comparing(Request::getId));
 
-		//Area name to be used in prev/next page button tooltip
+		//Area name to be used for prev/next page button
 		String finalAreaName = areaName == null ? "" : " " + areaName;
 
 		//Send message back to sender

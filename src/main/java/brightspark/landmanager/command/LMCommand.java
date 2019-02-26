@@ -25,11 +25,9 @@ import net.minecraft.world.WorldServer;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 public abstract class LMCommand extends CommandBase
 {
@@ -69,7 +67,7 @@ public abstract class LMCommand extends CommandBase
 
     protected List<Area> getAllAreas(MinecraftServer server)
     {
-        List<Area> areas = new ArrayList<>();
+        List<Area> areas = new LinkedList<>();
         for(WorldServer world : server.worlds)
         {
             CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
@@ -80,9 +78,25 @@ public abstract class LMCommand extends CommandBase
         return areas;
     }
 
+    protected List<Area> getAreasByNameRegex(MinecraftServer server, String regex)
+    {
+        Pattern pattern = Pattern.compile(regex);
+        List<Area> areas = new LinkedList<>();
+        for(WorldServer world : server.worlds)
+        {
+            CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
+            if(cap != null)
+                for(Area area : cap.getAllAreas())
+                    if(pattern.matcher(area.getName()).matches())
+                        areas.add(area);
+        }
+        areas.sort(Comparator.comparing(Area::getName));
+        return areas;
+    }
+
     protected List<String> getAllAreaNames(MinecraftServer server)
     {
-        List<String> areaNames = new ArrayList<>();
+        List<String> areaNames = new LinkedList<>();
         for(WorldServer world : server.worlds)
         {
             CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
@@ -213,8 +227,10 @@ public abstract class LMCommand extends CommandBase
     private <T> ListView<T> getListView(List<T> list, int page, int maxPerPage)
     {
         page = Math.max(0, page);
+        maxPerPage = Math.max(1, maxPerPage);
         int size = list.size();
-        int pageMax = size / maxPerPage;
+        //Need to add 1 to maxPerPage so that we don't have an empty extra page when size == maxPerPage
+        int pageMax = size / (maxPerPage + 1);
         //We reduce the given page number by 1, because we calculate starting from page 0, but is shown to start from page 1.
         if(page > 0)
             page--;
