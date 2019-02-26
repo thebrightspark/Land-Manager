@@ -50,7 +50,7 @@ public class LandManager
     public static final CreativeTabs LM_TAB = new CreativeTabs(MOD_ID)
     {
         @Override
-        public ItemStack getTabIconItem()
+        public ItemStack createIcon()
         {
             return new ItemStack(LMItems.adminItem);
         }

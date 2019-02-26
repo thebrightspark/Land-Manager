@@ -23,7 +23,7 @@ public class ItemAdmin extends Item
 {
     public ItemAdmin()
     {
-        setUnlocalizedName("admin");
+        setTranslationKey("admin");
         setRegistryName("admin");
         setCreativeTab(LandManager.LM_TAB);
         setMaxStackSize(1);
