@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.Constants;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 public class RequestsWorldSavedData extends WorldSavedData
 {
@@ -112,6 +113,18 @@ public class RequestsWorldSavedData extends WorldSavedData
 	public Set<Request> getRequestsByArea(String areaName)
 	{
 		return requestsByArea.computeIfAbsent(areaName, k -> new HashSet<>());
+	}
+
+	public Set<Request> getRequestsByRegex(String regex)
+	{
+		Pattern pattern = Pattern.compile(regex);
+		Set<Request> requestsMatching = new HashSet<>();
+		requestsByArea.forEach((areaName, requests) ->
+		{
+			if(pattern.matcher(areaName).matches())
+				requestsMatching.addAll(requests);
+		});
+		return requestsMatching;
 	}
 
 	public Set<Request> getAllRequests()

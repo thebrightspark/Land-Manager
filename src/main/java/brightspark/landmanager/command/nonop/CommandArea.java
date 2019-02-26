@@ -40,7 +40,7 @@ public class CommandArea extends LMCommandArea
         ITextComponent areaNameComponent = new TextComponentTranslation("lm.command.area.name");
         areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
         text.appendSibling(areaNameComponent).appendText(" " + area.getName());
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.dim")).appendText(" " + String.valueOf(area.getDimensionId()));
+        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.dim")).appendText(" " + area.getDimensionId());
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.allocation")).appendText(" ").appendSibling(playerName);
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmin")).appendText(" " + posToString(area.getMinPos()));
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmax")).appendText(" " + posToString(area.getMaxPos()));

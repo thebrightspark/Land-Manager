@@ -10,6 +10,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 
 //lm op disapprove <requestId>
 public class CommandDisapprove extends LMCommand
@@ -60,6 +61,10 @@ public class CommandDisapprove extends LMCommand
 		//Notify the player if they're online
 		EntityPlayerMP player = server.getPlayerList().getPlayerByUUID(request.getPlayerUuid());
 		if(player != null)
-			player.sendMessage(new TextComponentTranslation("lm.command.disapprove.playerMessage", areaName, sender.getDisplayName()));
+		{
+			TextComponentTranslation textComp = new TextComponentTranslation("lm.command.disapprove.playerMessage", areaName, sender.getDisplayName());
+			textComp.getStyle().setColor(TextFormatting.DARK_RED);
+			player.sendMessage(textComp);
+		}
 	}
 }

@@ -8,7 +8,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 
 import java.util.List;
 
-//lm areas [page]
+//lm areas [page] [areaName]
 public class CommandAreas extends LMCommand
 {
     @Override
@@ -28,9 +28,9 @@ public class CommandAreas extends LMCommand
     {
         int page = args.length > 0 ? parseIntWithDefault(args[0], 0) : 0;
 
-        //Show list of all recipes in pages
+        //Show list of all areas in pages
         List<Area> areas = getAllAreas(server);
-        if(areas.size() == 0)
+        if(areas.isEmpty())
         {
             sender.sendMessage(new TextComponentTranslation("lm.command.areas.none"));
             return;

@@ -53,7 +53,7 @@ lm.command.area.explosions=Explosions:
 lm.command.area.interactions=Block Interactions:
 
 #Areas
-lm.command.areas.usage=Use /areas [page]
+lm.command.areas.usage=Use /areas [page] [areaNameRegex]
 lm.command.areas.none=No areas found
 lm.command.areas.title=Areas - Page %s / %s
 
@@ -87,7 +87,7 @@ lm.command.allocate.failed=Area '%s' does not exist
 lm.command.approve.usage=Use /lm op approve <requestId> to approve a claim request. Check for requests using the 'requests' command
 lm.command.approve.noRequest=No request with id %s
 lm.command.approve.noArea=Area '%s' does not exist
-lm.command.approve.playerMessage=§2Your request for area '%s' has been approved by %s!
+lm.command.approve.playerMessage=Your request for area '%s' has been approved by %s!
 
 #Clear Allocation
 lm.command.clear.usage=Use /lm op clearAllocation <areaName>
@@ -102,10 +102,11 @@ lm.command.delete.failed=Failed to delete area '%s'
 lm.command.disapprove.usage=Use /lm op disapprove <requestId> to disapprove a claim request. Check for requests using the 'requests' command
 lm.command.disapprove.noRequest=No request with id %s
 lm.command.disapprove.noArea=Area '%s' does not exist
-lm.command.disapprove.playerMessage=§4Your request for area '%s' has been disapproved by %s!
+lm.command.disapprove.playerMessage=Your request for area '%s' has been disapproved by %s!
 
 #Requests
-lm.command.requests.usage=Use /lm op requests [page] [areaName]. You can display requests for an area without providing the page
+lm.command.requests.usage=Use /lm op requests [page] [areaNameRegex]. You can display requests for an area without providing the page
+lm.command.requests.none=No requests found
 lm.command.requests.title=Requests - Page %s / %s
 
 #Tool

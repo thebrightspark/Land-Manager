@@ -54,6 +54,7 @@ public class CommandClaim extends LMCommandArea
         if(area == null)
         {
             //Get the area the player is standing in
+            cap = getWorldCapForPlayer(player);
             BlockPos playerPos = player.getPosition();
             area = cap.intersectingArea(playerPos);
             if(area == null)

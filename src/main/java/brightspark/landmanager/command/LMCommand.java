@@ -20,6 +20,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,15 +33,26 @@ import java.util.function.Function;
 
 public abstract class LMCommand extends CommandBase
 {
+    protected CapabilityAreas getWorldCap(World world) throws CommandException
+    {
+        CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
+        if(cap == null)
+            throw new CommandException("lm.command.data", world.provider.getDimension());
+        return cap;
+    }
+
+    protected CapabilityAreas getWorldCapForPlayer(EntityPlayer player) throws CommandException
+    {
+        return getWorldCap(player.world);
+    }
+
     protected CapabilityAreas getWorldCapWithArea(MinecraftServer server, String areaName) throws CommandException
     {
         if(areaName == null)
             throw new WrongUsageException("lm.command.areaName");
         for(WorldServer world : server.worlds)
         {
-            CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-            if(cap == null)
-                throw new CommandException("lm.command.data", world.provider.getDimension());
+            CapabilityAreas cap = getWorldCap(world);
             if(cap.hasArea(areaName))
                 return cap;
         }
