@@ -104,6 +104,11 @@ public class RequestsWorldSavedData extends WorldSavedData
 		return success;
 	}
 
+	public Request getRequestById(int id)
+	{
+		return requests.stream().filter(req -> req.getId() == id).findFirst().orElse(null);
+	}
+
 	public Set<Request> getRequestsByArea(String areaName)
 	{
 		return requestsByArea.computeIfAbsent(areaName, k -> new HashSet<>());

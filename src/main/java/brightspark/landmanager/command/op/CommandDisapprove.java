@@ -40,9 +40,10 @@ public class CommandDisapprove extends LMCommand
 		if(requests == null)
 			throw new CommandException("lm.command.reqdata");
 
-		int finalId = id;
-		Request request = requests.getAllRequests().stream().filter(req ->
-			req.getId() == finalId).findFirst().orElseThrow(() -> new CommandException("lm.command.disapprove.noRequest", finalId));
+		//noinspection ConstantConditions
+		Request request = requests.getRequestById(id);
+		if(request == null)
+			throw new CommandException("lm.command.disapprove.noRequest", id);
 
 		//Disapprove the claim request
 		String areaName = request.getAreaName();
