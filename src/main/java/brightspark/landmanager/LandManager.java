@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 @Mod(modid = LandManager.MOD_ID, name = LandManager.MOD_NAME, version = LandManager.VERSION)
 public class LandManager
@@ -56,7 +57,7 @@ public class LandManager
         }
     };
 
-    //public static final Pattern INVALID_AREA_NAME = Pattern.compile("(^\\d .*|^\\d$)");
+    public static final Pattern AREA_NAME = Pattern.compile("^\\w+$");
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event)

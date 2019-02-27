@@ -61,6 +61,7 @@ public class MessageCreateAreaReply implements IMessage
                 {
                     Minecraft mc = Minecraft.getMinecraft();
                     EntityPlayer player = mc.player;
+                    GuiScreen gui;
                     switch(message.result)
                     {
                         case SUCCESS:
@@ -71,7 +72,7 @@ public class MessageCreateAreaReply implements IMessage
                             break;
                         case NAME_EXISTS:
                             player.sendMessage(new TextComponentTranslation("message.create.name", message.areaName));
-                            GuiScreen gui = mc.currentScreen;
+                            gui = mc.currentScreen;
                             if(gui instanceof GuiCreateArea)
                                 ((GuiCreateArea) gui).clearTextField();
                             break;
@@ -79,6 +80,12 @@ public class MessageCreateAreaReply implements IMessage
                             player.sendMessage(new TextComponentTranslation("message.create.intersects"));
                             player.closeScreen();
                             resetItem(player);
+                            break;
+                        case INVALID_NAME:
+                            player.sendMessage(new TextComponentTranslation("message.create.invalid_name"));
+                            gui = mc.currentScreen;
+                            if(gui instanceof GuiCreateArea)
+                                ((GuiCreateArea) gui).clearTextField();
                             break;
                         case INVALID:
                             player.sendMessage(new TextComponentTranslation("message.create.invalid"));

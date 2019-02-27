@@ -16,6 +16,7 @@ message.tool.cleared=Cleared saved position
 message.create.added=Added area '%s'
 message.create.name=An area with the name %s already exists!
 message.create.intersects=New area intersects with an existing area!
+message.create.invalid_name=Area name is invalid! It must not contain spaces or special characters other than '_'
 message.create.invalid=Area is invalid!
 message.areas.show=Now showing all nearby areas
 message.areas.hide=Turned off showing all nearby areas
