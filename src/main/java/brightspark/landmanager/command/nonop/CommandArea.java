@@ -10,6 +10,11 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 //lm area <areaName>
 public class CommandArea extends LMCommandArea
 {
@@ -28,12 +33,22 @@ public class CommandArea extends LMCommandArea
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap)
     {
-        ITextComponent playerName;
-        String playerNameString = getPlayerNameFromUuid(server, area.getAllocatedPlayer());
-        if(playerNameString == null)
-            playerName = new TextComponentTranslation("lm.command.area.noplayer");
+        //Get owner
+        ITextComponent ownerName;
+        String ownerNameString = getPlayerNameFromUuid(server, area.getOwner());
+        if(ownerNameString == null)
+            ownerName = new TextComponentTranslation("lm.command.area.noplayer");
         else
-            playerName = new TextComponentString(playerNameString);
+            ownerName = new TextComponentString(ownerNameString);
+
+        //Get members
+        ITextComponent members = null;
+        Set<UUID> memberSet = area.getMembers();
+        if(!memberSet.isEmpty())
+        {
+            List<String> names = memberSet.stream().map(uuid -> getPlayerNameFromUuid(server, uuid)).sorted().collect(Collectors.toList());
+            members = new TextComponentString(String.join(", ", names));
+        }
 
         ITextComponent text = new TextComponentString("");
         text.getStyle().setColor(TextFormatting.WHITE);
@@ -41,7 +56,11 @@ public class CommandArea extends LMCommandArea
         areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
         text.appendSibling(areaNameComponent).appendText(" " + area.getName());
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.dim")).appendText(" " + area.getDimensionId());
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.allocation")).appendText(" ").appendSibling(playerName);
+        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.owner")).appendText(" ").appendSibling(ownerName);
+        if(members == null)
+            text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members.none"));
+        else
+            text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members")).appendText(" ").appendSibling(members);
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmin")).appendText(" " + posToString(area.getMinPos()));
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmax")).appendText(" " + posToString(area.getMaxPos()));
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.passives")).appendText(" ").appendSibling(booleanToText(area.canPassiveSpawn()));

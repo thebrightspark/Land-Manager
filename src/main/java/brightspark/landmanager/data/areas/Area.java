@@ -1,12 +1,17 @@
 package brightspark.landmanager.data.areas;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class Area implements INBTSerializable<NBTTagCompound>
@@ -14,7 +19,8 @@ public class Area implements INBTSerializable<NBTTagCompound>
     private String name;
     private int dimensionId;
     private BlockPos pos1, pos2, center;
-    private UUID allocatedPlayer;
+    private UUID owner;
+    private Set<UUID> members = new HashSet<>();
     private boolean
             canPassiveSpawn = true,
             canHostileSpawn = true,
@@ -77,14 +83,34 @@ public class Area implements INBTSerializable<NBTTagCompound>
         return center;
     }
 
-    public UUID getAllocatedPlayer()
+    public UUID getOwner()
     {
-        return allocatedPlayer;
+        return owner;
     }
 
-    public void setAllocatedPlayer(UUID uuid)
+    public void setOwner(UUID playerUuid)
     {
-        allocatedPlayer = uuid;
+        owner = playerUuid;
+    }
+
+    public Set<UUID> getMembers()
+    {
+        return members;
+    }
+
+    public boolean addMember(UUID playerUuid)
+    {
+        return members.add(playerUuid);
+    }
+
+    public boolean removeMember(UUID playerUuid)
+    {
+        return members.remove(playerUuid);
+    }
+
+    public boolean isMember(UUID playerUuid)
+    {
+        return owner.equals(playerUuid) || members.contains(playerUuid);
     }
 
     public boolean canPassiveSpawn()
@@ -158,8 +184,19 @@ public class Area implements INBTSerializable<NBTTagCompound>
         nbt.setInteger("dimension", dimensionId);
         nbt.setLong("position1", pos1.toLong());
         nbt.setLong("position2", pos2.toLong());
-        if(allocatedPlayer != null)
-            nbt.setUniqueId("player", allocatedPlayer);
+        if(owner != null)
+            nbt.setUniqueId("player", owner);
+        if(!members.isEmpty())
+        {
+            NBTTagList memberList = new NBTTagList();
+            members.forEach(member ->
+            {
+                NBTTagCompound memberNbt = new NBTTagCompound();
+                memberNbt.setUniqueId("uuid", member);
+                memberList.appendTag(memberNbt);
+            });
+            nbt.setTag("members", memberList);
+        }
         nbt.setBoolean("passive", canPassiveSpawn);
         nbt.setBoolean("hostile", canHostileSpawn);
         nbt.setBoolean("explosions", explosions);
@@ -175,7 +212,13 @@ public class Area implements INBTSerializable<NBTTagCompound>
         pos1 = BlockPos.fromLong(nbt.getLong("position1"));
         pos2 = BlockPos.fromLong(nbt.getLong("position2"));
         if(nbt.hasUniqueId("player"))
-            allocatedPlayer = nbt.getUniqueId("player");
+            owner = nbt.getUniqueId("player");
+        members.clear();
+        if(nbt.hasKey("members"))
+        {
+            NBTTagList memberList = nbt.getTagList("members", Constants.NBT.TAG_COMPOUND);
+            memberList.forEach(memberNbt -> members.add(((NBTTagCompound) memberNbt).getUniqueId("uuid")));
+        }
         canPassiveSpawn = nbt.getBoolean("passive");
         canHostileSpawn = nbt.getBoolean("hostile");
         explosions = nbt.getBoolean("explosions");
@@ -185,12 +228,16 @@ public class Area implements INBTSerializable<NBTTagCompound>
     @Override
     public boolean equals(Object obj)
     {
-        if(!(obj instanceof Area))
-            return false;
+        if(obj == null) return false;
+        if(obj == this) return true;
+        if(obj.getClass() != getClass()) return false;
         Area other = (Area) obj;
-        return name.equals(other.name) &&
-                dimensionId == other.dimensionId &&
-                pos1.equals(other.pos1) &&
-                pos2.equals(other.pos2);
+
+        return new EqualsBuilder()
+            .append(name, other.name)
+            .append(dimensionId, other.dimensionId)
+            .append(pos1, other.pos1)
+            .append(pos2, other.pos2)
+            .isEquals();
     }
 }

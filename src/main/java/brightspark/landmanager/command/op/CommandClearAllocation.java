@@ -27,7 +27,7 @@ public class CommandClearAllocation extends LMCommandArea
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap)
     {
-        area.setAllocatedPlayer(null);
+        area.setOwner(null);
         cap.dataChanged();
         sender.sendMessage(new TextComponentTranslation("lm.command.clear.cleared", area.getName()));
         LandManager.areaLog(AreaLogType.CLEAR_ALLOCATION, area.getName(), sender);

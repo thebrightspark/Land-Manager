@@ -62,7 +62,7 @@ public class CapabilityAreasImpl implements CapabilityAreas
         Area area = getArea(areaName);
         if(area != null)
         {
-            area.setAllocatedPlayer(playerUuid);
+            area.setOwner(playerUuid);
             dataChanged();
         }
         return area != null;

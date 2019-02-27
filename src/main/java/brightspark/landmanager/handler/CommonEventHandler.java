@@ -24,7 +24,6 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
-import java.util.Objects;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
@@ -44,11 +43,6 @@ public class CommonEventHandler
         return (LMConfig.creativeIgnoresProtection && player.isCreative()) || player.canUseCommand(2, "");
     }
 
-    private static boolean playerOwnsArea(Area area, EntityPlayer player)
-    {
-        return Objects.equals(area.getAllocatedPlayer(), player.getUniqueID());
-    }
-
     private static Area getProtectedArea(EntityPlayer player, BlockPos pos)
     {
         if(isPlayerCreativeOrOP(player))
@@ -59,7 +53,7 @@ public class CommonEventHandler
         if(cap == null)
             return null;
         Area area = cap.intersectingArea(pos);
-        if(area != null && !playerOwnsArea(area, player))
+        if(area != null && !area.isMember(player.getUniqueID()))
             //Area is protected against this player
             return area;
         return null;
@@ -90,7 +84,7 @@ public class CommonEventHandler
                 lastTimeHitProtectedBlock = worldTime;
             }
             else
-                LandManager.areaLog(AreaLogType.BREAK, area.getName(), (EntityPlayerMP) player);
+                LandManager.areaLog(AreaLogType.BREAK, area.getName(), player);
             event.setNewSpeed(0f);
             event.setCanceled(true);
         }
@@ -105,7 +99,7 @@ public class CommonEventHandler
         if(area != null)
         {
             player.sendMessage(new TextComponentTranslation("message.protection.place"));
-            LandManager.areaLog(AreaLogType.PLACE, area.getName(), (EntityPlayerMP) player);
+            LandManager.areaLog(AreaLogType.PLACE, area.getName(), player);
             event.setCanceled(true);
         }
     }
@@ -119,7 +113,7 @@ public class CommonEventHandler
         CapabilityAreas cap = getAreas(event.getWorld());
         if(cap == null)
             return;
-        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area -> !area.canInteract() && !playerOwnsArea(area, event.getEntityPlayer())))
+        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area -> !area.canInteract() && !area.isMember(event.getEntityPlayer().getUniqueID())))
         {
             if(event.getWorld().isRemote && event.getHand() == EnumHand.MAIN_HAND)
                 event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.interact"));

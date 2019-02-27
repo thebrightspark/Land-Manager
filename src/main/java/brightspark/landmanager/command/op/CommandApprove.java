@@ -56,7 +56,7 @@ public class CommandApprove extends LMCommand
 			requests.deleteAllForArea(areaName);
 			return;
 		}
-		area.setAllocatedPlayer(request.getPlayerUuid());
+		area.setOwner(request.getPlayerUuid());
 		areas.dataChanged();
 		requests.deleteRequest(areaName, id);
 

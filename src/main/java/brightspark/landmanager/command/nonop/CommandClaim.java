@@ -37,11 +37,7 @@ public class CommandClaim extends LMCommandArea
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException
     {
-        if(!(sender instanceof EntityPlayer))
-        {
-            sender.sendMessage(new TextComponentTranslation("lm.command.player"));
-            return;
-        }
+        validateSenderIsPlayer(sender);
 
         EntityPlayer player = (EntityPlayer) sender;
 
@@ -66,7 +62,7 @@ public class CommandClaim extends LMCommandArea
 
         String areaName = area.getName();
 
-        if(area.getAllocatedPlayer() != null)
+        if(area.getOwner() != null)
         {
             //Area already claimed
             player.sendMessage(new TextComponentTranslation("lm.command.claim.already", areaName));
@@ -100,7 +96,7 @@ public class CommandClaim extends LMCommandArea
 
     public static void claimArea(EntityPlayer player, Area area, CapabilityAreas cap)
     {
-        area.setAllocatedPlayer(player.getUniqueID());
+        area.setOwner(player.getUniqueID());
         cap.dataChanged();
         player.sendMessage(new TextComponentTranslation("lm.command.claim.claimed", area.getName()));
         LandManager.areaLog(AreaLogType.CLAIM, area.getName(), player);

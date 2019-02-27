@@ -4,7 +4,6 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -43,18 +42,10 @@ public class CommandAllocate extends LMCommand
 
         CapabilityAreas cap = getWorldCapWithArea(server, areaName);
         String playerName = args[0];
-        UUID uuid = null;
-        GameProfile profile = server.getPlayerProfileCache().getGameProfileForUsername(playerName);
-        if(profile != null)
-            uuid = profile.getId();
-        if(uuid == null)
-        {
-            sender.sendMessage(new TextComponentTranslation("lm.command.allocate.noplayer", playerName));
-            return;
-        }
+        UUID uuid = getUuidFromPlayerName(server, playerName);
         if(cap.setAllocation(areaName, uuid))
         {
-            sender.sendMessage(new TextComponentTranslation("lm.command.allocate.success", areaName, profile.getName()));
+            sender.sendMessage(new TextComponentTranslation("lm.command.allocate.success", areaName, playerName));
             LandManager.areaLog(AreaLogType.ALLOCATE, areaName, sender);
         }
         else

@@ -25,7 +25,10 @@ import net.minecraft.world.WorldServer;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -53,6 +56,20 @@ public abstract class LMCommand extends CommandBase
             CapabilityAreas cap = getWorldCap(world);
             if(cap.hasArea(areaName))
                 return cap;
+        }
+        throw new CommandException("lm.command.none", areaName);
+    }
+
+    protected Area getArea(MinecraftServer server, String areaName) throws CommandException
+    {
+        if(areaName == null)
+            throw new WrongUsageException("lm.command.areaName");
+        for(WorldServer world : server.worlds)
+        {
+            CapabilityAreas cap = getWorldCap(world);
+            Area area = cap.getArea(areaName);
+            if(area != null)
+                return area;
         }
         throw new CommandException("lm.command.none", areaName);
     }
@@ -119,6 +136,14 @@ public abstract class LMCommand extends CommandBase
         return playerName;
     }
 
+    protected UUID getUuidFromPlayerName(MinecraftServer server, String playerName) throws CommandException
+    {
+        GameProfile profile = server.getPlayerProfileCache().getGameProfileForUsername(playerName);
+        if(profile != null)
+            return profile.getId();
+        throw new CommandException("lm.command.noplayer", playerName);
+    }
+
     protected String posToString(BlockPos pos)
     {
         return String.format("%sX: %s%s, %sY: %s%s, %sZ: %s%s", TextFormatting.YELLOW, TextFormatting.RESET, pos.getX(), TextFormatting.YELLOW, TextFormatting.RESET, pos.getY(), TextFormatting.YELLOW, TextFormatting.RESET, pos.getZ());
@@ -165,6 +190,12 @@ public abstract class LMCommand extends CommandBase
             return false;
         UserListOpsEntry op = server.getPlayerList().getOppedPlayers().getEntry(((EntityPlayer) sender).getGameProfile());
         return op != null;
+    }
+
+    protected void validateSenderIsPlayer(ICommandSender sender) throws CommandException
+    {
+        if(!(sender instanceof EntityPlayer))
+            throw new CommandException("lm.command.player");
     }
 
     protected Integer parseIntWithDefault(String arg)

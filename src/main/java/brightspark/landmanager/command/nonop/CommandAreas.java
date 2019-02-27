@@ -57,11 +57,11 @@ public class CommandAreas extends LMCommand
 		//Send message back to sender
 		sender.sendMessage(createListMessage(sender, areas, area ->
 		{
-			String playerName = getPlayerNameFromUuid(server, area.getAllocatedPlayer());
-			if(playerName == null)
+			String ownerName = getPlayerNameFromUuid(server, area.getOwner());
+			if(ownerName == null)
 				return "  " + area.getName();
 			else
-				return String.format("  %s -> %s", area.getName(), playerName);
+				return String.format("  %s -> %s", area.getName(), ownerName);
 		}, page, "lm.command.areas.title", pageNum -> "/lm areas " + pageNum + finalAreaName));
 	}
 }

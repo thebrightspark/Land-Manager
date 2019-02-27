@@ -31,6 +31,7 @@ message.misc.false=False
 ##Misc command translations
 
 lm.command.none=Couldn't find area '%s'
+lm.command.noplayer=Could not find player %s
 lm.command.player=You need to be a player to use this command
 lm.command.areaName=No area name provided!
 lm.command.data=Failed to get areas from the world with dimension id %s
@@ -45,7 +46,9 @@ lm.command.area.usage=Use /lm area <areaName> to see details about the area
 lm.command.area.noplayer=None
 lm.command.area.name=Area Name:
 lm.command.area.dim=Dimension ID:
-lm.command.area.allocation=Allocation:
+lm.command.area.owner=Owner:
+lm.command.area.members=Members:
+lm.command.area.members.none=Members: None
 lm.command.area.posmin=Block Pos Min:
 lm.command.area.posmax=Block Pos Max:
 lm.command.area.passives=Can Passive Entities Spawn:
@@ -80,7 +83,6 @@ lm.command.showoff=Not showing any areas
 
 #Allocate
 lm.command.allocate.usage=Use /lm op allocate <playerName> <areaName> to allocate the area to the player
-lm.command.allocate.noplayer=Could not find player %s
 lm.command.allocate.success=Allocated area '%s' to player %s
 lm.command.allocate.failed=Area '%s' does not exist
 

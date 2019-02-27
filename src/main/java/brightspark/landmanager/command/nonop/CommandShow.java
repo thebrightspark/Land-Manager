@@ -5,8 +5,8 @@ import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.message.MessageShowArea;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -32,13 +32,9 @@ public class CommandShow extends LMCommandArea
     }
 
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap)
+    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException
     {
-        if(!(sender instanceof EntityPlayer))
-        {
-            sender.sendMessage(new TextComponentTranslation("lm.command.player"));
-            return;
-        }
+        validateSenderIsPlayer(sender);
 
         if(area == null)
         {
