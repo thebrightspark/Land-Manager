@@ -1,4 +1,4 @@
-package brightspark.landmanager.command.op;
+package brightspark.landmanager.command.optional;
 
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.item.LMItems;

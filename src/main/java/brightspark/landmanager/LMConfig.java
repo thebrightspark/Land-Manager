@@ -58,6 +58,10 @@ public class LMConfig
         @Config.Comment("If other players can interact (right click) with blocks in the area")
         @Config.RequiresMcRestart
         public boolean interactions = false;
+
+        @Config.Comment("If non-op players can use '/lm tool' to get the admin tool for creating areas")
+        @Config.RequiresMcRestart
+        public boolean tool = false;
     }
 
     @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)

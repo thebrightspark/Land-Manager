@@ -2,10 +2,7 @@ package brightspark.landmanager.command;
 
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.command.nonop.*;
-import brightspark.landmanager.command.optional.CommandExplosions;
-import brightspark.landmanager.command.optional.CommandHostiles;
-import brightspark.landmanager.command.optional.CommandInteractions;
-import brightspark.landmanager.command.optional.CommandPassives;
+import brightspark.landmanager.command.optional.*;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.server.command.CommandTreeBase;
 import net.minecraftforge.server.command.CommandTreeHelp;
@@ -28,6 +25,8 @@ public class CommandLM extends CommandTreeBase
             addSubcommand(new CommandExplosions());
         if(LMConfig.permissions.interactions)
             addSubcommand(new CommandInteractions());
+        if(LMConfig.permissions.tool)
+            addSubcommand(new CommandTool());
 
         addSubcommand(new CommandOp());
         addSubcommand(new CommandTreeHelp(this));
