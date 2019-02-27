@@ -107,6 +107,14 @@ lm.command.disapprove.noRequest=No request with id %s
 lm.command.disapprove.noArea=Area '%s' does not exist
 lm.command.disapprove.playerMessage=Your request for area '%s' has been disapproved by %s!
 
+#Members
+lm.command.members.usage=Use /lm members <add|remove> <areaName> <playerName>
+lm.command.members.owner=You are not the owner of the area '%s'!
+lm.command.members.add.success=Player '%s' successfully added to area '%s'
+lm.command.members.add.already=Player '%s' is already a member of area '%s'
+lm.command.members.remove.success=Player '%s' successfully remove from area '%s'
+lm.command.members.remove.already=Player '%s' already isn't a member of area '%s'
+
 #Requests
 lm.command.requests.usage=Use /lm op requests [page] [areaNameRegex]. You can display requests for an area without providing the page
 lm.command.requests.none=No requests found

@@ -54,7 +54,7 @@ public class CommandMembers extends CommandTreeBase
 		@Override
 		public String getUsage(ICommandSender sender)
 		{
-			return "lm.command.members.add.usage";
+			return "lm.command.members.usage";
 		}
 
 		@Override
@@ -69,15 +69,15 @@ public class CommandMembers extends CommandTreeBase
 			Area area = getArea(server, args[0]);
 			if(!area.getOwner().equals(player.getUniqueID()))
 			{
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.owner"));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.owner", area.getName()));
 				return;
 			}
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
 			if(area.addMember(uuid))
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success"));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player, area.getName()));
 			else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already"));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player, area.getName()));
 		}
 	}
 
@@ -93,7 +93,7 @@ public class CommandMembers extends CommandTreeBase
 		@Override
 		public String getUsage(ICommandSender sender)
 		{
-			return "lm.command.members.remove.usage";
+			return "lm.command.members.usage";
 		}
 
 		@Override
@@ -108,15 +108,15 @@ public class CommandMembers extends CommandTreeBase
 			Area area = getArea(server, args[0]);
 			if(!area.getOwner().equals(player.getUniqueID()))
 			{
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.owner"));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.owner", args[0]));
 				return;
 			}
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
 			if(area.removeMember(uuid))
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success"));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player, area.getName()));
 			else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already"));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player, area.getName()));
 		}
 	}
 }
