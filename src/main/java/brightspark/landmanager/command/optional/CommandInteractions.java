@@ -1,5 +1,6 @@
 package brightspark.landmanager.command.optional;
 
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
@@ -24,7 +25,7 @@ public class CommandInteractions extends LMCommandArea
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "lm.command.interactions.usage";
+        return LMConfig.permissions.interactions ?  "lm.command.interactions.usage" : "lm.command.interactions.usage.op";
     }
 
     @Override

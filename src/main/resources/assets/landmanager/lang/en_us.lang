@@ -57,7 +57,7 @@ lm.command.area.explosions=Explosions:
 lm.command.area.interactions=Block Interactions:
 
 #Areas
-lm.command.areas.usage=Use /areas [page] [areaNameRegex]
+lm.command.areas.usage=Use /lm areas [page] [areaNameRegex]
 lm.command.areas.none=No areas found
 lm.command.areas.title=Areas - Page %s / %s
 
@@ -120,27 +120,38 @@ lm.command.requests.usage=Use /lm op requests [page] [areaNameRegex]. You can di
 lm.command.requests.none=No requests found
 lm.command.requests.title=Requests - Page %s / %s
 
-#Tool
-lm.command.tool.usage=Use /lm op tool to give yourself the admin tool
-lm.command.tool.inventory=No room in inventory for tool
-
 ##Optional Commands
 
 #Explosions
-lm.command.explosions.usage=Use /lm%s explosions <areaName> to toggle explosion damage
+lm.command.explosions.usage=Use /lm explosions <areaName> to toggle explosion damage
+lm.command.explosions.usage.op=Use /lm op explosions <areaName> to toggle explosion damage
 lm.command.explosions.success=Set explosions to %s for area '%s'
 
 #Hostiles
-lm.command.hostiles.usage=Use /lm%s hostiles <areaName> to toggle hostile entity spawning
+lm.command.hostiles.usage=Use /lm hostiles <areaName> to toggle hostile entity spawning
+lm.command.hostiles.usage.op=Use /lm op hostiles <areaName> to toggle hostile entity spawning
 lm.command.hostiles.success=Set hostile entity spawning to %s for area '%s'
 
 #Interactions
-lm.command.interactions.usage=Use /lm%s interactions <areaName> to toggle player interactions (right clicking) with blocks
+lm.command.interactions.usage=Use /lm interactions <areaName> to toggle player interactions (right clicking) with blocks
+lm.command.interactions.usage.op=Use /lm op interactions <areaName> to toggle player interactions (right clicking) with blocks
 lm.command.interactions.success=Set interactions to %s for area '%s'
 
 #Passives
-lm.command.passives.usage=Use /lm%s passives <areaName> to toggle passive entity spawning
+lm.command.passives.usage=Use /lm passives <areaName> to toggle passive entity spawning
+lm.command.passives.usage.op=Use /lm op passives <areaName> to toggle passive entity spawning
 lm.command.passives.success=Set passive entity spawning to %s for area '%s'
+
+#Rename
+lm.command.rename.usage=Use /lm rename <areaName> <newAreaName> to rename an area
+lm.command.rename.usage.op=Use /lm op rename <areaName> <newAreaName> to rename an area
+lm.command.rename.success=You successfully renamed the area '%s' to '%s'
+lm.command.rename.invalid=The new area name '%s' is invalid! It must not contain spaces or special characters other than '_'
+
+#Tool
+lm.command.tool.usage=Use /lm tool to give yourself the admin tool
+lm.command.tool.usage.op=Use /lm op tool to give yourself the admin tool
+lm.command.tool.inventory=No room in inventory for tool
 
 ####Log Types
 

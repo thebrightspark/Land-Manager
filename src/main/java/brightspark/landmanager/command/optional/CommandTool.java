@@ -1,5 +1,6 @@
 package brightspark.landmanager.command.optional;
 
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.item.LMItems;
 import net.minecraft.command.CommandException;
@@ -23,7 +24,7 @@ public class CommandTool extends LMCommand
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "lm.command.tool.usage";
+        return LMConfig.permissions.tool ?  "lm.command.tool.usage" : "lm.command.tool.usage.op";
     }
 
     @Override

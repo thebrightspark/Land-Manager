@@ -1,5 +1,6 @@
 package brightspark.landmanager.command.optional;
 
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
@@ -24,7 +25,7 @@ public class CommandHostiles extends LMCommandArea
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "lm.command.hostiles.usage";
+        return LMConfig.permissions.hostileSpawning ?  "lm.command.hostiles.usage" : "lm.command.hostiles.usage.op";
     }
 
     @Override

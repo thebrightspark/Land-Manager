@@ -1,5 +1,6 @@
 package brightspark.landmanager.command.optional;
 
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
@@ -24,7 +25,7 @@ public class CommandPassives extends LMCommandArea
     @Override
     public String getUsage(ICommandSender sender)
     {
-        return "lm.command.passives.usage";
+        return LMConfig.permissions.passiveSpawning ?  "lm.command.passives.usage" : "lm.command.passives.usage.op";
     }
 
     @Override
