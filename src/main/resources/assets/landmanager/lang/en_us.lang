@@ -71,6 +71,11 @@ lm.command.claim.request.success=Claim request successfully created for area '%s
 lm.command.claim.request.failed=Claim request failed - you already have one for the area '%s'!
 lm.command.claim.request.opMessage=§7New claim request (%s) from %s for area '%s'
 
+#MyAreas
+lm.command.myareas.usage=Use /lm myareas [page] [areaNameRegex]
+lm.command.myareas.none=No areas found
+lm.command.myareas.title=My Areas - Page %s / %s
+
 #Show
 lm.command.show.usage=Use /lm show [areaName]. Providing no area will show all areas nearby
 lm.command.show.showing=Now showing area '%s'
