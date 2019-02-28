@@ -28,6 +28,8 @@ public class CommandOp extends CommandTreeBase
             addSubcommand(new CommandInteractions());
         if(!LMConfig.permissions.tool)
             addSubcommand(new CommandTool());
+        if(!LMConfig.permissions.rename)
+            addSubcommand(new CommandRename());
 
         addSubcommand(new CommandTreeHelp(this));
     }

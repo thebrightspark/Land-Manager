@@ -4,7 +4,6 @@ import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
@@ -49,11 +48,5 @@ public abstract class LMCommandArea extends LMCommand
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
     {
         return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-    }
-
-    protected void checkCanEditArea(MinecraftServer server, ICommandSender sender, Area area) throws CommandException
-    {
-        if(!isOP(server, sender) && !area.getOwner().equals(((EntityPlayer) sender).getUniqueID()))
-            throw new CommandException("lm.command.noPerm", area.getName());
     }
 }

@@ -35,7 +35,7 @@ public class CapabilityAreasImpl implements CapabilityAreas
     @Override
     public AddAreaResult addArea(Area area)
     {
-        if(!LandManager.AREA_NAME.matcher(area.getName()).matches())
+        if(!Area.validateName(area.getName()))
             return AddAreaResult.INVALID_NAME;
         if(areas.keySet().contains(area.getName()))
             return AddAreaResult.NAME_EXISTS;

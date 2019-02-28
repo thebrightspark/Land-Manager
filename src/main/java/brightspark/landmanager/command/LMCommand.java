@@ -192,6 +192,12 @@ public abstract class LMCommand extends CommandBase
         return op != null;
     }
 
+    protected void checkCanEditArea(MinecraftServer server, ICommandSender sender, Area area) throws CommandException
+    {
+        if(!isOP(server, sender) && !area.isOwner(((EntityPlayer) sender).getUniqueID()))
+            throw new CommandException("lm.command.noPerm", area.getName());
+    }
+
     protected void validateSenderIsPlayer(ICommandSender sender) throws CommandException
     {
         if(!(sender instanceof EntityPlayer))

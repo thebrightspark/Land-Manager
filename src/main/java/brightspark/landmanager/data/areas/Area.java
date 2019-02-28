@@ -13,9 +13,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class Area implements INBTSerializable<NBTTagCompound>
 {
+    private static final Pattern AREA_NAME = Pattern.compile("^\\w+$");
+
     private String name;
     private int dimensionId;
     private BlockPos pos1, pos2, center;
@@ -51,9 +54,22 @@ public class Area implements INBTSerializable<NBTTagCompound>
         return (in1 + in2) / 2;
     }
 
+    public static boolean validateName(String areaName)
+    {
+        return AREA_NAME.matcher(areaName).matches();
+    }
+
     public String getName()
     {
         return name;
+    }
+
+    public boolean setName(String name)
+    {
+        if(!validateName(name))
+            return false;
+        this.name = name;
+        return true;
     }
 
     public int getDimensionId()
@@ -93,6 +109,11 @@ public class Area implements INBTSerializable<NBTTagCompound>
         owner = playerUuid;
     }
 
+    public boolean isOwner(UUID playerUuid)
+    {
+        return owner.equals(playerUuid);
+    }
+
     public Set<UUID> getMembers()
     {
         return members;
@@ -110,7 +131,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
 
     public boolean isMember(UUID playerUuid)
     {
-        return owner.equals(playerUuid) || members.contains(playerUuid);
+        return isOwner(playerUuid) || members.contains(playerUuid);
     }
 
     public boolean canPassiveSpawn()

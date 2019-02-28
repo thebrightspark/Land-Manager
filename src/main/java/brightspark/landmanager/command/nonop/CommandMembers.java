@@ -67,7 +67,7 @@ public class CommandMembers extends CommandTreeBase
 				throwWrongUsage(sender);
 
 			Area area = getArea(server, args[0]);
-			if(!area.getOwner().equals(player.getUniqueID()))
+			if(!area.isOwner(player.getUniqueID()))
 			{
 				player.sendMessage(new TextComponentTranslation("lm.command.members.owner", area.getName()));
 				return;
@@ -106,7 +106,7 @@ public class CommandMembers extends CommandTreeBase
 				throwWrongUsage(sender);
 
 			Area area = getArea(server, args[0]);
-			if(!area.getOwner().equals(player.getUniqueID()))
+			if(!area.isOwner(player.getUniqueID()))
 			{
 				player.sendMessage(new TextComponentTranslation("lm.command.members.owner", args[0]));
 				return;

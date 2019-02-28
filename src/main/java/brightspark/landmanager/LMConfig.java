@@ -43,25 +43,29 @@ public class LMConfig
                 "An OP will then need to use the 'approve' command to accept the request"})
         public boolean claimRequest = false;
 
-        @Config.Comment("If passive entities can spawn in the area")
+        @Config.Comment("If area owners can toggle whether passive entities can spawn in the area")
         @Config.RequiresMcRestart
         public boolean passiveSpawning = false;
 
-        @Config.Comment("If hostile entities can spawn in the area")
+        @Config.Comment("If area owners can toggle whether hostile entities can spawn in the area")
         @Config.RequiresMcRestart
         public boolean hostileSpawning = false;
 
-        @Config.Comment("If explosions can destroy blocks in the area")
+        @Config.Comment("If area owners can toggle whether explosions can destroy blocks in the area")
         @Config.RequiresMcRestart
         public boolean explosions = false;
 
-        @Config.Comment("If other players can interact (right click) with blocks in the area")
+        @Config.Comment("If area owners can toggle whether other players can interact (right click) with blocks in the area")
         @Config.RequiresMcRestart
         public boolean interactions = false;
 
         @Config.Comment("If non-op players can use '/lm tool' to get the admin tool for creating areas")
         @Config.RequiresMcRestart
         public boolean tool = false;
+
+        @Config.Comment("If area owners can rename their areas")
+        @Config.RequiresMcRestart
+        public boolean rename = false;
     }
 
     @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
