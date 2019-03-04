@@ -11,6 +11,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.util.math.BlockPos;
@@ -148,6 +149,11 @@ public abstract class LMCommand extends CommandBase
         if(profile != null)
             return profile.getId();
         throw new CommandException("lm.command.noplayer", playerName);
+    }
+
+    protected EntityPlayerMP getPlayerFromUuid(MinecraftServer server, UUID uuid)
+    {
+        return server.getPlayerList().getPlayerByUUID(uuid);
     }
 
     protected String posToString(BlockPos pos)
