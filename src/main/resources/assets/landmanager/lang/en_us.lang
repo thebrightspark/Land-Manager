@@ -114,7 +114,6 @@ lm.command.disapprove.playerMessage=Your request for area '%s' has been disappro
 
 #Members
 lm.command.members.usage=Use /lm members <add|remove> <areaName> <playerName>
-lm.command.members.owner=You are not the owner of the area '%s'!
 lm.command.members.add.success=Player '%s' successfully added to area '%s'
 lm.command.members.add.already=Player '%s' is already a member of area '%s'
 lm.command.members.remove.success=Player '%s' successfully remove from area '%s'
