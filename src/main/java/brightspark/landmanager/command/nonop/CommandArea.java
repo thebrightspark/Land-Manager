@@ -55,12 +55,12 @@ public class CommandArea extends LMCommandArea
         ITextComponent areaNameComponent = new TextComponentTranslation("lm.command.area.name");
         areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
         text.appendSibling(areaNameComponent).appendText(" " + area.getName());
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.dim")).appendText(" " + area.getDimensionId());
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.owner")).appendText(" ").appendSibling(ownerName);
         if(members == null)
             text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members.none"));
         else
             text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members")).appendText(" ").appendSibling(members);
+        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.dim")).appendText(" " + area.getDimensionId());
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmin")).appendText(" " + posToString(area.getMinPos()));
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmax")).appendText(" " + posToString(area.getMaxPos()));
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.passives")).appendText(" ").appendSibling(booleanToText(area.canPassiveSpawn()));
