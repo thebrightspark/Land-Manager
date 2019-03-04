@@ -9,7 +9,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 
-//lm showAll
+//lm showoff
 public class CommandShowOff extends LMCommand
 {
     @Override

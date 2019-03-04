@@ -16,11 +16,14 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -77,6 +80,25 @@ public class LandManager
     {
         event.registerServerCommand(new CommandLM());
         //event.registerServerCommand(new CommandLandManagerLogs());
+    }
+
+    @Mod.EventHandler
+    public void serverStarted(FMLServerStartedEvent event)
+    {
+        //Ensure that area names do not contain whitespaces
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        for(WorldServer world : server.worlds)
+        {
+            CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
+            if(cap == null)
+                continue;
+            cap.getAllAreas().forEach(area ->
+            {
+                String name = area.getName();
+                if(name.contains(" "))
+                    area.setName(name.replaceAll(" ", "_"));
+            });
+        }
     }
 
     public static void areaLog(AreaLogType type, String areaName, ICommandSender sender)
