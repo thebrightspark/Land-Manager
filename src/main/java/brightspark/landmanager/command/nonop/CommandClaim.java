@@ -90,15 +90,10 @@ public class CommandClaim extends LMCommandArea
         else
         {
             //Claim the area
-            claimArea(player, area, cap);
+            area.setOwner(player.getUniqueID());
+            cap.dataChanged();
+            player.sendMessage(new TextComponentTranslation("lm.command.claim.claimed", area.getName()));
+            LandManager.areaLog(AreaLogType.CLAIM, area.getName(), player);
         }
-    }
-
-    public static void claimArea(EntityPlayer player, Area area, CapabilityAreas cap)
-    {
-        area.setOwner(player.getUniqueID());
-        cap.dataChanged();
-        player.sendMessage(new TextComponentTranslation("lm.command.claim.claimed", area.getName()));
-        LandManager.areaLog(AreaLogType.CLAIM, area.getName(), player);
     }
 }

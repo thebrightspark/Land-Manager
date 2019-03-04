@@ -1,7 +1,10 @@
 package brightspark.landmanager.command;
 
 import brightspark.landmanager.LMConfig;
-import brightspark.landmanager.command.op.*;
+import brightspark.landmanager.command.op.CommandApprove;
+import brightspark.landmanager.command.op.CommandDelete;
+import brightspark.landmanager.command.op.CommandDisapprove;
+import brightspark.landmanager.command.op.CommandRequests;
 import brightspark.landmanager.command.optional.*;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.server.command.CommandTreeBase;
@@ -12,8 +15,6 @@ public class CommandOp extends CommandTreeBase
     public CommandOp()
     {
         addSubcommand(new CommandDelete());
-        addSubcommand(new CommandAllocate());
-        addSubcommand(new CommandClearAllocation());
         addSubcommand(new CommandRequests());
         addSubcommand(new CommandApprove());
         addSubcommand(new CommandDisapprove());

@@ -23,7 +23,10 @@ import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -47,31 +50,34 @@ public abstract class LMCommand extends CommandBase
         return getWorldCap(player.world);
     }
 
-    protected CapabilityAreas getWorldCapWithArea(MinecraftServer server, String areaName) throws CommandException
+    protected Pair<CapabilityAreas, Area> getAreaAndCap(MinecraftServer server, String areaName) throws CommandException
     {
         if(areaName == null)
             throw new WrongUsageException("lm.command.areaName");
         for(WorldServer world : server.worlds)
         {
-            CapabilityAreas cap = getWorldCap(world);
-            if(cap.hasArea(areaName))
-                return cap;
+            CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
+            if(cap == null)
+                continue;
+            Area area = cap.getArea(areaName);
+            if(area != null)
+                return new ImmutablePair<>(cap, area);
         }
         throw new CommandException("lm.command.none", areaName);
     }
 
-    protected Area getArea(MinecraftServer server, String areaName) throws CommandException
+    protected Pair<CapabilityAreas, Area> getAreaAndCapNoException(MinecraftServer server, @Nonnull String areaName)
     {
-        if(areaName == null)
-            throw new WrongUsageException("lm.command.areaName");
         for(WorldServer world : server.worlds)
         {
-            CapabilityAreas cap = getWorldCap(world);
+            CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
+            if(cap == null)
+                continue;
             Area area = cap.getArea(areaName);
             if(area != null)
-                return area;
+                return new ImmutablePair<>(cap, area);
         }
-        throw new CommandException("lm.command.none", areaName);
+        return null;
     }
 
     protected RequestsWorldSavedData getRequestsData(MinecraftServer server) throws CommandException

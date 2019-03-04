@@ -6,6 +6,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -36,10 +37,9 @@ public abstract class LMCommandArea extends LMCommand
         if(areaName.isEmpty())
             throwWrongUsage(sender);
 
-        CapabilityAreas cap = getWorldCapWithArea(server, areaName);
-        Area area = cap.getArea(areaName);
+        Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, areaName);
 
-        execute(server, sender, area, cap);
+        execute(server, sender, pair.getRight(), pair.getLeft());
     }
 
     public abstract void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException;

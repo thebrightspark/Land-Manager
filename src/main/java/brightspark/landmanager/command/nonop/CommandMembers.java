@@ -2,6 +2,7 @@ package brightspark.landmanager.command.nonop;
 
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.CapabilityAreas;
 import com.google.common.collect.Lists;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -10,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.server.command.CommandTreeBase;
 import net.minecraftforge.server.command.CommandTreeHelp;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.UUID;
@@ -66,14 +68,17 @@ public class CommandMembers extends CommandTreeBase
 			if(args.length != 2)
 				throwWrongUsage(sender);
 
-			Area area = getArea(server, args[0]);
-			checkCanEditArea(server, sender, area);
+			Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
+			checkCanEditArea(server, sender, pair.getRight());
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
-			if(area.addMember(uuid))
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player, area.getName()));
+			if(pair.getRight().addMember(uuid))
+			{
+				pair.getLeft().dataChanged();
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player, pair.getRight().getName()));
+			}
 			else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player, area.getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player, pair.getRight().getName()));
 		}
 	}
 
@@ -101,14 +106,17 @@ public class CommandMembers extends CommandTreeBase
 			if(args.length != 2)
 				throwWrongUsage(sender);
 
-			Area area = getArea(server, args[0]);
-			checkCanEditArea(server, sender, area);
+			Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
+			checkCanEditArea(server, sender, pair.getRight());
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
-			if(area.removeMember(uuid))
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player, area.getName()));
+			if(pair.getRight().removeMember(uuid))
+			{
+				pair.getLeft().dataChanged();
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player, pair.getRight().getName()));
+			}
 			else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player, area.getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player, pair.getRight().getName()));
 		}
 	}
 }

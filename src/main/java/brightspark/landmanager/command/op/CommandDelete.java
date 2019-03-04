@@ -30,6 +30,7 @@ public class CommandDelete extends LMCommandArea
     {
         if(cap.removeArea(area.getName()))
         {
+            //TODO: Notify all members of the area that the area was deleted
             sender.sendMessage(new TextComponentTranslation("lm.command.delete.deleted", area.getName()));
             LandManager.areaLog(AreaLogType.DELETE, area.getName(), sender);
             RequestsWorldSavedData requests = RequestsWorldSavedData.get(server.getEntityWorld());

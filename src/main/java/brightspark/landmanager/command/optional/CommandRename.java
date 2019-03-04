@@ -3,10 +3,12 @@ package brightspark.landmanager.command.optional;
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.CapabilityAreas;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class CommandRename extends LMCommand
 {
@@ -30,12 +32,15 @@ public class CommandRename extends LMCommand
 		if(args.length != 2)
 			throwWrongUsage(sender);
 
-		Area area = getArea(server, args[0]);
-		checkCanEditArea(server, sender, area);
+		Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
+		checkCanEditArea(server, sender, pair.getRight());
 
 		String newName = args[1];
-		if(area.setName(newName))
+		if(pair.getRight().setName(newName))
+		{
+			pair.getLeft().dataChanged();
 			sender.sendMessage(new TextComponentTranslation("lm.command.rename.success", newName));
+		}
 		else
 			sender.sendMessage(new TextComponentTranslation("lm.command.rename.invalid", newName));
 	}

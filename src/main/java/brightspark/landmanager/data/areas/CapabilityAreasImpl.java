@@ -57,15 +57,16 @@ public class CapabilityAreasImpl implements CapabilityAreas
     }
 
     @Override
-    public boolean setAllocation(String areaName, UUID playerUuid)
+    public boolean setOwner(String areaName, UUID playerUuid)
     {
         Area area = getArea(areaName);
         if(area != null)
         {
             area.setOwner(playerUuid);
             dataChanged();
+            return true;
         }
-        return area != null;
+        return false;
     }
 
     @Override
@@ -114,6 +115,7 @@ public class CapabilityAreasImpl implements CapabilityAreas
         return areas.values().stream().filter(area -> area.intersects(pos)).collect(Collectors.toSet());
     }
 
+    //TODO: Have a more efficient method that updates for a single Area
     @Override
     public void dataChanged()
     {

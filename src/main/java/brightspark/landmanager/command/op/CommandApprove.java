@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import org.apache.commons.lang3.tuple.Pair;
 
 //lm op approve <requestId>
 public class CommandApprove extends LMCommand
@@ -48,16 +49,14 @@ public class CommandApprove extends LMCommand
 
 		//Approve the claim request
 		String areaName = request.getAreaName();
-		CapabilityAreas areas = getWorldCapWithArea(server, areaName);
-		Area area = areas.getArea(areaName);
-		if(area == null)
+		Pair<CapabilityAreas, Area> pair = getAreaAndCapNoException(server, areaName);
+		if(pair == null)
 		{
 			sender.sendMessage(new TextComponentTranslation("lm.command.approve.noArea", areaName));
 			requests.deleteAllForArea(areaName);
 			return;
 		}
-		area.setOwner(request.getPlayerUuid());
-		areas.dataChanged();
+		pair.getLeft().setOwner(areaName, request.getPlayerUuid());
 		requests.deleteRequest(areaName, id);
 
 		//Notify the player if they're online

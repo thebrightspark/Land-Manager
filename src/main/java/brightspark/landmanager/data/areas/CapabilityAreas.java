@@ -19,7 +19,7 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
 
     boolean removeArea(String areaName);
 
-    boolean setAllocation(String areaName, UUID playerUuid);
+    boolean setOwner(String areaName, UUID playerUuid);
 
     List<Area> getAllAreas();
 
