@@ -63,10 +63,6 @@ public class LMConfig
         @Config.RequiresMcRestart
         public boolean tool = false;
 
-        @Config.Comment("If area owners can set a cost for their area when selling it (if currency mod integration available)")
-        @Config.RequiresMcRestart
-        public boolean setCost = false;
-
         @Config.Comment("If area owners can rename their areas")
         @Config.RequiresMcRestart
         public boolean rename = false;
