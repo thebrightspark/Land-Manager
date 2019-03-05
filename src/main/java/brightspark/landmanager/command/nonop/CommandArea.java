@@ -37,7 +37,7 @@ public class CommandArea extends LMCommandArea
         ITextComponent ownerName;
         String ownerNameString = getPlayerNameFromUuid(server, area.getOwner());
         if(ownerNameString == null)
-            ownerName = new TextComponentTranslation("lm.command.area.noplayer");
+            ownerName = new TextComponentTranslation("lm.command.area.none");
         else
             ownerName = new TextComponentString(ownerNameString);
 
@@ -56,10 +56,11 @@ public class CommandArea extends LMCommandArea
         areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
         text.appendSibling(areaNameComponent).appendText(" " + area.getName());
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.owner")).appendText(" ").appendSibling(ownerName);
+        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members")).appendText(" ");
         if(members == null)
-            text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members.none"));
+            text.appendSibling(new TextComponentTranslation("lm.command.area.none"));
         else
-            text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members")).appendText(" ").appendSibling(members);
+            text.appendSibling(members);
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.dim")).appendText(" " + area.getDimensionId());
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmin")).appendText(" " + posToString(area.getMinPos()));
         text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmax")).appendText(" " + posToString(area.getMaxPos()));

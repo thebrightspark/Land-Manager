@@ -11,6 +11,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -111,7 +112,7 @@ public class Area implements INBTSerializable<NBTTagCompound>
 
     public boolean isOwner(UUID playerUuid)
     {
-        return owner.equals(playerUuid);
+        return Objects.equals(owner, playerUuid);
     }
 
     public Set<UUID> getMembers()

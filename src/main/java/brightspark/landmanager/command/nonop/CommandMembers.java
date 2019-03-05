@@ -75,10 +75,10 @@ public class CommandMembers extends CommandTreeBase
 			if(pair.getRight().addMember(uuid))
 			{
 				pair.getLeft().dataChanged();
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player, pair.getRight().getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player.getDisplayName(), pair.getRight().getName()));
 			}
 			else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player, pair.getRight().getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player.getDisplayName(), pair.getRight().getName()));
 		}
 	}
 
@@ -113,10 +113,10 @@ public class CommandMembers extends CommandTreeBase
 			if(pair.getRight().removeMember(uuid))
 			{
 				pair.getLeft().dataChanged();
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player, pair.getRight().getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player.getDisplayName(), pair.getRight().getName()));
 			}
 			else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player, pair.getRight().getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player.getDisplayName(), pair.getRight().getName()));
 		}
 	}
 }

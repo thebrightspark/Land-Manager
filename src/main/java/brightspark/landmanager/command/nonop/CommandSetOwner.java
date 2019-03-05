@@ -25,7 +25,7 @@ public class CommandSetOwner extends LMCommand
 	@Override
 	public String getUsage(ICommandSender sender)
 	{
-		return null;
+		return "lm.command.setowner.usage";
 	}
 
 	@Override
@@ -39,20 +39,23 @@ public class CommandSetOwner extends LMCommand
 
 		String areaName = args[0];
 		Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, areaName);
+		Area area = pair.getRight();
 		UUID player = null;
 		if(args.length > 1)
 		{
-			checkCanEditArea(server, sender, pair.getRight());
+			checkCanEditArea(server, sender, area);
 			player = getUuidFromPlayerName(server, argsToString(args, 1));
 		}
 
-		//Set the owner
-		if(pair.getLeft().setOwner(areaName, player))
-		{
-			sender.sendMessage(new TextComponentTranslation("lm.command.setowner.success"));
-			LandManager.areaLog(AreaLogType.SET_OWNER, areaName, sender);
-		}
-		else
-			throw new CommandException("lm.command.none", areaName);
+		//Set the owner and update members
+		UUID prevOwner = area.getOwner();
+		area.setOwner(player);
+		if(player != null)
+			area.removeMember(player);
+		if(prevOwner != null)
+			area.addMember(prevOwner);
+		pair.getLeft().dataChanged();
+		sender.sendMessage(new TextComponentTranslation("lm.command.setowner.success", areaName, player));
+		LandManager.areaLog(AreaLogType.SET_OWNER, areaName, sender);
 	}
 }

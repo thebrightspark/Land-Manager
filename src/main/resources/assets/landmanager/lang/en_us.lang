@@ -43,12 +43,11 @@ lm.command.noPerm=You do not have permission to edit the area '%s''!
 
 #Area
 lm.command.area.usage=Use /lm area <areaName> to see details about the area
-lm.command.area.noplayer=None
+lm.command.area.none=None
 lm.command.area.name=Area Name:
 lm.command.area.dim=Dimension ID:
 lm.command.area.owner=Owner:
 lm.command.area.members=Members:
-lm.command.area.members.none=Members: None
 lm.command.area.posmin=Block Pos Min:
 lm.command.area.posmax=Block Pos Max:
 lm.command.area.passives=Can Passive Entities Spawn:
@@ -65,20 +64,32 @@ lm.command.areas.title=Areas - Page %s / %s
 lm.command.claim.usage=Use /lm claim [areaName] to claim an area. Providing no area will try claiming the area you're standing in
 lm.command.claim.disabled=Area claiming is not enabled! Ask an OP to allocate you an area.
 lm.command.claim.none=There is no area where you are standing!
-lm.command.claim.claimed=Area '%s' claimed
-lm.command.claim.already=Someone else has already claimed area '%s'
-lm.command.claim.request.success=Claim request successfully created for area '%s'
-lm.command.claim.request.failed=Claim request failed - you already have one for the area '%s'!
-lm.command.claim.request.opMessage=§7New claim request (%s) from %s for area '%s'
+lm.command.claim.claimed=Area %s claimed
+lm.command.claim.already=Someone else has already claimed area %s
+lm.command.claim.request.success=Claim request successfully created for area %s
+lm.command.claim.request.failed=Claim request failed - you already have one for the area %s!
+lm.command.claim.request.opMessage=§7New claim request (%s) from %s for area %s
+
+#Members
+lm.command.members.usage=Use /lm members <add|remove> <areaName> <playerName>
+lm.command.members.add.success=%s was successfully added to area %s
+lm.command.members.add.already=%s is already a member of area %s
+lm.command.members.remove.success=%s was successfully remove from area %s
+lm.command.members.remove.already=%s already isn't a member of area %s
 
 #MyAreas
 lm.command.myareas.usage=Use /lm myareas [page] [areaNameRegex]
 lm.command.myareas.none=No areas found
 lm.command.myareas.title=My Areas - Page %s / %s
 
+#SetOwner
+lm.command.setowner.usage=Use /lm setowner <areaName> [playerName]
+lm.command.setowner.op=You must be an OP or owner of the area to use this command
+lm.command.setowner.success=The new owner of the area %s is %s
+
 #Show
 lm.command.show.usage=Use /lm show [areaName]. Providing no area will show all areas nearby
-lm.command.show.showing=Now showing area '%s'
+lm.command.show.showing=Now showing area %s
 
 #Showoff
 lm.command.showoff.usage= Use /lm showoff
@@ -86,38 +97,22 @@ lm.command.showoff=Not showing any areas
 
 ##Op Commands
 
-#Allocate
-lm.command.allocate.usage=Use /lm op allocate <playerName> <areaName> to allocate the area to the player
-lm.command.allocate.success=Allocated area '%s' to player %s
-lm.command.allocate.failed=Area '%s' does not exist
-
 #Approve
 lm.command.approve.usage=Use /lm op approve <requestId> to approve a claim request. Check for requests using the 'requests' command
 lm.command.approve.noRequest=No request with id %s
-lm.command.approve.noArea=Area '%s' does not exist
-lm.command.approve.playerMessage=Your request for area '%s' has been approved by %s!
-
-#Clear Allocation
-lm.command.clear.usage=Use /lm op clearAllocation <areaName>
-lm.command.clear.cleared=Cleared player allocation for area '%s'
+lm.command.approve.noArea=Area %s does not exist
+lm.command.approve.playerMessage=Your request for area %s has been approved by %s!
 
 #Delete
 lm.command.delete.usage=Use /lm op delete
-lm.command.delete.deleted=Deleted area '%s'
-lm.command.delete.failed=Failed to delete area '%s'
+lm.command.delete.deleted=Deleted area %s
+lm.command.delete.failed=Failed to delete area %s
 
 #Disapprove
 lm.command.disapprove.usage=Use /lm op disapprove <requestId> to disapprove a claim request. Check for requests using the 'requests' command
 lm.command.disapprove.noRequest=No request with id %s
-lm.command.disapprove.noArea=Area '%s' does not exist
-lm.command.disapprove.playerMessage=Your request for area '%s' has been disapproved by %s!
-
-#Members
-lm.command.members.usage=Use /lm members <add|remove> <areaName> <playerName>
-lm.command.members.add.success=Player '%s' successfully added to area '%s'
-lm.command.members.add.already=Player '%s' is already a member of area '%s'
-lm.command.members.remove.success=Player '%s' successfully remove from area '%s'
-lm.command.members.remove.already=Player '%s' already isn't a member of area '%s'
+lm.command.disapprove.noArea=Area %s does not exist
+lm.command.disapprove.playerMessage=Your request for area %s has been disapproved by %s!
 
 #Requests
 lm.command.requests.usage=Use /lm op requests [page] [areaNameRegex]. You can display requests for an area without providing the page
@@ -129,27 +124,27 @@ lm.command.requests.title=Requests - Page %s / %s
 #Explosions
 lm.command.explosions.usage=Use /lm explosions <areaName> to toggle explosion damage
 lm.command.explosions.usage.op=Use /lm op explosions <areaName> to toggle explosion damage
-lm.command.explosions.success=Set explosions to %s for area '%s'
+lm.command.explosions.success=Set explosions to %s for area %s
 
 #Hostiles
 lm.command.hostiles.usage=Use /lm hostiles <areaName> to toggle hostile entity spawning
 lm.command.hostiles.usage.op=Use /lm op hostiles <areaName> to toggle hostile entity spawning
-lm.command.hostiles.success=Set hostile entity spawning to %s for area '%s'
+lm.command.hostiles.success=Set hostile entity spawning to %s for area %s
 
 #Interactions
 lm.command.interactions.usage=Use /lm interactions <areaName> to toggle player interactions (right clicking) with blocks
 lm.command.interactions.usage.op=Use /lm op interactions <areaName> to toggle player interactions (right clicking) with blocks
-lm.command.interactions.success=Set interactions to %s for area '%s'
+lm.command.interactions.success=Set interactions to %s for area %s
 
 #Passives
 lm.command.passives.usage=Use /lm passives <areaName> to toggle passive entity spawning
 lm.command.passives.usage.op=Use /lm op passives <areaName> to toggle passive entity spawning
-lm.command.passives.success=Set passive entity spawning to %s for area '%s'
+lm.command.passives.success=Set passive entity spawning to %s for area %s
 
 #Rename
 lm.command.rename.usage=Use /lm rename <areaName> <newAreaName> to rename an area
 lm.command.rename.usage.op=Use /lm op rename <areaName> <newAreaName> to rename an area
-lm.command.rename.success=You successfully renamed the area '%s' to '%s'
+lm.command.rename.success=You successfully renamed the area %s to %s
 lm.command.rename.invalid=The new area name '%s' is invalid! It must not contain spaces or special characters other than '_'
 
 #Tool

@@ -17,6 +17,8 @@ public class CommandLM extends CommandTreeBase
         addSubcommand(new CommandShow());
         addSubcommand(new CommandShowOff());
         addSubcommand(new CommandMembers());
+        addSubcommand(new CommandMyAreas());
+        addSubcommand(new CommandSetOwner());
 
         if(LMConfig.permissions.passiveSpawning)
             addSubcommand(new CommandPassives());
