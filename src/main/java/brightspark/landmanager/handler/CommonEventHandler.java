@@ -71,11 +71,11 @@ public class CommonEventHandler
     @SubscribeEvent
     public static void onBlockStartBreak(net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed event)
     {
-        //Stop players from breaking blocks in protected areas
         EntityPlayer player = event.getEntityPlayer();
         Area area = getProtectedArea(player, event.getPos());
-        if(area != null)
+        if(area != null || !LMConfig.globalSettings.canPlayersBreakBlocks)
         {
+            //Stop players from breaking blocks
             if(player.world.isRemote)
             {
                 long worldTime = player.world.getTotalWorldTime();
@@ -84,7 +84,7 @@ public class CommonEventHandler
                 lastTimeHitProtectedBlock = worldTime;
             }
             else
-                LandManager.areaLog(AreaLogType.BREAK, area.getName(), player);
+                LandManager.areaLog(AreaLogType.BREAK, area == null ? "GLOBAL" : area.getName(), player);
             event.setNewSpeed(0f);
             event.setCanceled(true);
         }
@@ -96,10 +96,10 @@ public class CommonEventHandler
         //Stop players from placing block in protected areas
         EntityPlayer player = event.getPlayer();
         Area area = getProtectedArea(player, event.getPos());
-        if(area != null)
+        if(area != null || !LMConfig.globalSettings.canPlayersPlaceBlocks)
         {
             player.sendMessage(new TextComponentTranslation("message.protection.place"));
-            LandManager.areaLog(AreaLogType.PLACE, area.getName(), player);
+            LandManager.areaLog(AreaLogType.PLACE, area == null ? "GLOBAL" : area.getName(), player);
             event.setCanceled(true);
         }
     }
@@ -113,7 +113,8 @@ public class CommonEventHandler
         CapabilityAreas cap = getAreas(event.getWorld());
         if(cap == null)
             return;
-        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area -> !area.canInteract() && !area.isMember(event.getEntityPlayer().getUniqueID())))
+        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area -> !area.canInteract() && !area.isMember(event.getEntityPlayer().getUniqueID()))
+                || !LMConfig.globalSettings.canPlayersInteract)
         {
             if(event.getWorld().isRemote && event.getHand() == EnumHand.MAIN_HAND)
                 event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.interact"));
@@ -152,6 +153,11 @@ public class CommonEventHandler
             return;
         Set<Area> areas = cap.intersectingAreas(new BlockPos(event.getX(), event.getY(), event.getZ()));
         boolean hostile = event.getEntityLiving().isCreatureType(EnumCreatureType.MONSTER, false);
+        if(areas.isEmpty())
+        {
+            if(!(hostile ? LMConfig.globalSettings.canHostileSpawn : LMConfig.globalSettings.canPassiveSpawn))
+                event.setResult(Event.Result.DENY);
+        }
         if(areas.stream().anyMatch(area -> !(hostile ? area.canHostileSpawn() : area.canPassiveSpawn())))
             event.setResult(Event.Result.DENY);
     }
@@ -163,6 +169,11 @@ public class CommonEventHandler
         CapabilityAreas cap = getAreas(event.getWorld());
         if(cap == null)
             return;
-        event.getAffectedBlocks().removeIf(pos -> cap.intersectingAreas(pos).stream().anyMatch(area -> !area.canExplosionsCauseDamage()));
+        event.getAffectedBlocks().removeIf(pos ->
+        {
+            Set<Area> areas = cap.intersectingAreas(pos);
+            return areas.isEmpty() ? !LMConfig.globalSettings.canExplosionsDestroyBlocks :
+                    areas.stream().anyMatch(area -> !area.canExplosionsCauseDamage());
+        });
     }
 }

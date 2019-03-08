@@ -25,6 +25,9 @@ public class LMConfig
     @Config.Comment("Non-OP player permissions for what they can change in their areas")
     public static final Permissions permissions = new Permissions();
 
+	@Config.Comment("Global settings affect all blocks outside of any areas")
+    public static final GlobalSettings globalSettings = new GlobalSettings();
+
     public static class Client
     {
         @Config.Comment("The radius within which nearby areas will show when /lmShow is showing all nearby areas")
@@ -66,6 +69,27 @@ public class LMConfig
         @Config.Comment("If area owners can rename their areas")
         @Config.RequiresMcRestart
         public boolean rename = false;
+    }
+
+    public static class GlobalSettings
+    {
+    	@Config.Comment("Can passive entities spawn in global spaces")
+	    public boolean canPassiveSpawn = true;
+
+	    @Config.Comment("Can hostile entities spawn in global spaces")
+	    public boolean canHostileSpawn = true;
+
+	    @Config.Comment("Can explosions destroy global blocks")
+	    public boolean canExplosionsDestroyBlocks = true;
+
+	    @Config.Comment("Can players interact with global blocks")
+	    public boolean canPlayersInteract = true;
+
+	    @Config.Comment("Can players break global blocks")
+	    public boolean canPlayersBreakBlocks = true;
+
+	    @Config.Comment("Can players break global blocks")
+	    public boolean canPlayersPlaceBlocks = true;
     }
 
     @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
