@@ -34,7 +34,7 @@ public class CommandSetOwner extends LMCommand
 		if(args.length < 1)
 			throwWrongUsage(sender);
 		//Only OPs can set the owner to null
-		if(args.length == 1 && isOP(server, sender))
+		if(args.length == 1 && !isOP(server, sender))
 			throw new CommandException("lm.command.setowner.op");
 
 		String areaName = args[0];

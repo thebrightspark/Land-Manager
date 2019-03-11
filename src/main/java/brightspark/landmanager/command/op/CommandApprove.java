@@ -58,6 +58,7 @@ public class CommandApprove extends LMCommand
 		}
 		pair.getLeft().setOwner(areaName, request.getPlayerUuid());
 		requests.deleteRequest(areaName, id);
+		sender.sendMessage(new TextComponentTranslation("lm.command.approve.success", id, getPlayerNameFromUuid(server, request.getPlayerUuid()), areaName));
 
 		//Notify the player if they're online
 		EntityPlayerMP player = getPlayerFromUuid(server, request.getPlayerUuid());

@@ -57,13 +57,14 @@ public class CommandDisapprove extends LMCommand
 			return;
 		}
 		requests.deleteRequest(areaName, id);
+		sender.sendMessage(new TextComponentTranslation("lm.command.disapprove.success", id, getPlayerNameFromUuid(server, request.getPlayerUuid()), areaName));
 
 		//Notify the player if they're online
 		EntityPlayerMP player = getPlayerFromUuid(server, request.getPlayerUuid());
 		if(player != null)
 		{
 			TextComponentTranslation textComp = new TextComponentTranslation("lm.command.disapprove.playerMessage", areaName, sender.getDisplayName());
-			textComp.getStyle().setColor(TextFormatting.DARK_RED);
+			textComp.getStyle().setColor(TextFormatting.RED);
 			player.sendMessage(textComp);
 		}
 	}

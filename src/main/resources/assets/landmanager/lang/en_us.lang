@@ -101,6 +101,7 @@ lm.command.showoff=Not showing any areas
 lm.command.approve.usage=Use /lm op approve <requestId> to approve a claim request. Check for requests using the 'requests' command
 lm.command.approve.noRequest=No request with id %s
 lm.command.approve.noArea=Area %s does not exist
+lm.command.approve.success=Approved request %s - %s is now the owner of area %s
 lm.command.approve.playerMessage=Your request for area %s has been approved by %s!
 
 #Delete
@@ -112,6 +113,7 @@ lm.command.delete.failed=Failed to delete area %s
 lm.command.disapprove.usage=Use /lm op disapprove <requestId> to disapprove a claim request. Check for requests using the 'requests' command
 lm.command.disapprove.noRequest=No request with id %s
 lm.command.disapprove.noArea=Area %s does not exist
+lm.command.disapprove.success=Disapproved request %s from %s for area %s
 lm.command.disapprove.playerMessage=Your request for area %s has been disapproved by %s!
 
 #Requests
