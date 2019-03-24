@@ -5,12 +5,14 @@ import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.requests.Request;
 import brightspark.landmanager.data.requests.RequestsWorldSavedData;
+import brightspark.landmanager.event.AreaClaimApprovalEvent;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.commons.lang3.tuple.Pair;
 
 //lm op approve <requestId>
@@ -47,7 +49,6 @@ public class CommandApprove extends LMCommand
 		if(request == null)
 			throw new CommandException("lm.command.approve.noRequest", id);
 
-		//Approve the claim request
 		String areaName = request.getAreaName();
 		Pair<CapabilityAreas, Area> pair = getAreaAndCapNoException(server, areaName);
 		if(pair == null)
@@ -56,6 +57,10 @@ public class CommandApprove extends LMCommand
 			requests.deleteAllForArea(areaName);
 			return;
 		}
+		if(MinecraftForge.EVENT_BUS.post(new AreaClaimApprovalEvent(pair.getRight(), request, sender)))
+			return;
+
+		//Approve the claim request
 		pair.getLeft().setOwner(areaName, request.getPlayerUuid());
 		requests.deleteRequest(areaName, id);
 		sender.sendMessage(new TextComponentTranslation("lm.command.approve.success", id, getPlayerNameFromUuid(server, request.getPlayerUuid()), areaName));

@@ -5,9 +5,11 @@ import brightspark.landmanager.data.areas.AddAreaResult;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
+import brightspark.landmanager.event.AreaCreationEvent;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -58,9 +60,27 @@ public class MessageCreateArea implements IMessage
                         CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
                         if(cap != null)
                         {
-                            result = cap.addArea(area);
-                            if(result == AddAreaResult.SUCCESS)
-                                LandManager.areaLog(AreaLogType.CREATE, area.getName(), player);
+                            //Validation
+                            if(!Area.validateName(area.getName()))
+                                result = AddAreaResult.INVALID_NAME;
+                            else if(cap.hasArea(area.getName()))
+                                result = AddAreaResult.NAME_EXISTS;
+                            else if(cap.intersectsAnArea(area))
+                                result = AddAreaResult.AREA_INTERSECTS;
+                            else if(!cap.addArea(area))
+                                result = AddAreaResult.NAME_EXISTS;
+                            else if(!MinecraftForge.EVENT_BUS.post(new AreaCreationEvent(area)))
+                            {
+                                //Add new area
+                                boolean success = cap.addArea(area);
+                                if(success)
+                                {
+                                    result = AddAreaResult.SUCCESS;
+                                    LandManager.areaLog(AreaLogType.CREATE, area.getName(), player);
+                                }
+                                else
+                                    result = AddAreaResult.INVALID_NAME;
+                            }
                         }
                     }
 

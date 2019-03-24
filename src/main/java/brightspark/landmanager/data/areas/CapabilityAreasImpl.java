@@ -2,6 +2,7 @@ package brightspark.landmanager.data.areas;
 
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
+import brightspark.landmanager.event.AreaDeletedEvent;
 import brightspark.landmanager.message.MessageUpdateCapability;
 import com.google.common.collect.Lists;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -9,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.*;
@@ -33,27 +35,26 @@ public class CapabilityAreasImpl implements CapabilityAreas
     }
 
     @Override
-    public AddAreaResult addArea(Area area)
+    public boolean addArea(Area area)
     {
-        if(!Area.validateName(area.getName()))
-            return AddAreaResult.INVALID_NAME;
-        if(areas.keySet().contains(area.getName()))
-            return AddAreaResult.NAME_EXISTS;
-        for(Area a : areas.values())
-            if(area.intersects(a))
-                return AddAreaResult.AREA_INTERSECTS;
+        if(hasArea(area.getName()))
+            return false;
         areas.put(area.getName(), area);
         dataChanged();
-        return AddAreaResult.SUCCESS;
+        return true;
     }
 
     @Override
     public boolean removeArea(String areaName)
     {
-        boolean result = areas.remove(areaName) != null;
-        if(result)
+        Area areaRemoved = areas.remove(areaName);
+        boolean removed = areaRemoved != null;
+        if(removed)
+        {
+            MinecraftForge.EVENT_BUS.post(new AreaDeletedEvent(areaRemoved));
             dataChanged();
-        return result;
+        }
+        return removed;
     }
 
     @Override
@@ -101,6 +102,12 @@ public class CapabilityAreasImpl implements CapabilityAreas
             }
         });
         return nearbyAreas;
+    }
+
+    @Override
+    public boolean intersectsAnArea(Area area)
+    {
+        return areas.values().stream().anyMatch(area::intersects);
     }
 
     @Override

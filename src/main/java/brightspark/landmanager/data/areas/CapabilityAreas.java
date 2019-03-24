@@ -15,7 +15,7 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
 
     Area getArea(String areaName);
 
-    AddAreaResult addArea(Area area);
+    boolean addArea(Area area);
 
     boolean removeArea(String areaName);
 
@@ -26,6 +26,8 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
     List<String> getAllAreaNames();
 
     Set<Area> getNearbyAreas(BlockPos pos);
+
+    boolean intersectsAnArea(Area area);
 
     Area intersectingArea(BlockPos pos);
 

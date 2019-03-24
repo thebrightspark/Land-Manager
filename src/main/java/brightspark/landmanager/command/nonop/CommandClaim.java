@@ -7,12 +7,14 @@ import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.data.requests.RequestsWorldSavedData;
+import brightspark.landmanager.event.AreaClaimEvent;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.MinecraftForge;
 
 //lm claim [areaName]
 public class CommandClaim extends LMCommandArea
@@ -87,7 +89,7 @@ public class CommandClaim extends LMCommandArea
                 //Request failed
                 player.sendMessage(new TextComponentTranslation("lm.command.claim.request.failed", areaName));
         }
-        else
+        else if(!MinecraftForge.EVENT_BUS.post(new AreaClaimEvent(area, player)))
         {
             //Claim the area
             area.setOwner(player.getUniqueID());
