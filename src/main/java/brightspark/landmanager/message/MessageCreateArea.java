@@ -67,8 +67,6 @@ public class MessageCreateArea implements IMessage
                                 result = AddAreaResult.NAME_EXISTS;
                             else if(cap.intersectsAnArea(area))
                                 result = AddAreaResult.AREA_INTERSECTS;
-                            else if(!cap.addArea(area))
-                                result = AddAreaResult.NAME_EXISTS;
                             else if(!MinecraftForge.EVENT_BUS.post(new AreaCreationEvent(area)))
                             {
                                 //Add new area
@@ -79,7 +77,7 @@ public class MessageCreateArea implements IMessage
                                     LandManager.areaLog(AreaLogType.CREATE, area.getName(), player);
                                 }
                                 else
-                                    result = AddAreaResult.INVALID_NAME;
+                                    result = AddAreaResult.NAME_EXISTS;
                             }
                         }
                     }
