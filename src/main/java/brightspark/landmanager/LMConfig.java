@@ -88,7 +88,7 @@ public class LMConfig
 	    @Config.Comment("Can players break global blocks")
 	    public boolean canPlayersBreakBlocks = true;
 
-	    @Config.Comment("Can players break global blocks")
+	    @Config.Comment("Can players place global blocks")
 	    public boolean canPlayersPlaceBlocks = true;
     }
 
