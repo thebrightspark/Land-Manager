@@ -121,12 +121,18 @@ public class BoxRenderer
 		GlStateManager.translate(-x, -y, -z);
 		float[] rgb = colour.getRGBColorComponents(null);
 		AxisAlignedBB box = new AxisAlignedBB(area.getMinPos(), area.getMaxPos().add(1, 1, 1)).grow(0.001d);
-		GlStateManager.enableDepth();
-		RenderGlobal.renderFilledBox(box, rgb[0], rgb[1], rgb[2], LMConfig.client.areaBoxAlpha);
-		GlStateManager.disableDepth();
-		GlStateManager.color(rgb[0], rgb[1], rgb[2], 1f);
-		renderBoxEdges(box);
-		GlStateManager.color(1f, 1f, 1f);
+		if(LMConfig.client.areaBoxAlpha > 0f)
+		{
+			GlStateManager.enableDepth();
+			RenderGlobal.renderFilledBox(box, rgb[0], rgb[1], rgb[2], LMConfig.client.areaBoxAlpha);
+			GlStateManager.disableDepth();
+		}
+		if(LMConfig.client.areaBoxEdgeThickness > 0f)
+		{
+			GlStateManager.color(rgb[0], rgb[1], rgb[2], 1f);
+			renderBoxEdges(box);
+			GlStateManager.color(1f, 1f, 1f);
+		}
 		Vec3d playerPos = player.getPositionEyes((float) partialTicks);
 		Vec3d nameRenderPos = box.getCenter();
 		nameRenderPos = new Vec3d(nameRenderPos.x, MathHelper.clamp(playerPos.y, box.minY + 0.5d, box.maxY - 0.5d), nameRenderPos.z);
