@@ -27,7 +27,6 @@ import java.util.Map;
 
 public class BoxRenderer
 {
-	private static final double EDGE_THICKNESS = 0.025D;
 	private static final Minecraft MC = Minecraft.getMinecraft();
 	private static final Map<EnumFacing, List<Triple<Vec3d, Vec3d, Vec3d>>> OFFSETS = new HashMap<>();
 
@@ -123,7 +122,7 @@ public class BoxRenderer
 		float[] rgb = colour.getRGBColorComponents(null);
 		AxisAlignedBB box = new AxisAlignedBB(area.getMinPos(), area.getMaxPos().add(1, 1, 1)).grow(0.001d);
 		GlStateManager.enableDepth();
-		RenderGlobal.renderFilledBox(box, rgb[0], rgb[1], rgb[2], 0.2f);
+		RenderGlobal.renderFilledBox(box, rgb[0], rgb[1], rgb[2], LMConfig.client.areaBoxAlpha);
 		GlStateManager.disableDepth();
 		GlStateManager.color(rgb[0], rgb[1], rgb[2], 1f);
 		renderBoxEdges(box);
@@ -167,9 +166,9 @@ public class BoxRenderer
 		{
 			int actualI = i < 4 ? i : 0;
 			Triple<Vec3d, Vec3d, Vec3d> triple = offsetByVertex.get(actualI);
-			Vec3d v = corners[actualI].add(triple.getLeft().scale(EDGE_THICKNESS));
+			Vec3d v = corners[actualI].add(triple.getLeft().scale(LMConfig.client.areaBoxEdgeThickness));
 			buffer.pos(v.x, v.y, v.z).endVertex();
-			v = corners[actualI].add(triple.getMiddle().scale(EDGE_THICKNESS));
+			v = corners[actualI].add(triple.getMiddle().scale(LMConfig.client.areaBoxEdgeThickness));
 			buffer.pos(v.x, v.y, v.z).endVertex();
 		}
 		tessellator.draw();
@@ -179,9 +178,9 @@ public class BoxRenderer
 		{
 			int actualI = i < 4 ? i : 0;
 			Triple<Vec3d, Vec3d, Vec3d> triple = offsetByVertex.get(actualI);
-			Vec3d v = corners[actualI].add(triple.getRight().scale(EDGE_THICKNESS));
+			Vec3d v = corners[actualI].add(triple.getRight().scale(LMConfig.client.areaBoxEdgeThickness));
 			buffer.pos(v.x, v.y, v.z).endVertex();
-			v = corners[actualI].add(triple.getLeft().scale(EDGE_THICKNESS));
+			v = corners[actualI].add(triple.getLeft().scale(LMConfig.client.areaBoxEdgeThickness));
 			buffer.pos(v.x, v.y, v.z).endVertex();
 		}
 		tessellator.draw();

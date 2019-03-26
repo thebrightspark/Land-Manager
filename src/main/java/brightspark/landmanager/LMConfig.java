@@ -38,6 +38,14 @@ public class LMConfig
 
         @Config.Comment("Whether OPs will see area changes in their chat")
         public boolean showChatLogs = true;
+
+        @Config.Comment("The alpha for the sides of area boxes rendered in the world")
+        @Config.RangeDouble(min = 0D, max = 1D)
+        public float areaBoxAlpha = 0.2F;
+
+        @Config.Comment("The thickness of area box edges rendered in the world")
+        @Config.RangeDouble(min = 0D)
+        public double areaBoxEdgeThickness = 0.025D;
     }
 
     public static class Permissions
