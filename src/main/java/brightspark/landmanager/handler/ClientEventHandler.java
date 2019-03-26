@@ -44,16 +44,16 @@ public class ClientEventHandler
             mc.player.sendMessage(new TextComponentTranslation("message.areas.hide"));
     }
 
-    private static float randFloat(float min, float max)
+    private static float randFloat(float min)
     {
-        return min + rand.nextFloat() * (max - min);
+        return min + rand.nextFloat() * (1f - min);
     }
 
     private static Color getColour(String areaName)
     {
         Color colour = colourCache.get(areaName);
         if(colour == null)
-            colourCache.put(areaName, colour = Color.getHSBColor(rand.nextFloat(), randFloat(0.3f, 1f), randFloat(0.7f, 1f)));
+            colourCache.put(areaName, colour = Color.getHSBColor(rand.nextFloat(), randFloat(0.3f), randFloat(0.7f)));
         return colour;
     }
 
