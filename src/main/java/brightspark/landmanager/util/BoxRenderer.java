@@ -117,7 +117,6 @@ public class BoxRenderer
 		GlStateManager.enableAlpha();
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-		GlStateManager.glLineWidth(5f);
 		GlStateManager.disableTexture2D();
 		GlStateManager.disableLighting();
 		GlStateManager.translate(-x, -y, -z);
