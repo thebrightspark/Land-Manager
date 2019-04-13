@@ -58,7 +58,7 @@ public class CommandMembers extends CommandTreeBase
 		@Override
 		public String getUsage(ICommandSender sender)
 		{
-			return "lm.command.members.usage";
+			return "lm.command.members.add.usage";
 		}
 
 		@Override
@@ -107,7 +107,7 @@ public class CommandMembers extends CommandTreeBase
 		@Override
 		public String getUsage(ICommandSender sender)
 		{
-			return "lm.command.members.usage";
+			return "lm.command.members.remove.usage";
 		}
 
 		@Override
