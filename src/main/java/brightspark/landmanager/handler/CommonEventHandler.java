@@ -9,6 +9,7 @@ import brightspark.landmanager.data.logs.AreaLogType;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -43,20 +44,12 @@ public class CommonEventHandler
         return (LMConfig.creativeIgnoresProtection && player.isCreative()) || player.canUseCommand(2, "");
     }
 
-    private static Area getProtectedArea(EntityPlayer player, BlockPos pos)
+    private static Area getArea(EntityPlayer player, BlockPos pos)
     {
-        if(isPlayerCreativeOrOP(player))
-            return null;
-
-        //Check if in protected area
-        CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
+        CapabilityAreas cap = getAreas(player.world);
         if(cap == null)
             return null;
-        Area area = cap.intersectingArea(pos);
-        if(area != null && !area.isMember(player.getUniqueID()))
-            //Area is protected against this player
-            return area;
-        return null;
+        return cap.intersectingArea(pos);
     }
 
     private static void sendCapToPlayer(EntityPlayer player)
@@ -72,54 +65,64 @@ public class CommonEventHandler
     public static void onBlockStartBreak(net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed event)
     {
         EntityPlayer player = event.getEntityPlayer();
-        Area area = getProtectedArea(player, event.getPos());
-        if(area != null || !LMConfig.globalSettings.canPlayersBreakBlocks)
+        Area area = getArea(player, event.getPos());
+        if(area != null && area.isMember(player.getUniqueID()))
+            return;
+        else if(isPlayerCreativeOrOP(player))
+            return;
+        else if(area == null && LMConfig.globalSettings.canPlayersBreakBlocks)
+            return;
+        //Stop players from breaking blocks
+        if(player.world.isRemote)
         {
-            //Stop players from breaking blocks
-            if(player.world.isRemote)
-            {
-                long worldTime = player.world.getTotalWorldTime();
-                if(worldTime - lastTimeHitProtectedBlock > 10)
-                    player.sendMessage(new TextComponentTranslation("message.protection.break"));
-                lastTimeHitProtectedBlock = worldTime;
-            }
-            else
-                LandManager.areaLog(AreaLogType.BREAK, area == null ? "GLOBAL" : area.getName(), player);
-            event.setNewSpeed(0f);
-            event.setCanceled(true);
+            long worldTime = player.world.getTotalWorldTime();
+            if(worldTime - lastTimeHitProtectedBlock > 10)
+                player.sendMessage(new TextComponentTranslation("message.protection.break"));
+            lastTimeHitProtectedBlock = worldTime;
         }
+        else
+            LandManager.areaLog(AreaLogType.BREAK, area == null ? "GLOBAL" : area.getName(), player);
+        event.setNewSpeed(0f);
+        event.setCanceled(true);
     }
 
     @SubscribeEvent
     public static void onBlockPlace(BlockEvent.PlaceEvent event)
     {
-        //Stop players from placing block in protected areas
         EntityPlayer player = event.getPlayer();
-        Area area = getProtectedArea(player, event.getPos());
-        if(area != null || !LMConfig.globalSettings.canPlayersPlaceBlocks)
-        {
-            player.sendMessage(new TextComponentTranslation("message.protection.place"));
-            LandManager.areaLog(AreaLogType.PLACE, area == null ? "GLOBAL" : area.getName(), player);
-            event.setCanceled(true);
-        }
+        Area area = getArea(player, event.getPos());
+        if(area != null && area.isMember(player.getUniqueID()))
+            return;
+        else if(isPlayerCreativeOrOP(player))
+            return;
+        else if(area == null && LMConfig.globalSettings.canPlayersPlaceBlocks)
+            return;
+        //Stop players from placing blocks
+        player.sendMessage(new TextComponentTranslation("message.protection.place"));
+        LandManager.areaLog(AreaLogType.PLACE, area == null ? "GLOBAL" : area.getName(), player);
+        event.setCanceled(true);
     }
 
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event)
     {
-        //Stop players from right clicking blocks in areas that prevent it
-        if(isPlayerCreativeOrOP(event.getEntityPlayer()))
-            return;
+        EntityPlayer player = event.getEntityPlayer();
         CapabilityAreas cap = getAreas(event.getWorld());
         if(cap == null)
             return;
-        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(area -> !area.canInteract() && !area.isMember(event.getEntityPlayer().getUniqueID()))
-                || !LMConfig.globalSettings.canPlayersInteract)
-        {
-            if(event.getWorld().isRemote && event.getHand() == EnumHand.MAIN_HAND)
-                event.getEntityPlayer().sendMessage(new TextComponentTranslation("message.protection.interact"));
-            event.setCanceled(true);
-        }
+        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(a -> a.canInteract() || a.isMember(player.getUniqueID())))
+            return;
+        else if(isPlayerCreativeOrOP(player))
+            return;
+        else if(LMConfig.globalSettings.canPlayersPlaceBlocks)
+            return;
+        //If player is holding shift with an itemblock, then allow it for block placing checks
+        if(player.isSneaking() && event.getItemStack().getItem() instanceof ItemBlock)
+            return;
+        //Stop players from right clicking blocks
+        if(event.getWorld().isRemote && event.getHand() == EnumHand.MAIN_HAND)
+            player.sendMessage(new TextComponentTranslation("message.protection.interact"));
+        event.setUseBlock(Event.Result.DENY);
     }
 
     @SubscribeEvent
