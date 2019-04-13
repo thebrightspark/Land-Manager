@@ -47,6 +47,6 @@ public abstract class LMCommandArea extends LMCommand
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
     {
-        return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, getAllAreaNames(server)) : super.getTabCompletions(server, sender, args, targetPos);
     }
 }

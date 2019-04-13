@@ -8,9 +8,12 @@ import brightspark.landmanager.data.logs.AreaLogType;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
 //lm setowner <areaName> [playerName]
@@ -58,5 +61,16 @@ public class CommandSetOwner extends LMCommand
 		pair.getLeft().dataChanged();
 		sender.sendMessage(new TextComponentTranslation("lm.command.setowner.success", areaName, playerName));
 		LandManager.areaLog(AreaLogType.SET_OWNER, areaName, sender);
+	}
+
+	@Override
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
+	{
+		switch(args.length)
+		{
+			case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+			case 2:     return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+			default:    return super.getTabCompletions(server, sender, args, targetPos);
+		}
 	}
 }

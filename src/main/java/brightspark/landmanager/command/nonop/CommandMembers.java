@@ -8,11 +8,13 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.server.command.CommandTreeBase;
 import net.minecraftforge.server.command.CommandTreeHelp;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,6 +82,17 @@ public class CommandMembers extends CommandTreeBase
 			else
 				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player.getDisplayName(), pair.getRight().getName()));
 		}
+
+		@Override
+		public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
+		{
+			switch(args.length)
+			{
+				case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+				case 2:     return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+				default:    return super.getTabCompletions(server, sender, args, targetPos);
+			}
+		}
 	}
 
 	//lm members remove <areaName> <playerName>
@@ -117,6 +130,17 @@ public class CommandMembers extends CommandTreeBase
 			}
 			else
 				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player.getDisplayName(), pair.getRight().getName()));
+		}
+
+		@Override
+		public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
+		{
+			switch(args.length)
+			{
+				case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+				case 2:     return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+				default:    return super.getTabCompletions(server, sender, args, targetPos);
+			}
 		}
 	}
 }
