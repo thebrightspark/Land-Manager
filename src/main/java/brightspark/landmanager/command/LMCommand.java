@@ -200,7 +200,10 @@ public abstract class LMCommand extends CommandBase
     {
         if(!(sender instanceof EntityPlayer))
             return false;
-        UserListOpsEntry op = server.getPlayerList().getOppedPlayers().getEntry(((EntityPlayer) sender).getGameProfile());
+        EntityPlayer player = (EntityPlayer) sender;
+        if(player.getName().equals(server.getServerOwner()))
+            return true;
+        UserListOpsEntry op = server.getPlayerList().getOppedPlayers().getEntry(player.getGameProfile());
         return op != null;
     }
 
