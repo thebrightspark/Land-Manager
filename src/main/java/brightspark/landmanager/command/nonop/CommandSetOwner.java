@@ -40,22 +40,23 @@ public class CommandSetOwner extends LMCommand
 		String areaName = args[0];
 		Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, areaName);
 		Area area = pair.getRight();
-		UUID player = null;
+		String playerName = argsToString(args, 1);
+		UUID playerUuid = null;
 		if(args.length > 1)
 		{
 			checkCanEditArea(server, sender, area);
-			player = getUuidFromPlayerName(server, argsToString(args, 1));
+			playerUuid = getUuidFromPlayerName(server, playerName);
 		}
 
 		//Set the owner and update members
 		UUID prevOwner = area.getOwner();
-		area.setOwner(player);
-		if(player != null)
-			area.removeMember(player);
+		area.setOwner(playerUuid);
+		if(playerUuid != null)
+			area.removeMember(playerUuid);
 		if(prevOwner != null)
 			area.addMember(prevOwner);
 		pair.getLeft().dataChanged();
-		sender.sendMessage(new TextComponentTranslation("lm.command.setowner.success", areaName, player));
+		sender.sendMessage(new TextComponentTranslation("lm.command.setowner.success", areaName, playerName));
 		LandManager.areaLog(AreaLogType.SET_OWNER, areaName, sender);
 	}
 }
