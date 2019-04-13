@@ -114,7 +114,7 @@ public class CommonEventHandler
             return;
         else if(isPlayerCreativeOrOP(player))
             return;
-        else if(LMConfig.globalSettings.canPlayersPlaceBlocks)
+        else if(LMConfig.globalSettings.canPlayersInteract)
             return;
         //If player is holding shift with an itemblock, then allow it for block placing checks
         if(player.isSneaking() && event.getItemStack().getItem() instanceof ItemBlock)
