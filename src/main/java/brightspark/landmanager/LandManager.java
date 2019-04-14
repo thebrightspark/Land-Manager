@@ -71,6 +71,7 @@ public class LandManager
         NETWORK.registerMessage(new MessageUpdateCapability.Handler(), MessageUpdateCapability.class, 2, Side.CLIENT);
         NETWORK.registerMessage(new MessageShowArea.Handler(), MessageShowArea.class, 3, Side.CLIENT);
         NETWORK.registerMessage(new MessageChatLog.Handler(), MessageChatLog.class, 4, Side.CLIENT);
+        NETWORK.registerMessage(new MessageOpenHomeGui.Handler(), MessageOpenHomeGui.class, 5, Side.CLIENT);
 
         CapabilityManager.INSTANCE.register(CapabilityAreas.class, new CapStorage<>(), CapabilityAreasImpl::new);
     }

@@ -20,6 +20,12 @@ public class GuiHandler implements IGuiHandler
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
     {
-        return ID == 0 ? new GuiCreateArea(player, new BlockPos(x, y, z)) : null;
+        BlockPos pos = new BlockPos(x, y, z);
+        switch(ID)
+        {
+            case 0:     return new GuiCreateArea(player, pos);
+            case 1:     return new GuiHome(world, pos);
+            default:    return null;
+        }
     }
 }

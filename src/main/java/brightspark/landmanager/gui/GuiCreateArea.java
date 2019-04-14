@@ -7,24 +7,18 @@ import brightspark.landmanager.item.ItemAdmin;
 import brightspark.landmanager.message.MessageCreateArea;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 
 import java.io.IOException;
 
-public class GuiCreateArea extends GuiScreen
+public class GuiCreateArea extends LMGui
 {
-    private static final ResourceLocation bgImage = new ResourceLocation(LandManager.MOD_ID, "textures/gui/gui_create_area.png");
     private static final int textColour = 14737632;
-    private static int xSize = 113;
-    private static int ySize = 46;
-    private int guiLeft, guiTop;
 
     private GuiCheckBox extendCheck;
     private GuiTextField nameInput;
@@ -35,9 +29,10 @@ public class GuiCreateArea extends GuiScreen
 
     public GuiCreateArea(EntityPlayer player, BlockPos pos2)
     {
+        super("gui_create_area", 113, 46);
         Position position = ItemAdmin.getPos(player.getHeldItemMainhand());
         if(position == null)
-            mc.player.closeScreen();
+            player.closeScreen();
         else
         {
             this.dimId = position.dimensionId;
@@ -73,21 +68,20 @@ public class GuiCreateArea extends GuiScreen
     @Override
     public void initGui()
     {
-        guiLeft = (width - xSize) / 2;
-        guiTop = (height - ySize) / 2;
+        super.initGui();
 
         nameInput = new GuiTextField(0, fontRenderer, guiLeft + 5, guiTop + 16, xSize - 10, fontRenderer.FONT_HEIGHT + 2);
         nameInput.setFocused(true);
 
-        extendCheck = addButton(new GuiCheckBox(1, guiLeft + 5, guiTop + 31, I18n.format("gui.component.checkbox"), false));
+        extendCheck = addButton(new GuiCheckBox(1, 5, 31, I18n.format("gui.component.checkbox"), false));
 
         String text = I18n.format("gui.component.confirm");
-        addButton(new GuiButton(2, guiLeft + 68, guiTop + 31, 40, fontRenderer.FONT_HEIGHT + 2, text)
+        addButton(new GuiButton(2, 68, 31, 40, fontRenderer.FONT_HEIGHT + 2, text)
         {
             @Override
             public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
             {
-                mc.getTextureManager().bindTexture(bgImage);
+                mc.getTextureManager().bindTexture(image);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
                 GlStateManager.enableBlend();
@@ -100,21 +94,10 @@ public class GuiCreateArea extends GuiScreen
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    protected void drawText()
     {
-        drawDefaultBackground();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-        //Draw GUI background
-        mc.getTextureManager().bindTexture(bgImage);
-        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-
-        super.drawScreen(mouseX, mouseY, partialTicks);
-
         nameInput.drawTextBox();
-
-        //Draw text
-        drawString(fontRenderer, I18n.format("gui.text.area"), guiLeft + 5, guiTop + 5, textColour);
+        drawLangString("gui.text.area", 5, 5, textColour, false);
     }
 
     @Override

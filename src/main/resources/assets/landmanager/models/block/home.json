@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "particle": "landmanager:blocks/home_side",
+        "down": "landmanager:blocks/home_bottom",
+        "up": "landmanager:blocks/home_top",
+        "north": "landmanager:blocks/home_side",
+        "east": "landmanager:blocks/home_side",
+        "south": "landmanager:blocks/home_side",
+        "west": "landmanager:blocks/home_side"
+    }
+}

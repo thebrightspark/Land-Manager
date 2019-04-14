@@ -23,6 +23,8 @@ message.areas.hide=Turned off showing all nearby areas
 message.protection.break=Cannot break blocks in this area!
 message.protection.place=Cannot place blocks in this area!
 message.protection.interact=Cannot interact with blocks in this area!
+message.home.none=This Home Block is not within an area!
+message.home.notMember=You are not a member of this area!
 message.misc.true=True
 message.misc.false=False
 

@@ -5,6 +5,7 @@ import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.requests.RequestsWorldSavedData;
 import brightspark.landmanager.util.ListView;
+import brightspark.landmanager.util.Utils;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -13,7 +14,6 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -196,20 +196,9 @@ public abstract class LMCommand extends CommandBase
         throw new WrongUsageException(getUsage(sender));
     }
 
-    protected boolean isOP(MinecraftServer server, ICommandSender sender)
-    {
-        if(!(sender instanceof EntityPlayer))
-            return false;
-        EntityPlayer player = (EntityPlayer) sender;
-        if(player.getName().equals(server.getServerOwner()))
-            return true;
-        UserListOpsEntry op = server.getPlayerList().getOppedPlayers().getEntry(player.getGameProfile());
-        return op != null;
-    }
-
     protected void checkCanEditArea(MinecraftServer server, ICommandSender sender, Area area) throws CommandException
     {
-        if(!isOP(server, sender) && !area.isOwner(((EntityPlayer) sender).getUniqueID()))
+        if(!Utils.isOp(server, sender) && !area.isOwner(((EntityPlayer) sender).getUniqueID()))
             throw new CommandException("lm.command.noPerm", area.getName());
     }
 
