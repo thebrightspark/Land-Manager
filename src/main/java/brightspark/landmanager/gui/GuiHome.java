@@ -4,17 +4,22 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.handler.ClientEventHandler;
+import brightspark.landmanager.message.MessageHomeAction;
+import brightspark.landmanager.util.HomeGuiActionType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +27,7 @@ public class GuiHome extends LMGui
 {
 	private static final int PLAYER_LIST_SIZE = 4;
 
+	private BlockPos pos;
 	private Area area = null;
 	private GuiTextField input;
 	private int playerListStartIndex = 0;
@@ -36,6 +42,7 @@ public class GuiHome extends LMGui
 	public GuiHome(World world, BlockPos pos)
 	{
 		super("gui_home", 162, 144);
+		this.pos = pos;
 		CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
 		if(cap != null)
 			area = cap.intersectingArea(pos);
@@ -49,6 +56,20 @@ public class GuiHome extends LMGui
 		this.members = members;
 	}
 
+	public void addMember(UUID uuid, String player)
+	{
+		members.add(new ImmutablePair<>(uuid, player));
+		members.sort(Comparator.comparing(Pair::getRight));
+		updatePlayerList();
+	}
+
+	public void removeMember(UUID player)
+	{
+		members.removeIf(pair -> pair.getLeft().equals(player));
+		playerListStartIndex = MathHelper.clamp(playerListStartIndex, 0, members.size() - PLAYER_LIST_SIZE);
+		updatePlayerList();
+	}
+
 	@Override
 	public void initGui()
 	{
@@ -60,12 +81,12 @@ public class GuiHome extends LMGui
 		for(int i = 0; i < PLAYER_LIST_SIZE; i++)
 			listButtons.add(addButton(new ListButton(7, 16 + (i * 12))));
 
-		addButton(new ArrowButton(97, 29, true));
-		addButton(new ArrowButton(97, 52, false));
+		upButton = addButton(new ArrowButton(97, 29, true));
+		downButton = addButton(new ArrowButton(97, 52, false));
 
-		addButton(new ActionButton(111, 29, "Add", 0));
-		addButton(new ActionButton(111, 41, "Kick", 1));
-		addButton(new ActionButton(111, 53, "Pass", 2));
+		addButton = addButton(new ActionButton(111, 29, "Add", HomeGuiActionType.ADD));
+		kickButton = addButton(new ActionButton(111, 41, "Kick", HomeGuiActionType.KICK));
+		passButton = addButton(new ActionButton(111, 53, "Pass", HomeGuiActionType.PASS));
 
 		for(int i = 0; i < 5; i++)
 		{
@@ -129,18 +150,8 @@ public class GuiHome extends LMGui
 		}
 		else if(button instanceof ActionButton)
 		{
-			//TODO: Action buttons
-			switch(((ActionButton) button).type)
-			{
-				case 0: //Add
-
-					break;
-				case 1: //Kick
-
-					break;
-				case 2: //Pass
-
-			}
+			LandManager.NETWORK.sendToServer(new MessageHomeAction(pos, ((ActionButton) button).type, members.get(selectedMemberIndex).getLeft()));
+			selectedMemberIndex = -1;
 		}
 		else if(button instanceof ToggleButton)
 		{
@@ -266,19 +277,19 @@ public class GuiHome extends LMGui
 
 	private class ActionButton extends LMButton
 	{
-		private final byte type;
+		private final HomeGuiActionType type;
 
-		public ActionButton(int x, int y, String buttonText, int type)
+		public ActionButton(int x, int y, String buttonText, HomeGuiActionType type)
 		{
 			super(x, y, 45, 12, 162, 0, buttonText);
-			this.type = (byte) type;
+			this.type = type;
 			textOffset = 12;
 		}
 
 		@Override
 		protected int getIconY()
 		{
-			return iconY + (type * height);
+			return iconY + (type.ordinal() * height);
 		}
 	}
 
