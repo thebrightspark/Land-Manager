@@ -3,6 +3,7 @@ package brightspark.landmanager.command.nonop;
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.util.Utils;
 import com.google.common.collect.Lists;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -89,7 +90,7 @@ public class CommandMembers extends CommandTreeBase
 			switch(args.length)
 			{
 				case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-				case 2:     return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+				case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayers(server));
 				default:    return super.getTabCompletions(server, sender, args, targetPos);
 			}
 		}
@@ -138,7 +139,7 @@ public class CommandMembers extends CommandTreeBase
 			switch(args.length)
 			{
 				case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-				case 2:     return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+				case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayers(server));
 				default:    return super.getTabCompletions(server, sender, args, targetPos);
 			}
 		}

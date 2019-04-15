@@ -70,7 +70,7 @@ public class CommandSetOwner extends LMCommand
 		switch(args.length)
 		{
 			case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-			case 2:     return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+			case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayers(server));
 			default:    return super.getTabCompletions(server, sender, args, targetPos);
 		}
 	}
