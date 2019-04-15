@@ -15,6 +15,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 public class BlockHome extends Block
 {
@@ -29,7 +30,7 @@ public class BlockHome extends Block
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
-		if(!world.isRemote && player instanceof EntityPlayerMP && !player.isSneaking())
+		if(!world.isRemote && world instanceof WorldServer && player instanceof EntityPlayerMP && !player.isSneaking())
 		{
 			CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
 			if(cap == null)
@@ -43,7 +44,7 @@ public class BlockHome extends Block
 			else if(!area.isMember(player.getUniqueID()) && !Utils.isOp(world.getMinecraftServer(), player))
 				player.sendMessage(new TextComponentTranslation("message.home.notMember"));
 			else
-				LandManager.NETWORK.sendTo(new MessageOpenHomeGui(pos), (EntityPlayerMP) player);
+				LandManager.NETWORK.sendTo(new MessageOpenHomeGui(pos, Utils.getAllPlayers(world.getMinecraftServer())), (EntityPlayerMP) player);
 		}
 		return true;
 	}

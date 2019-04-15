@@ -3,20 +3,35 @@ package brightspark.landmanager.gui;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
+import brightspark.landmanager.handler.ClientEventHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class GuiHome extends LMGui
 {
+	private static final int PLAYER_LIST_SIZE = 4;
+
 	private Area area = null;
 	private GuiTextField input;
+	private int playerListStartIndex = 0;
+	private List<Pair<UUID, String>> members;
+
+	private List<ListButton> listButtons = new ArrayList<>(PLAYER_LIST_SIZE);
+	private int selectedMemberIndex = -1;
+	private ArrowButton upButton, downButton;
+	private ActionButton addButton, kickButton, passButton;
+	private List<ToggleButton> toggleButtons = new ArrayList<>(5);
 
 	public GuiHome(World world, BlockPos pos)
 	{
@@ -24,6 +39,14 @@ public class GuiHome extends LMGui
 		CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
 		if(cap != null)
 			area = cap.intersectingArea(pos);
+	}
+
+	/**
+	 * Used by {@link brightspark.landmanager.message.MessageOpenHomeGui} to set the members data
+	 */
+	public void setMembersData(List<Pair<UUID, String>> members)
+	{
+		this.members = members;
 	}
 
 	@Override
@@ -34,8 +57,8 @@ public class GuiHome extends LMGui
 		input = new GuiTextField(0, fontRenderer, guiLeft + 99, guiTop + 15, 56, 10);
 		input.setEnableBackgroundDrawing(false);
 
-		for(int i = 0; i < 7; i++)
-			addButton(new ListButton(7, 16 + (i * 12)));
+		for(int i = 0; i < PLAYER_LIST_SIZE; i++)
+			listButtons.add(addButton(new ListButton(7, 16 + (i * 12))));
 
 		addButton(new ArrowButton(97, 29, true));
 		addButton(new ArrowButton(97, 52, false));
@@ -46,10 +69,10 @@ public class GuiHome extends LMGui
 
 		for(int i = 0; i < 5; i++)
 		{
-			ToggleButton b = new ToggleButton(108, 70 + (i * 14));
+			ToggleButton b = new ToggleButton(ToggleType.values()[i], 108, 70 + (i * 14));
 			b.locked = mc.world.rand.nextBoolean();
 			b.isOn = mc.world.rand.nextBoolean();
-			addButton(b);
+			toggleButtons.add(addButton(b));
 		}
 	}
 
@@ -84,8 +107,92 @@ public class GuiHome extends LMGui
 	protected void keyTyped(char typedChar, int keyCode) throws IOException
 	{
 		super.keyTyped(typedChar, keyCode);
-		if(input.isFocused())
-			input.textboxKeyTyped(typedChar, keyCode);
+		if(input.textboxKeyTyped(typedChar, keyCode))
+			updateActionButtons();
+	}
+
+	@Override
+	protected void actionPerformed(GuiButton button) throws IOException
+	{
+		if(button instanceof ListButton)
+		{
+			listButtons.forEach(listButton -> listButton.selected = false);
+			ListButton listButton = (ListButton) button;
+			listButton.selected = true;
+			selectedMemberIndex = listButton.id;
+		}
+		else if(button instanceof ArrowButton)
+		{
+			int change = ((ArrowButton) button).isUp ? -1 : 1;
+			playerListStartIndex += change;
+			updatePlayerList();
+		}
+		else if(button instanceof ActionButton)
+		{
+			//TODO: Action buttons
+			switch(((ActionButton) button).type)
+			{
+				case 0: //Add
+
+					break;
+				case 1: //Kick
+
+					break;
+				case 2: //Pass
+
+			}
+		}
+		else if(button instanceof ToggleButton)
+		{
+			//TODO: Toggle buttons
+			switch(((ToggleButton) button).type)
+			{
+				case BOUNDARIES:
+					ClientEventHandler.setRenderArea(area.getName());
+					break;
+				case INTERACTIONS:
+				case PASSIVE_SPAWNS:
+				case HOSTILE_SPAWNS:
+				case EXPLOSIONS:
+					//TODO: Send message to server to change
+			}
+		}
+	}
+
+	private boolean canScrollUp()
+	{
+		return playerListStartIndex > 0;
+	}
+
+	private boolean canScrollDown()
+	{
+		return members.size() > playerListStartIndex + PLAYER_LIST_SIZE;
+	}
+
+	private void updatePlayerList()
+	{
+		if(members == null)
+			return;
+
+		//Update members list
+		int membersSize = members.size();
+		for(int i = 0; i < PLAYER_LIST_SIZE; i++)
+		{
+			int playerListI = playerListStartIndex + i;
+			ListButton button = listButtons.get(i);
+			button.setPlayer(playerListI < membersSize ? members.get(playerListI) : null);
+			button.selected = selectedMemberIndex == playerListI;
+		}
+
+		//Update arrows
+		upButton.enabled = canScrollUp();
+		downButton.enabled = canScrollDown();
+	}
+
+	private void updateActionButtons()
+	{
+		addButton.enabled = StringUtils.isNotBlank(input.getText());
+		kickButton.enabled = passButton.enabled = selectedMemberIndex >= 0;
 	}
 
 	private class ListButton extends LMButton
@@ -99,7 +206,7 @@ public class GuiHome extends LMGui
 			textOffset = 1;
 		}
 
-		public void setPlayer(EntityPlayer player)
+		public void setPlayer(Pair<UUID, String> player)
 		{
 			if(player == null)
 			{
@@ -109,8 +216,8 @@ public class GuiHome extends LMGui
 			}
 			else
 			{
-				displayString = player.getDisplayNameString();
-				playerUuid = player.getUniqueID();
+				displayString = player.getRight();
+				playerUuid = player.getLeft();
 				enabled = true;
 			}
 		}
@@ -177,12 +284,14 @@ public class GuiHome extends LMGui
 
 	private class ToggleButton extends LMButton
 	{
+		public final ToggleType type;
 		public boolean locked = false;
 		public Boolean isOn = null;
 
-		public ToggleButton(int x, int y)
+		public ToggleButton(ToggleType type, int x, int y)
 		{
 			super(x, y, 12, 12, 162, 36, null);
+			this.type = type;
 		}
 
 		@Override
@@ -202,5 +311,14 @@ public class GuiHome extends LMGui
 			if(isOn != null)
 				super.drawButton(mc, mouseX, mouseY, partialTicks);
 		}
+	}
+
+	private enum ToggleType
+	{
+		BOUNDARIES,
+		INTERACTIONS,
+		PASSIVE_SPAWNS,
+		HOSTILE_SPAWNS,
+		EXPLOSIONS
 	}
 }

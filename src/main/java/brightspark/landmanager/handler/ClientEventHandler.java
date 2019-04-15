@@ -26,11 +26,18 @@ public class ClientEventHandler
     private static String renderArea = "";
     private static Map<String, Color> colourCache = new HashMap<>();
 
+    //Used by command
     public static void setRenderArea(String areaName)
     {
         renderAll = false;
         renderArea = areaName;
         colourCache.clear();
+    }
+
+    //Used by GUI
+    public static void setRenderArea(String areaName, boolean show)
+    {
+        //TODO
     }
 
     public static void toggleRenderAll()
