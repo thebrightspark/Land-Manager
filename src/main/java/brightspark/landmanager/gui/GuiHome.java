@@ -42,7 +42,7 @@ public class GuiHome extends LMGui
 	private int selectedMemberIndex = -1;
 	private ArrowButton upButton, downButton;
 	private ActionButton addButton, kickButton, passButton;
-	private List<ToggleButton> toggleButtons = new ArrayList<>(5);
+	private ToggleButton boundariesToggle, interactionsToggle, passivesToggle, hostilesToggle, explosionsToggle;
 
 	public GuiHome(World world, BlockPos pos)
 	{
@@ -56,6 +56,7 @@ public class GuiHome extends LMGui
 	public void setClientIsOp()
 	{
 		clientIsOp = true;
+		updateToggleButtons();
 	}
 
 	/**
@@ -123,11 +124,12 @@ public class GuiHome extends LMGui
 		kickButton = addButton(new ActionButton(111, 41, "Kick", HomeGuiActionType.KICK));
 		passButton = addButton(new ActionButton(111, 53, "Pass", HomeGuiActionType.PASS));
 
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.BOUNDARIES, 108, 70, true, ClientEventHandler.isAreaBeingRendered(area.getName()))));
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.INTERACTIONS, 108, 84, canUseToggle(LMConfig.permissions.interactions), area.canInteract())));
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.PASSIVE_SPAWNS, 108, 98, canUseToggle(LMConfig.permissions.passiveSpawning), area.canPassiveSpawn())));
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.HOSTILE_SPAWNS, 108, 112, canUseToggle(LMConfig.permissions.hostileSpawning), area.canHostileSpawn())));
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.EXPLOSIONS, 108, 126, canUseToggle(LMConfig.permissions.explosions), area.canExplosionsCauseDamage())));
+		boundariesToggle = addButton(new ToggleButton(HomeGuiToggleType.BOUNDARIES, 108, 70, ClientEventHandler.isAreaBeingRendered(area.getName())));
+		boundariesToggle.enabled = true;
+		interactionsToggle = addButton(new ToggleButton(HomeGuiToggleType.INTERACTIONS, 108, 84, area.canInteract()));
+		passivesToggle = addButton(new ToggleButton(HomeGuiToggleType.PASSIVE_SPAWNS, 108, 98, area.canPassiveSpawn()));
+		hostilesToggle = addButton(new ToggleButton(HomeGuiToggleType.HOSTILE_SPAWNS, 108, 112, area.canHostileSpawn()));
+		explosionsToggle = addButton(new ToggleButton(HomeGuiToggleType.EXPLOSIONS, 108, 126, area.canExplosionsCauseDamage()));
 	}
 
 	@Override
@@ -240,6 +242,14 @@ public class GuiHome extends LMGui
 		kickButton.enabled = passButton.enabled = selectedMemberIndex >= 0;
 	}
 
+	private void updateToggleButtons()
+	{
+		interactionsToggle.enabled = canUseToggle(LMConfig.permissions.interactions);
+		passivesToggle.enabled = canUseToggle(LMConfig.permissions.passiveSpawning);
+		hostilesToggle.enabled = canUseToggle(LMConfig.permissions.hostileSpawning);
+		explosionsToggle.enabled = canUseToggle(LMConfig.permissions.explosions);
+	}
+
 	private class ListButton extends LMButton
 	{
 		public boolean selected = false;
@@ -332,11 +342,11 @@ public class GuiHome extends LMGui
 		public final HomeGuiToggleType type;
 		public boolean isOn;
 
-		public ToggleButton(HomeGuiToggleType type, int x, int y, boolean enabled, boolean isOn)
+		public ToggleButton(HomeGuiToggleType type, int x, int y, boolean isOn)
 		{
 			super(x, y, 12, 12, 162, 36, null);
+			this.enabled = false;
 			this.type = type;
-			this.enabled = enabled;
 			this.isOn = isOn;
 			drawWhenDisabled = true;
 		}

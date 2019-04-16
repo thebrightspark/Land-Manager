@@ -50,31 +50,32 @@ public class MessageHomeToggle implements IMessage
 			if(cap == null)
 				return null;
 			Area area = cap.intersectingArea(message.pos);
-			if(area == null || (!area.isOwner(player.getUniqueID()) && !Utils.isOp(player.world.getMinecraftServer(), player)))
+			boolean playerIsOp = Utils.isOp(player.world.getMinecraftServer(), player);
+			if(area == null || (!area.isOwner(player.getUniqueID()) && !playerIsOp))
 				return null;
 			HomeGuiToggleType type = message.type;
 			switch(type)
 			{
 				case INTERACTIONS:
-					if(!LMConfig.permissions.interactions)
+					if(!playerIsOp && !LMConfig.permissions.interactions)
 						return null;
 					area.toggleInteractions();
 					cap.dataChanged();
 					return new MessageHomeToggleReply(type, area.canInteract());
 				case PASSIVE_SPAWNS:
-					if(!LMConfig.permissions.passiveSpawning)
+					if(!playerIsOp && !LMConfig.permissions.passiveSpawning)
 						return null;
 					area.togglePassiveSpawning();
 					cap.dataChanged();
 					return new MessageHomeToggleReply(type, area.canPassiveSpawn());
 				case HOSTILE_SPAWNS:
-					if(!LMConfig.permissions.hostileSpawning)
+					if(!playerIsOp && !LMConfig.permissions.hostileSpawning)
 						return null;
 					area.toggleHostileSpawning();
 					cap.dataChanged();
 					return new MessageHomeToggleReply(type, area.canHostileSpawn());
 				case EXPLOSIONS:
-					if(!LMConfig.permissions.explosions)
+					if(!playerIsOp && !LMConfig.permissions.explosions)
 						return null;
 					area.toggleExplosions();
 					cap.dataChanged();
