@@ -27,6 +27,20 @@ public class Utils
 		return op != null;
 	}
 
+	public static List<String> getAllPlayerNames(MinecraftServer server)
+	{
+		List<String> players = new LinkedList<>();
+		PlayerProfileCache profileCache = server.getPlayerProfileCache();
+		for(String name : profileCache.getUsernames())
+		{
+			GameProfile profile = profileCache.getGameProfileForUsername(name);
+			if(profile != null)
+				players.add(profile.getName());
+		}
+		players.sort(Comparator.naturalOrder());
+		return players;
+	}
+
 	public static List<Pair<UUID, String>> getAllPlayers(MinecraftServer server)
 	{
 		List<Pair<UUID, String>> players = new LinkedList<>();

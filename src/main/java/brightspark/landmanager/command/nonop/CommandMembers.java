@@ -90,7 +90,7 @@ public class CommandMembers extends CommandTreeBase
 			switch(args.length)
 			{
 				case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-				case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayers(server));
+				case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayerNames(server));
 				default:    return super.getTabCompletions(server, sender, args, targetPos);
 			}
 		}
@@ -139,7 +139,7 @@ public class CommandMembers extends CommandTreeBase
 			switch(args.length)
 			{
 				case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-				case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayers(server));
+				case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayerNames(server));
 				default:    return super.getTabCompletions(server, sender, args, targetPos);
 			}
 		}
