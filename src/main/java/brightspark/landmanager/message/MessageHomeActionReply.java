@@ -60,9 +60,11 @@ public class MessageHomeActionReply implements IMessage
 			{
 				case ADD:
 					guiHome.addMember(message.uuid, message.name);
+					guiHome.clearInput();
 					break;
 				case KICK:
 					guiHome.removeMember(message.uuid);
+					guiHome.clearSelection();
 					break;
 				case PASS:
 					if(!mc.player.getUniqueID().equals(message.uuid))

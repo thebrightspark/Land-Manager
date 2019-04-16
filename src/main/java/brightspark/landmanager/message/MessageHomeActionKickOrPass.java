@@ -4,6 +4,7 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.util.HomeGuiActionType;
+import brightspark.landmanager.util.Utils;
 import com.mojang.authlib.GameProfile;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -14,18 +15,18 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.UUID;
 
-public class MessageHomeAction implements IMessage
+public class MessageHomeActionKickOrPass implements IMessage
 {
 	private BlockPos pos;
-	private HomeGuiActionType type;
+	private boolean isPass;
 	private UUID uuid;
 
-	public MessageHomeAction() {}
+	public MessageHomeActionKickOrPass() {}
 
-	public MessageHomeAction(BlockPos pos, HomeGuiActionType type, UUID uuid)
+	public MessageHomeActionKickOrPass(BlockPos pos, boolean isPass, UUID uuid)
 	{
 		this.pos = pos;
-		this.type = type;
+		this.isPass = isPass;
 		this.uuid = uuid;
 	}
 
@@ -33,7 +34,7 @@ public class MessageHomeAction implements IMessage
 	public void fromBytes(ByteBuf buf)
 	{
 		pos = BlockPos.fromLong(buf.readLong());
-		type = HomeGuiActionType.values()[buf.readByte()];
+		isPass = buf.readBoolean();
 		long most = buf.readLong();
 		long least = buf.readLong();
 		uuid = new UUID(most, least);
@@ -43,22 +44,22 @@ public class MessageHomeAction implements IMessage
 	public void toBytes(ByteBuf buf)
 	{
 		buf.writeLong(pos.toLong());
-		buf.writeByte(type.ordinal());
+		buf.writeBoolean(isPass);
 		buf.writeLong(uuid.getMostSignificantBits());
 		buf.writeLong(uuid.getLeastSignificantBits());
 	}
 
-	public static class Handler implements IMessageHandler<MessageHomeAction, MessageHomeActionReply>
+	public static class Handler implements IMessageHandler<MessageHomeActionKickOrPass, MessageHomeActionReply>
 	{
 		@Override
-		public MessageHomeActionReply onMessage(MessageHomeAction message, MessageContext ctx)
+		public MessageHomeActionReply onMessage(MessageHomeActionKickOrPass message, MessageContext ctx)
 		{
 			EntityPlayerMP player = ctx.getServerHandler().player;
 			CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
 			if(cap == null)
 				return null;
 			Area area = cap.intersectingArea(message.pos);
-			if(area == null || !area.isOwner(player.getUniqueID()))
+			if(!Utils.canPlayerEditArea(area, player, player.world.getMinecraftServer()))
 				return null;
 			UUID uuid = message.uuid;
 			GameProfile profile = player.world.getMinecraftServer().getPlayerProfileCache().getProfileByUUID(uuid);
@@ -66,21 +67,14 @@ public class MessageHomeAction implements IMessage
 				return null;
 
 			boolean changed = true;
-			switch(message.type)
-			{
-				case ADD:
-					changed = area.addMember(uuid);
-					break;
-				case KICK:
-					changed = area.removeMember(uuid);
-					break;
-				case PASS:
-					area.setOwner(uuid);
-			}
+			if(message.isPass)
+				area.setOwner(uuid);
+			else
+				changed = area.removeMember(uuid);
 			if(changed)
 			{
 				cap.dataChanged();
-				return new MessageHomeActionReply(message.type, uuid, profile.getName());
+				return new MessageHomeActionReply(message.isPass ? HomeGuiActionType.PASS : HomeGuiActionType.KICK, uuid, profile.getName());
 			}
 			else
 				return null;

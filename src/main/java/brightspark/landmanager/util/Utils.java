@@ -1,5 +1,6 @@
 package brightspark.landmanager.util;
 
+import brightspark.landmanager.data.areas.Area;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,6 +26,13 @@ public class Utils
 			return true;
 		UserListOpsEntry op = server.getPlayerList().getOppedPlayers().getEntry(player.getGameProfile());
 		return op != null;
+	}
+
+	public static boolean canPlayerEditArea(Area area, EntityPlayer player, MinecraftServer server)
+	{
+		if(area == null || player == null || server == null)
+			return false;
+		return area.isOwner(player.getUniqueID()) || isOp(server, player);
 	}
 
 	public static List<String> getAllPlayerNames(MinecraftServer server)

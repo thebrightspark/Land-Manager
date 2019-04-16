@@ -50,9 +50,9 @@ public class MessageHomeToggle implements IMessage
 			if(cap == null)
 				return null;
 			Area area = cap.intersectingArea(message.pos);
-			boolean playerIsOp = Utils.isOp(player.world.getMinecraftServer(), player);
-			if(area == null || (!area.isOwner(player.getUniqueID()) && !playerIsOp))
+			if(!Utils.canPlayerEditArea(area, player, player.world.getMinecraftServer()))
 				return null;
+			boolean playerIsOp = Utils.isOp(player.world.getMinecraftServer(), player);
 			HomeGuiToggleType type = message.type;
 			switch(type)
 			{

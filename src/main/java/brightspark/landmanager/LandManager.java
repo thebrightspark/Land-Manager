@@ -79,7 +79,8 @@ public class LandManager
         regMessage(MessageShowArea.Handler.class, MessageShowArea.class, Side.CLIENT);
         regMessage(MessageChatLog.Handler.class, MessageChatLog.class, Side.CLIENT);
         regMessage(MessageOpenHomeGui.Handler.class, MessageOpenHomeGui.class, Side.CLIENT);
-        regMessage(MessageHomeAction.Handler.class, MessageHomeAction.class, Side.SERVER);
+        regMessage(MessageHomeActionKickOrPass.Handler.class, MessageHomeActionKickOrPass.class, Side.SERVER);
+        regMessage(MessageHomeActionAdd.Handler.class, MessageHomeActionAdd.class, Side.SERVER);
         regMessage(MessageHomeActionReply.Handler.class, MessageHomeActionReply.class, Side.CLIENT);
         regMessage(MessageHomeToggle.Handler.class, MessageHomeToggle.class, Side.SERVER);
         regMessage(MessageHomeToggleReply.Handler.class, MessageHomeToggleReply.class, Side.CLIENT);

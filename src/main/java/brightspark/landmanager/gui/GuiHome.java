@@ -5,7 +5,8 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.handler.ClientEventHandler;
-import brightspark.landmanager.message.MessageHomeAction;
+import brightspark.landmanager.message.MessageHomeActionAdd;
+import brightspark.landmanager.message.MessageHomeActionKickOrPass;
 import brightspark.landmanager.message.MessageHomeToggle;
 import brightspark.landmanager.util.HomeGuiActionType;
 import brightspark.landmanager.util.HomeGuiToggleType;
@@ -97,6 +98,17 @@ public class GuiHome extends LMGui
 			case EXPLOSIONS:
 				area.setExplosions(state);
 		}
+		updateToggleButtons();
+	}
+
+	public void clearInput()
+	{
+		input.setText("");
+	}
+
+	public void clearSelection()
+	{
+		selectedMemberIndex = -1;
 	}
 
 	private boolean canUseToggle(boolean config)
@@ -123,6 +135,7 @@ public class GuiHome extends LMGui
 		addButton = addButton(new ActionButton(111, 29, "Add", HomeGuiActionType.ADD));
 		kickButton = addButton(new ActionButton(111, 41, "Kick", HomeGuiActionType.KICK));
 		passButton = addButton(new ActionButton(111, 53, "Pass", HomeGuiActionType.PASS));
+		updateActionButtons();
 
 		boundariesToggle = addButton(new ToggleButton(HomeGuiToggleType.BOUNDARIES, 108, 70, ClientEventHandler.isAreaBeingRendered(area.getName())));
 		boundariesToggle.enabled = true;
@@ -168,7 +181,14 @@ public class GuiHome extends LMGui
 	}
 
 	@Override
-	protected void actionPerformed(GuiButton button)
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+	{
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+		input.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+	@Override
+	protected void actionPerformed(GuiButton button) throws IOException
 	{
 		if(button instanceof ListButton)
 		{
@@ -185,16 +205,25 @@ public class GuiHome extends LMGui
 		}
 		else if(button instanceof ActionButton)
 		{
-			LandManager.NETWORK.sendToServer(new MessageHomeAction(pos, ((ActionButton) button).type, members.get(selectedMemberIndex).getLeft()));
-			selectedMemberIndex = -1;
+			HomeGuiActionType type = ((ActionButton) button).type;
+			switch(type)
+			{
+				case KICK:
+				case PASS:
+					UUID memberUuid = selectedMemberIndex > 0 ? members.get(selectedMemberIndex).getLeft() : null;
+					LandManager.NETWORK.sendToServer(new MessageHomeActionKickOrPass(pos, type == HomeGuiActionType.PASS, memberUuid));
+					break;
+				case ADD:
+					LandManager.NETWORK.sendToServer(new MessageHomeActionAdd(pos, input.getText()));
+			}
 		}
 		else if(button instanceof ToggleButton)
 		{
 			ToggleButton toggleButton = (ToggleButton) button;
-			toggleButton.isOn = !toggleButton.isOn;
 			switch(toggleButton.type)
 			{
 				case BOUNDARIES:
+					toggleButton.isOn = !toggleButton.isOn;
 					ClientEventHandler.setRenderArea(area.getName(), toggleButton.isOn);
 					break;
 				case INTERACTIONS:
@@ -204,6 +233,7 @@ public class GuiHome extends LMGui
 					LandManager.NETWORK.sendToServer(new MessageHomeToggle(pos, toggleButton.type));
 			}
 		}
+		super.actionPerformed(button);
 	}
 
 	private boolean canScrollUp()
@@ -245,9 +275,13 @@ public class GuiHome extends LMGui
 	private void updateToggleButtons()
 	{
 		interactionsToggle.enabled = canUseToggle(LMConfig.permissions.interactions);
+		interactionsToggle.isOn = area.canInteract();
 		passivesToggle.enabled = canUseToggle(LMConfig.permissions.passiveSpawning);
+		passivesToggle.isOn = area.canPassiveSpawn();
 		hostilesToggle.enabled = canUseToggle(LMConfig.permissions.hostileSpawning);
+		hostilesToggle.isOn = area.canHostileSpawn();
 		explosionsToggle.enabled = canUseToggle(LMConfig.permissions.explosions);
+		explosionsToggle.isOn = area.canExplosionsCauseDamage();
 	}
 
 	private class ListButton extends LMButton
