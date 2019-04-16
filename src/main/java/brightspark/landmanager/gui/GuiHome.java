@@ -1,5 +1,6 @@
 package brightspark.landmanager.gui;
 
+import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
@@ -88,13 +89,11 @@ public class GuiHome extends LMGui
 		kickButton = addButton(new ActionButton(111, 41, "Kick", HomeGuiActionType.KICK));
 		passButton = addButton(new ActionButton(111, 53, "Pass", HomeGuiActionType.PASS));
 
-		for(int i = 0; i < 5; i++)
-		{
-			ToggleButton b = new ToggleButton(ToggleType.values()[i], 108, 70 + (i * 14));
-			b.locked = mc.world.rand.nextBoolean();
-			b.isOn = mc.world.rand.nextBoolean();
-			toggleButtons.add(addButton(b));
-		}
+		toggleButtons.add(addButton(new ToggleButton(ToggleType.BOUNDARIES, 108, 70, false, ClientEventHandler.isAreaBeingRendered(area.getName()))));
+		toggleButtons.add(addButton(new ToggleButton(ToggleType.INTERACTIONS, 108, 84, LMConfig.permissions.interactions, area.canInteract())));
+		toggleButtons.add(addButton(new ToggleButton(ToggleType.PASSIVE_SPAWNS, 108, 98, LMConfig.permissions.passiveSpawning, area.canPassiveSpawn())));
+		toggleButtons.add(addButton(new ToggleButton(ToggleType.HOSTILE_SPAWNS, 108, 112, LMConfig.permissions.hostileSpawning, area.canHostileSpawn())));
+		toggleButtons.add(addButton(new ToggleButton(ToggleType.EXPLOSIONS, 108, 126, LMConfig.permissions.explosions, area.canExplosionsCauseDamage())));
 	}
 
 	@Override
@@ -144,7 +143,7 @@ public class GuiHome extends LMGui
 		}
 		else if(button instanceof ArrowButton)
 		{
-			int change = ((ArrowButton) button).isUp ? -1 : 1;
+			int change = ((ArrowButton) button).isUp() ? -1 : 1;
 			playerListStartIndex += change;
 			updatePlayerList();
 		}
@@ -155,11 +154,12 @@ public class GuiHome extends LMGui
 		}
 		else if(button instanceof ToggleButton)
 		{
-			//TODO: Toggle buttons
-			switch(((ToggleButton) button).type)
+			ToggleButton toggleButton = (ToggleButton) button;
+			toggleButton.isOn = !toggleButton.isOn;
+			switch(toggleButton.type)
 			{
 				case BOUNDARIES:
-					ClientEventHandler.setRenderArea(area.getName());
+					ClientEventHandler.setRenderArea(area.getName(), toggleButton.isOn);
 					break;
 				case INTERACTIONS:
 				case PASSIVE_SPAWNS:
@@ -296,13 +296,15 @@ public class GuiHome extends LMGui
 	private class ToggleButton extends LMButton
 	{
 		public final ToggleType type;
-		public boolean locked = false;
-		public Boolean isOn = null;
+		public boolean locked;
+		public boolean isOn;
 
-		public ToggleButton(ToggleType type, int x, int y)
+		public ToggleButton(ToggleType type, int x, int y, boolean locked, boolean isOn)
 		{
 			super(x, y, 12, 12, 162, 36, null);
 			this.type = type;
+			this.locked = locked;
+			this.isOn = isOn;
 		}
 
 		@Override
@@ -314,13 +316,6 @@ public class GuiHome extends LMGui
 			if(isOn)
 				y += height;
 			return y;
-		}
-
-		@Override
-		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
-		{
-			if(isOn != null)
-				super.drawButton(mc, mouseX, mouseY, partialTicks);
 		}
 	}
 

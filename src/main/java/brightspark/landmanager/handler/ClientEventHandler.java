@@ -12,10 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Mod.EventBusSubscriber(modid = LandManager.MOD_ID, value = Side.CLIENT)
 public class ClientEventHandler
@@ -23,27 +20,40 @@ public class ClientEventHandler
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static final Random rand = new Random();
     private static boolean renderAll = false;
-    private static String renderArea = "";
+    private static Set<String> areasToRender = new HashSet<>();
     private static Map<String, Color> colourCache = new HashMap<>();
+
+    public static boolean isAreaBeingRendered(String areaName)
+    {
+    	return areasToRender.contains(areaName);
+    }
 
     //Used by command
     public static void setRenderArea(String areaName)
     {
         renderAll = false;
-        renderArea = areaName;
+        areasToRender.clear();
+        areasToRender.add(areaName);
         colourCache.clear();
     }
 
     //Used by GUI
     public static void setRenderArea(String areaName, boolean show)
     {
-        //TODO
+        renderAll = false;
+        if(show)
+            areasToRender.add(areaName);
+        else
+        {
+            areasToRender.remove(areaName);
+            colourCache.remove(areaName);
+        }
     }
 
     public static void toggleRenderAll()
     {
-        renderAll = !renderArea.isEmpty() || !renderAll;
-        renderArea = "";
+        renderAll = !areasToRender.isEmpty() || !renderAll;
+        areasToRender.clear();
         colourCache.clear();
         if(renderAll)
             mc.player.sendMessage(new TextComponentTranslation("message.areas.show"));
@@ -67,7 +77,7 @@ public class ClientEventHandler
     @SubscribeEvent
     public static void areaRendering(RenderWorldLastEvent event)
     {
-        if(!renderAll && renderArea.isEmpty())
+        if(!renderAll && areasToRender.isEmpty())
             return;
 
         CapabilityAreas cap = mc.world.getCapability(LandManager.CAPABILITY_AREAS, null);
@@ -79,11 +89,14 @@ public class ClientEventHandler
             Set<Area> areas = cap.getNearbyAreas(mc.player.getPosition());
             areas.forEach(area -> BoxRenderer.renderBox(area, getColour(area.getName()), event.getPartialTicks()));
         }
-        else if(!renderArea.isEmpty())
+        else if(!areasToRender.isEmpty())
         {
-            Area area = cap.getArea(renderArea);
-            if(area != null)
-                BoxRenderer.renderBox(area, getColour(area.getName()), event.getPartialTicks());
+            areasToRender.forEach(areaName ->
+            {
+                Area area = cap.getArea(areaName);
+                if(area != null)
+                    BoxRenderer.renderBox(area, getColour(area.getName()), event.getPartialTicks());
+            });
         }
     }
 }
