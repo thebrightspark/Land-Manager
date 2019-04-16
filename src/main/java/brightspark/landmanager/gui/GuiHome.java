@@ -7,6 +7,7 @@ import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.handler.ClientEventHandler;
 import brightspark.landmanager.message.MessageHomeAction;
 import brightspark.landmanager.util.HomeGuiActionType;
+import brightspark.landmanager.util.HomeGuiToggleType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
@@ -71,6 +72,24 @@ public class GuiHome extends LMGui
 		updatePlayerList();
 	}
 
+	public void setToggle(HomeGuiToggleType type, boolean state)
+	{
+		switch(type)
+		{
+			case INTERACTIONS:
+				area.setInteractions(state);
+				break;
+			case PASSIVE_SPAWNS:
+				area.setPassiveSpawning(state);
+				break;
+			case HOSTILE_SPAWNS:
+				area.setHostileSpawning(state);
+				break;
+			case EXPLOSIONS:
+				area.setExplosions(state);
+		}
+	}
+
 	@Override
 	public void initGui()
 	{
@@ -89,11 +108,11 @@ public class GuiHome extends LMGui
 		kickButton = addButton(new ActionButton(111, 41, "Kick", HomeGuiActionType.KICK));
 		passButton = addButton(new ActionButton(111, 53, "Pass", HomeGuiActionType.PASS));
 
-		toggleButtons.add(addButton(new ToggleButton(ToggleType.BOUNDARIES, 108, 70, false, ClientEventHandler.isAreaBeingRendered(area.getName()))));
-		toggleButtons.add(addButton(new ToggleButton(ToggleType.INTERACTIONS, 108, 84, LMConfig.permissions.interactions, area.canInteract())));
-		toggleButtons.add(addButton(new ToggleButton(ToggleType.PASSIVE_SPAWNS, 108, 98, LMConfig.permissions.passiveSpawning, area.canPassiveSpawn())));
-		toggleButtons.add(addButton(new ToggleButton(ToggleType.HOSTILE_SPAWNS, 108, 112, LMConfig.permissions.hostileSpawning, area.canHostileSpawn())));
-		toggleButtons.add(addButton(new ToggleButton(ToggleType.EXPLOSIONS, 108, 126, LMConfig.permissions.explosions, area.canExplosionsCauseDamage())));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.BOUNDARIES, 108, 70, false, ClientEventHandler.isAreaBeingRendered(area.getName()))));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.INTERACTIONS, 108, 84, LMConfig.permissions.interactions, area.canInteract())));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.PASSIVE_SPAWNS, 108, 98, LMConfig.permissions.passiveSpawning, area.canPassiveSpawn())));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.HOSTILE_SPAWNS, 108, 112, LMConfig.permissions.hostileSpawning, area.canHostileSpawn())));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.EXPLOSIONS, 108, 126, LMConfig.permissions.explosions, area.canExplosionsCauseDamage())));
 	}
 
 	@Override
@@ -295,11 +314,11 @@ public class GuiHome extends LMGui
 
 	private class ToggleButton extends LMButton
 	{
-		public final ToggleType type;
+		public final HomeGuiToggleType type;
 		public boolean locked;
 		public boolean isOn;
 
-		public ToggleButton(ToggleType type, int x, int y, boolean locked, boolean isOn)
+		public ToggleButton(HomeGuiToggleType type, int x, int y, boolean locked, boolean isOn)
 		{
 			super(x, y, 12, 12, 162, 36, null);
 			this.type = type;
@@ -317,14 +336,5 @@ public class GuiHome extends LMGui
 				y += height;
 			return y;
 		}
-	}
-
-	private enum ToggleType
-	{
-		BOUNDARIES,
-		INTERACTIONS,
-		PASSIVE_SPAWNS,
-		HOSTILE_SPAWNS,
-		EXPLOSIONS
 	}
 }

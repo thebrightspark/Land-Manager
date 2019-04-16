@@ -77,7 +77,13 @@ public class MessageHomeAction implements IMessage
 				case PASS:
 					area.setOwner(uuid);
 			}
-			return changed ? new MessageHomeActionReply(message.type, uuid, profile.getName()) : null;
+			if(changed)
+			{
+				cap.dataChanged();
+				return new MessageHomeActionReply(message.type, uuid, profile.getName());
+			}
+			else
+				return null;
 		}
 	}
 }

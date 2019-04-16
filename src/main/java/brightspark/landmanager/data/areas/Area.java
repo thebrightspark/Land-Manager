@@ -22,9 +22,10 @@ public class Area implements INBTSerializable<NBTTagCompound>
 
     private String name;
     private int dimensionId;
-    private BlockPos pos1, pos2, center;
+    private BlockPos pos1, pos2;
     private UUID owner;
     private Set<UUID> members = new HashSet<>();
+    //TODO: Have defaults configurable
     private boolean
             canPassiveSpawn = true,
             canHostileSpawn = true,
@@ -48,11 +49,6 @@ public class Area implements INBTSerializable<NBTTagCompound>
     public Area(NBTTagCompound nbt)
     {
         deserializeNBT(nbt);
-    }
-
-    private static int median(int in1, int in2)
-    {
-        return (in1 + in2) / 2;
     }
 
     public static boolean validateName(String areaName)
@@ -86,18 +82,6 @@ public class Area implements INBTSerializable<NBTTagCompound>
     public BlockPos getMaxPos()
     {
         return pos2;
-    }
-
-    public BlockPos getCenter()
-    {
-        if(center == null)
-        {
-            center = new BlockPos(
-                    median(pos1.getX(), pos2.getX()),
-                    median(pos1.getY(), pos2.getY()),
-                    median(pos1.getZ(), pos2.getZ()));
-        }
-        return center;
     }
 
     public UUID getOwner()
@@ -145,6 +129,11 @@ public class Area implements INBTSerializable<NBTTagCompound>
         canPassiveSpawn = !canPassiveSpawn;
     }
 
+    public void setPassiveSpawning(boolean value)
+    {
+        canPassiveSpawn = value;
+    }
+
     public boolean canHostileSpawn()
     {
         return canHostileSpawn;
@@ -153,6 +142,11 @@ public class Area implements INBTSerializable<NBTTagCompound>
     public void toggleHostileSpawning()
     {
         canHostileSpawn = !canHostileSpawn;
+    }
+
+    public void setHostileSpawning(boolean value)
+    {
+        canHostileSpawn = value;
     }
 
     public boolean canExplosionsCauseDamage()
@@ -165,6 +159,11 @@ public class Area implements INBTSerializable<NBTTagCompound>
         explosions = !explosions;
     }
 
+    public void setExplosions(boolean value)
+    {
+        explosions = value;
+    }
+
     public boolean canInteract()
     {
         return interactions;
@@ -173,6 +172,11 @@ public class Area implements INBTSerializable<NBTTagCompound>
     public void toggleInteractions()
     {
         interactions = !interactions;
+    }
+
+    public void setInteractions(boolean value)
+    {
+        interactions = value;
     }
 
     public AxisAlignedBB asAABB()
