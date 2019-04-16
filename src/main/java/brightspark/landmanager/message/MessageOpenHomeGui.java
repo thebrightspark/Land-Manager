@@ -22,13 +22,15 @@ import java.util.UUID;
 public class MessageOpenHomeGui implements IMessage
 {
 	private BlockPos pos;
+	private boolean isOp;
 	private List<Pair<UUID, String>> members;
 
 	public MessageOpenHomeGui() {}
 
-	public MessageOpenHomeGui(BlockPos pos, List<Pair<UUID, String>> members)
+	public MessageOpenHomeGui(BlockPos pos, boolean isOp, List<Pair<UUID, String>> members)
 	{
 		this.pos = pos;
+		this.isOp = isOp;
 		this.members = members;
 	}
 
@@ -36,6 +38,7 @@ public class MessageOpenHomeGui implements IMessage
 	public void fromBytes(ByteBuf buf)
 	{
 		pos = BlockPos.fromLong(buf.readLong());
+		isOp = buf.readBoolean();
 		int membersSize = buf.readInt();
 		members = new LinkedList<>();
 		for(int i = 0; i < membersSize; i++)
@@ -51,6 +54,7 @@ public class MessageOpenHomeGui implements IMessage
 	public void toBytes(ByteBuf buf)
 	{
 		buf.writeLong(pos.toLong());
+		buf.writeBoolean(isOp);
 		buf.writeInt(members.size());
 		members.forEach(pair ->
 		{
@@ -71,7 +75,12 @@ public class MessageOpenHomeGui implements IMessage
 			player.openGui(LandManager.INSTANCE, 1, world, pos.getX(), pos.getY(), pos.getZ());
 			GuiScreen gui = Minecraft.getMinecraft().currentScreen;
 			if(gui instanceof GuiHome)
-				((GuiHome) gui).setMembersData(message.members);
+			{
+				GuiHome guiHome = (GuiHome) gui;
+				guiHome.setMembersData(message.members);
+				if(message.isOp)
+					guiHome.setClientIsOp();
+			}
 			else
 				LandManager.LOGGER.warn("The home GUI wasn't open! Unable to set members data.");
 			return null;

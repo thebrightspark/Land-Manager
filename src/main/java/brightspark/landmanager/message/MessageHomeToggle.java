@@ -5,6 +5,7 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.util.HomeGuiToggleType;
+import brightspark.landmanager.util.Utils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
@@ -49,7 +50,7 @@ public class MessageHomeToggle implements IMessage
 			if(cap == null)
 				return null;
 			Area area = cap.intersectingArea(message.pos);
-			if(area == null || !area.isOwner(player.getUniqueID()))
+			if(area == null || (!area.isOwner(player.getUniqueID()) && !Utils.isOp(player.world.getMinecraftServer(), player)))
 				return null;
 			HomeGuiToggleType type = message.type;
 			switch(type)

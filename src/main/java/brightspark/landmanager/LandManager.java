@@ -27,6 +27,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
@@ -46,6 +47,7 @@ public class LandManager
     public static LandManager INSTANCE;
     public static Logger LOGGER;
     public static SimpleNetworkWrapper NETWORK;
+    private static int messageId = 0;
 
     @CapabilityInject(CapabilityAreas.class)
     public static Capability<CapabilityAreas> CAPABILITY_AREAS = null;
@@ -59,6 +61,11 @@ public class LandManager
         }
     };
 
+    private static <REQ extends IMessage, REPLY extends IMessage> void regMessage(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> requestMessageType, Side side)
+    {
+        NETWORK.registerMessage(messageHandler, requestMessageType, messageId++, side);
+    }
+
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event)
     {
@@ -66,12 +73,16 @@ public class LandManager
 
         NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());
         NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
-        NETWORK.registerMessage(new MessageCreateArea.Handler(), MessageCreateArea.class, 0, Side.SERVER);
-        NETWORK.registerMessage(new MessageCreateAreaReply.Handler(), MessageCreateAreaReply.class, 1, Side.CLIENT);
-        NETWORK.registerMessage(new MessageUpdateCapability.Handler(), MessageUpdateCapability.class, 2, Side.CLIENT);
-        NETWORK.registerMessage(new MessageShowArea.Handler(), MessageShowArea.class, 3, Side.CLIENT);
-        NETWORK.registerMessage(new MessageChatLog.Handler(), MessageChatLog.class, 4, Side.CLIENT);
-        NETWORK.registerMessage(new MessageOpenHomeGui.Handler(), MessageOpenHomeGui.class, 5, Side.CLIENT);
+        regMessage(MessageCreateArea.Handler.class, MessageCreateArea.class, Side.SERVER);
+        regMessage(MessageCreateAreaReply.Handler.class, MessageCreateAreaReply.class, Side.CLIENT);
+        regMessage(MessageUpdateCapability.Handler.class, MessageUpdateCapability.class, Side.CLIENT);
+        regMessage(MessageShowArea.Handler.class, MessageShowArea.class, Side.CLIENT);
+        regMessage(MessageChatLog.Handler.class, MessageChatLog.class, Side.CLIENT);
+        regMessage(MessageOpenHomeGui.Handler.class, MessageOpenHomeGui.class, Side.CLIENT);
+        regMessage(MessageHomeAction.Handler.class, MessageHomeAction.class, Side.SERVER);
+        regMessage(MessageHomeActionReply.Handler.class, MessageHomeActionReply.class, Side.CLIENT);
+        regMessage(MessageHomeToggle.Handler.class, MessageHomeToggle.class, Side.SERVER);
+        regMessage(MessageHomeToggleReply.Handler.class, MessageHomeToggleReply.class, Side.CLIENT);
 
         CapabilityManager.INSTANCE.register(CapabilityAreas.class, new CapStorage<>(), CapabilityAreasImpl::new);
     }

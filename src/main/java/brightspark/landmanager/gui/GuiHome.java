@@ -6,6 +6,7 @@ import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.handler.ClientEventHandler;
 import brightspark.landmanager.message.MessageHomeAction;
+import brightspark.landmanager.message.MessageHomeToggle;
 import brightspark.landmanager.util.HomeGuiActionType;
 import brightspark.landmanager.util.HomeGuiToggleType;
 import net.minecraft.client.Minecraft;
@@ -29,6 +30,8 @@ public class GuiHome extends LMGui
 {
 	private static final int PLAYER_LIST_SIZE = 4;
 
+	private boolean clientIsOp = false;
+	private boolean isOwner;
 	private BlockPos pos;
 	private Area area = null;
 	private GuiTextField input;
@@ -48,6 +51,11 @@ public class GuiHome extends LMGui
 		CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
 		if(cap != null)
 			area = cap.intersectingArea(pos);
+	}
+
+	public void setClientIsOp()
+	{
+		clientIsOp = true;
 	}
 
 	/**
@@ -90,10 +98,17 @@ public class GuiHome extends LMGui
 		}
 	}
 
+	private boolean canUseToggle(boolean config)
+	{
+		return clientIsOp || (config && isOwner);
+	}
+
 	@Override
 	public void initGui()
 	{
 		super.initGui();
+
+		isOwner = area.isOwner(mc.player.getUniqueID());
 
 		input = new GuiTextField(0, fontRenderer, guiLeft + 99, guiTop + 15, 56, 10);
 		input.setEnableBackgroundDrawing(false);
@@ -108,11 +123,11 @@ public class GuiHome extends LMGui
 		kickButton = addButton(new ActionButton(111, 41, "Kick", HomeGuiActionType.KICK));
 		passButton = addButton(new ActionButton(111, 53, "Pass", HomeGuiActionType.PASS));
 
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.BOUNDARIES, 108, 70, false, ClientEventHandler.isAreaBeingRendered(area.getName()))));
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.INTERACTIONS, 108, 84, LMConfig.permissions.interactions, area.canInteract())));
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.PASSIVE_SPAWNS, 108, 98, LMConfig.permissions.passiveSpawning, area.canPassiveSpawn())));
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.HOSTILE_SPAWNS, 108, 112, LMConfig.permissions.hostileSpawning, area.canHostileSpawn())));
-		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.EXPLOSIONS, 108, 126, LMConfig.permissions.explosions, area.canExplosionsCauseDamage())));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.BOUNDARIES, 108, 70, true, ClientEventHandler.isAreaBeingRendered(area.getName()))));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.INTERACTIONS, 108, 84, canUseToggle(LMConfig.permissions.interactions), area.canInteract())));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.PASSIVE_SPAWNS, 108, 98, canUseToggle(LMConfig.permissions.passiveSpawning), area.canPassiveSpawn())));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.HOSTILE_SPAWNS, 108, 112, canUseToggle(LMConfig.permissions.hostileSpawning), area.canHostileSpawn())));
+		toggleButtons.add(addButton(new ToggleButton(HomeGuiToggleType.EXPLOSIONS, 108, 126, canUseToggle(LMConfig.permissions.explosions), area.canExplosionsCauseDamage())));
 	}
 
 	@Override
@@ -151,7 +166,7 @@ public class GuiHome extends LMGui
 	}
 
 	@Override
-	protected void actionPerformed(GuiButton button) throws IOException
+	protected void actionPerformed(GuiButton button)
 	{
 		if(button instanceof ListButton)
 		{
@@ -184,7 +199,7 @@ public class GuiHome extends LMGui
 				case PASSIVE_SPAWNS:
 				case HOSTILE_SPAWNS:
 				case EXPLOSIONS:
-					//TODO: Send message to server to change
+					LandManager.NETWORK.sendToServer(new MessageHomeToggle(pos, toggleButton.type));
 			}
 		}
 	}
@@ -315,22 +330,22 @@ public class GuiHome extends LMGui
 	private class ToggleButton extends LMButton
 	{
 		public final HomeGuiToggleType type;
-		public boolean locked;
 		public boolean isOn;
 
-		public ToggleButton(HomeGuiToggleType type, int x, int y, boolean locked, boolean isOn)
+		public ToggleButton(HomeGuiToggleType type, int x, int y, boolean enabled, boolean isOn)
 		{
 			super(x, y, 12, 12, 162, 36, null);
 			this.type = type;
-			this.locked = locked;
+			this.enabled = enabled;
 			this.isOn = isOn;
+			drawWhenDisabled = true;
 		}
 
 		@Override
 		protected int getIconY()
 		{
 			int y = iconY;
-			if(locked)
+			if(!enabled)
 				y += height * 2;
 			if(isOn)
 				y += height;

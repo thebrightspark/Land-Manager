@@ -10,6 +10,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -44,7 +45,10 @@ public class BlockHome extends Block
 			else if(!area.isMember(player.getUniqueID()) && !Utils.isOp(world.getMinecraftServer(), player))
 				player.sendMessage(new TextComponentTranslation("message.home.notMember"));
 			else
-				LandManager.NETWORK.sendTo(new MessageOpenHomeGui(pos, Utils.getAllPlayers(world.getMinecraftServer())), (EntityPlayerMP) player);
+			{
+				MinecraftServer server = world.getMinecraftServer();
+				LandManager.NETWORK.sendTo(new MessageOpenHomeGui(pos, Utils.isOp(server, player), Utils.getAllPlayers(server)), (EntityPlayerMP) player);
+			}
 		}
 		return true;
 	}
