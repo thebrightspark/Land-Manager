@@ -12,6 +12,7 @@ import brightspark.landmanager.util.HomeGuiActionType;
 import brightspark.landmanager.util.HomeGuiToggleType;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -130,9 +131,9 @@ public class GuiHome extends LMGui
 		upButton = addButton(new ArrowButton(97, 29, true));
 		downButton = addButton(new ArrowButton(97, 52, false));
 
-		addButton = addButton(new ActionButton(111, 29, "Add", HomeGuiActionType.ADD));
-		kickButton = addButton(new ActionButton(111, 41, "Kick", HomeGuiActionType.KICK));
-		passButton = addButton(new ActionButton(111, 53, "Pass", HomeGuiActionType.PASS));
+		addButton = addButton(new ActionButton(111, 29, "gui.home.add", HomeGuiActionType.ADD));
+		kickButton = addButton(new ActionButton(111, 41, "gui.home.kick", HomeGuiActionType.KICK));
+		passButton = addButton(new ActionButton(111, 53, "gui.home.pass", HomeGuiActionType.PASS));
 		updateActionButtons();
 
 		boundariesToggle = addButton(new ToggleButton(HomeGuiToggleType.BOUNDARIES, 108, 70, ClientEventHandler.isAreaBeingRendered(area.getName())));
@@ -155,13 +156,14 @@ public class GuiHome extends LMGui
 		input.drawTextBox();
 
 		int colour = 4210752;
-		drawString(area.getName(), 6, 5, colour, false);
+		drawStringWithMaxWidth(area.getName(), 6 + guiLeft, 5 + guiTop, 150, colour, false);
 
-		drawString("Show Boundaries", 7, 72, colour, false);
-		drawString("Interact Permission", 7, 86, colour, false);
-		drawString("Passive Spawning", 7, 100, colour, false);
-		drawString("Hostile Spawning", 7, 114, colour, false);
-		drawString("Explosions", 7, 128, colour, false);
+		int x = 7 + guiLeft;
+		drawLangString("gui.home.boundaries", x, 72 + guiTop, colour, false);
+		drawLangString("gui.home.interactions", x, 86 + guiTop, colour, false);
+		drawLangString("gui.home.passives", x, 100 + guiTop, colour, false);
+		drawLangString("gui.home.hostiles", x, 114 + guiTop, colour, false);
+		drawLangString("gui.home.explosions", x, 128 + guiTop, colour, false);
 	}
 
 	@Override
@@ -292,8 +294,6 @@ public class GuiHome extends LMGui
 
 	private class ListButton extends LMButton
 	{
-		private UUID playerUuid = null;
-
 		public ListButton(int x, int y)
 		{
 			super(x, y, 87, 11, 87, 144, null);
@@ -312,13 +312,11 @@ public class GuiHome extends LMGui
 			if(player == null)
 			{
 				displayString = null;
-				playerUuid = null;
 				enabled = false;
 			}
 			else
 			{
 				displayString = player.getRight();
-				playerUuid = player.getLeft();
 				enabled = true;
 			}
 		}
@@ -328,9 +326,10 @@ public class GuiHome extends LMGui
 			hasIcon = selected;
 		}
 
-		public UUID getPlayerUuid()
+		@Override
+		protected void drawText()
 		{
-			return playerUuid;
+			drawStringWithMaxWidth(displayString, x + textOffset, y + (height - 8) / 2, 85, getTextColour(), true);
 		}
 	}
 
@@ -362,7 +361,7 @@ public class GuiHome extends LMGui
 
 		public ActionButton(int x, int y, String buttonText, HomeGuiActionType type)
 		{
-			super(x, y, 45, 12, 162, 0, buttonText);
+			super(x, y, 45, 12, 162, 0, I18n.format(buttonText));
 			this.type = type;
 			textOffset = 12;
 		}

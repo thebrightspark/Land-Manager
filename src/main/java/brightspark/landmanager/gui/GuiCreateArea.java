@@ -73,9 +73,9 @@ public class GuiCreateArea extends LMGui
         nameInput = new GuiTextField(0, fontRenderer, guiLeft + 5, guiTop + 16, xSize - 10, fontRenderer.FONT_HEIGHT + 2);
         nameInput.setFocused(true);
 
-        extendCheck = addButton(new GuiCheckBox(1, 5, 31, I18n.format("gui.component.checkbox"), false));
+        extendCheck = addButton(new GuiCheckBox(1, 5, 31, I18n.format("gui.create.checkbox"), false));
 
-        String text = I18n.format("gui.component.confirm");
+        String text = I18n.format("gui.create.confirm");
         addButton(new GuiButton(2, 68, 31, 40, fontRenderer.FONT_HEIGHT + 2, text)
         {
             @Override
@@ -97,7 +97,7 @@ public class GuiCreateArea extends LMGui
     protected void drawText()
     {
         nameInput.drawTextBox();
-        drawLangString("gui.text.area", 5, 5, textColour, false);
+        drawLangString("gui.create.area", 5 + guiLeft, 5 + guiTop, textColour, false);
     }
 
     @Override

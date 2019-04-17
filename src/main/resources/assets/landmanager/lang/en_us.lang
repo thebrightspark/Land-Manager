@@ -8,6 +8,10 @@ item.admin.name=Admin Tool
 item.admin.tooltip.notset=First position not set
 item.admin.tooltip.set=Dim Id: %d, BlockPos: %s
 
+####Block
+
+tile.home.name=Home Block
+
 ####Messages
 
 message.tool.saved=Saved block position %d, %d, %d
@@ -177,6 +181,15 @@ arealog.type.set_explosions=SET_EXPLOSIONS
 
 ####Gui
 
-gui.component.checkbox=Min/Max Y
-gui.component.confirm=Confirm
-gui.text.area=Area name:
+gui.create.checkbox=Min/Max Y
+gui.create.confirm=Confirm
+gui.create.area=Area name:
+
+gui.home.add=Add
+gui.home.kick=Kick
+gui.home.pass=Pass
+gui.home.boundaries=Show Boundaries
+gui.home.interactions=Interact Permission
+gui.home.passives=Passive Spawning
+gui.home.hostiles=Hostiles Spawning
+gui.home.explosions=Explosions

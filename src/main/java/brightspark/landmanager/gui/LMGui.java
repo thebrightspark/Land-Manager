@@ -67,12 +67,21 @@ public class LMGui extends GuiScreen
 
 	protected void drawString(String text, int x, int y, int colour, boolean shadow)
 	{
-		fontRenderer.drawString(text, x + guiLeft, y + guiTop, colour, shadow);
+		fontRenderer.drawString(text, x, y, colour, shadow);
 	}
 
 	protected void drawLangString(String langKey, int x, int y, int colour, boolean shadow)
 	{
 		drawString(I18n.format(langKey), x, y, colour, shadow);
+	}
+
+	protected void drawStringWithMaxWidth(String text, int x, int y, int maxWidth, int colour, boolean shadow)
+	{
+		int textWidth = fontRenderer.getStringWidth(text);
+		int ellipsisWidth = fontRenderer.getStringWidth("...");
+		if(textWidth > maxWidth - 6 && textWidth > ellipsisWidth)
+			text = fontRenderer.trimStringToWidth(text, maxWidth - 6 - ellipsisWidth).trim() + "...";
+		drawString(text, x, y, colour, shadow);
 	}
 
 	protected class LMButton extends GuiButton
@@ -104,6 +113,11 @@ public class LMGui extends GuiScreen
 			return iconY;
 		}
 
+		protected void drawText()
+		{
+			drawString(fontRenderer, displayString, x + textOffset, y + (height - 8) / 2, getTextColour());
+		}
+
 		@Override
 		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
 		{
@@ -119,7 +133,7 @@ public class LMGui extends GuiScreen
 				drawTexturedModalRect(x, y, getIconX(), getIconY(), width, height);
 			}
 			if(StringUtils.isNotBlank(displayString))
-				drawString(fontRenderer, displayString, x + textOffset, y + (height - 8) / 2, getTextColour());
+				drawText();
 		}
 	}
 }
