@@ -108,10 +108,10 @@ public class LMGui extends GuiScreen
 		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
 		{
 			if(!visible) return;
-			this.hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
 			//Draw button
 			if(!drawWhenDisabled && !enabled)
 				return;
+			this.hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
 			if(hasIcon)
 			{
 				mc.getTextureManager().bindTexture(image);

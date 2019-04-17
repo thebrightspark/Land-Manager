@@ -8,12 +8,15 @@ import brightspark.landmanager.util.Utils;
 import com.mojang.authlib.GameProfile;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Locale;
 import java.util.UUID;
 
 public class MessageHomeActionAdd implements IMessage
@@ -55,7 +58,10 @@ public class MessageHomeActionAdd implements IMessage
 			Area area = cap.intersectingArea(message.pos);
 			if(!Utils.canPlayerEditArea(area, player, player.world.getMinecraftServer()))
 				return null;
-			GameProfile profile = player.world.getMinecraftServer().getPlayerProfileCache().getGameProfileForUsername(message.name);
+			PlayerProfileCache cache = player.world.getMinecraftServer().getPlayerProfileCache();
+			if(!ArrayUtils.contains(cache.getUsernames(), message.name.toLowerCase(Locale.ROOT)))
+				return null;
+			GameProfile profile = cache.getGameProfileForUsername(message.name);
 			if(profile == null)
 				return null;
 

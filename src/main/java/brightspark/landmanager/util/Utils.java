@@ -7,8 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.server.management.UserListOpsEntry;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -49,17 +47,9 @@ public class Utils
 		return players;
 	}
 
-	public static List<Pair<UUID, String>> getAllPlayers(MinecraftServer server)
+	public static String getPlayerName(MinecraftServer server, UUID uuid)
 	{
-		List<Pair<UUID, String>> players = new LinkedList<>();
-		PlayerProfileCache profileCache = server.getPlayerProfileCache();
-		for(String name : profileCache.getUsernames())
-		{
-			GameProfile profile = profileCache.getGameProfileForUsername(name);
-			if(profile != null)
-				players.add(new ImmutablePair<>(profile.getId(), profile.getName()));
-		}
-		players.sort(Comparator.comparing(Pair::getRight));
-		return players;
+		GameProfile profile = server.getPlayerProfileCache().getProfileByUUID(uuid);
+		return profile == null ? null : profile.getName();
 	}
 }

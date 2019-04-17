@@ -10,10 +10,8 @@ import brightspark.landmanager.message.MessageHomeActionKickOrPass;
 import brightspark.landmanager.message.MessageHomeToggle;
 import brightspark.landmanager.util.HomeGuiActionType;
 import brightspark.landmanager.util.HomeGuiToggleType;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -66,19 +64,19 @@ public class GuiHome extends LMGui
 	public void setMembersData(List<Pair<UUID, String>> members)
 	{
 		this.members = members;
+		updatePlayerList();
 	}
 
 	public void addMember(UUID uuid, String player)
 	{
 		members.add(new ImmutablePair<>(uuid, player));
-		members.sort(Comparator.comparing(Pair::getRight));
 		updatePlayerList();
 	}
 
 	public void removeMember(UUID player)
 	{
 		members.removeIf(pair -> pair.getLeft().equals(player));
-		playerListStartIndex = MathHelper.clamp(playerListStartIndex, 0, members.size() - PLAYER_LIST_SIZE);
+		playerListStartIndex = MathHelper.clamp(playerListStartIndex, 0, Math.max(0, members.size() - PLAYER_LIST_SIZE));
 		updatePlayerList();
 	}
 
@@ -169,7 +167,8 @@ public class GuiHome extends LMGui
 	@Override
 	public void updateScreen()
 	{
-		input.updateCursorCounter();
+		if(input != null)
+			input.updateCursorCounter();
 	}
 
 	@Override
@@ -185,6 +184,8 @@ public class GuiHome extends LMGui
 	{
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 		input.mouseClicked(mouseX, mouseY, mouseButton);
+		if(mouseX >= input.x && mouseX < input.x + input.width && mouseY >= input.y && mouseY < input.y + input.height && mouseButton == 1)
+			input.setText("");
 	}
 
 	@Override
@@ -192,10 +193,11 @@ public class GuiHome extends LMGui
 	{
 		if(button instanceof ListButton)
 		{
-			listButtons.forEach(listButton -> listButton.selected = false);
+			listButtons.forEach(listButton -> listButton.setSelected(false));
 			ListButton listButton = (ListButton) button;
-			listButton.selected = true;
-			selectedMemberIndex = listButton.id;
+			listButton.setSelected(true);
+			selectedMemberIndex = listButton.id + playerListStartIndex;
+			updateActionButtons();
 		}
 		else if(button instanceof ArrowButton)
 		{
@@ -210,11 +212,14 @@ public class GuiHome extends LMGui
 			{
 				case KICK:
 				case PASS:
-					UUID memberUuid = selectedMemberIndex > 0 ? members.get(selectedMemberIndex).getLeft() : null;
-					LandManager.NETWORK.sendToServer(new MessageHomeActionKickOrPass(pos, type == HomeGuiActionType.PASS, memberUuid));
+					UUID memberUuid = selectedMemberIndex >= 0 ? members.get(selectedMemberIndex).getLeft() : null;
+					if(memberUuid != null)
+						LandManager.NETWORK.sendToServer(new MessageHomeActionKickOrPass(pos, type == HomeGuiActionType.PASS, memberUuid));
 					break;
 				case ADD:
-					LandManager.NETWORK.sendToServer(new MessageHomeActionAdd(pos, input.getText()));
+					String inputText = input.getText();
+					if(StringUtils.isNotBlank(inputText))
+						LandManager.NETWORK.sendToServer(new MessageHomeActionAdd(pos, inputText));
 			}
 		}
 		else if(button instanceof ToggleButton)
@@ -252,13 +257,14 @@ public class GuiHome extends LMGui
 			return;
 
 		//Update members list
+		members.sort(Comparator.comparing(Pair::getRight));
 		int membersSize = members.size();
 		for(int i = 0; i < PLAYER_LIST_SIZE; i++)
 		{
 			int playerListI = playerListStartIndex + i;
 			ListButton button = listButtons.get(i);
 			button.setPlayer(playerListI < membersSize ? members.get(playerListI) : null);
-			button.selected = selectedMemberIndex == playerListI;
+			button.setSelected(selectedMemberIndex == playerListI);
 		}
 
 		//Update arrows
@@ -286,13 +292,19 @@ public class GuiHome extends LMGui
 
 	private class ListButton extends LMButton
 	{
-		public boolean selected = false;
 		private UUID playerUuid = null;
 
 		public ListButton(int x, int y)
 		{
 			super(x, y, 87, 11, 87, 144, null);
 			textOffset = 1;
+			drawWhenDisabled = false;
+		}
+
+		@Override
+		protected int getTextColour()
+		{
+			return 14737632;
 		}
 
 		public void setPlayer(Pair<UUID, String> player)
@@ -311,23 +323,14 @@ public class GuiHome extends LMGui
 			}
 		}
 
+		public void setSelected(boolean selected)
+		{
+			hasIcon = selected;
+		}
+
 		public UUID getPlayerUuid()
 		{
 			return playerUuid;
-		}
-
-		@Override
-		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
-		{
-			if(!visible || !enabled) return;
-			this.hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-			//Draw button
-			if(selected)
-			{
-				mc.getTextureManager().bindTexture(image);
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-				drawTexturedModalRect(x, y, getIconX(), getIconY(), width, height);
-			}
 		}
 	}
 

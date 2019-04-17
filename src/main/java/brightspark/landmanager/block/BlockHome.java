@@ -17,6 +17,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class BlockHome extends Block
 {
@@ -47,7 +53,11 @@ public class BlockHome extends Block
 			else
 			{
 				MinecraftServer server = world.getMinecraftServer();
-				LandManager.NETWORK.sendTo(new MessageOpenHomeGui(pos, Utils.isOp(server, player), Utils.getAllPlayers(server)), (EntityPlayerMP) player);
+				List<Pair<UUID, String>> members = area.getMembers().stream()
+					.map(uuid -> new ImmutablePair<>(uuid, Utils.getPlayerName(server, uuid)))
+					.filter(pair -> pair.getLeft() != null)
+					.collect(Collectors.toList());
+				LandManager.NETWORK.sendTo(new MessageOpenHomeGui(pos, Utils.isOp(server, player), members), (EntityPlayerMP) player);
 			}
 		}
 		return true;
