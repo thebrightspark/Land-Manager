@@ -84,6 +84,7 @@ public class LandManager
         regMessage(MessageHomeActionReply.Handler.class, MessageHomeActionReply.class, Side.CLIENT);
         regMessage(MessageHomeToggle.Handler.class, MessageHomeToggle.class, Side.SERVER);
         regMessage(MessageHomeToggleReply.Handler.class, MessageHomeToggleReply.class, Side.CLIENT);
+        regMessage(MessageHomeActionReplyError.Handler.class, MessageHomeActionReplyError.class, Side.CLIENT);
 
         CapabilityManager.INSTANCE.register(CapabilityAreas.class, new CapStorage<>(), CapabilityAreasImpl::new);
     }

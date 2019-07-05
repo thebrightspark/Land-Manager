@@ -36,4 +36,12 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
     void dataChanged();
 
     void sendDataToPlayer(EntityPlayerMP player);
+
+    int getNumAreasJoined(UUID playerUuid);
+
+    boolean canJoinArea(UUID playerUuid);
+
+    void increasePlayerAreasNum(UUID playerUuid);
+
+    void decreasePlayerAreasNum(UUID playerUuid);
 }

@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class GuiHome extends LMGui
 	private ArrowButton upButton, downButton;
 	private ActionButton addButton, kickButton, passButton;
 	private ToggleButton boundariesToggle, interactionsToggle, passivesToggle, hostilesToggle, explosionsToggle;
+
+	private String errorMessage = null;
+	private String[] errorMessageArgs = null;
 
 	public GuiHome(World world, BlockPos pos)
 	{
@@ -110,6 +114,21 @@ public class GuiHome extends LMGui
 		selectedMemberIndex = -1;
 	}
 
+	public void setErrorMessage(String errorMessage, String[] args)
+	{
+		this.errorMessage = errorMessage;
+		this.errorMessageArgs = args;
+	}
+
+	private void clearErrorMessage()
+	{
+		if(errorMessage != null)
+		{
+			errorMessage = null;
+			errorMessageArgs = null;
+		}
+	}
+
 	private boolean canUseToggle(boolean config)
 	{
 		return clientIsOp || (config && isOwner);
@@ -164,6 +183,9 @@ public class GuiHome extends LMGui
 		drawLangString("gui.home.passives", x, 100 + guiTop, colour, false);
 		drawLangString("gui.home.hostiles", x, 114 + guiTop, colour, false);
 		drawLangString("gui.home.explosions", x, 128 + guiTop, colour, false);
+
+		if (errorMessage != null)
+			drawCenteredString(I18n.format(errorMessage, (Object[]) errorMessageArgs), width / 2, guiTop - 15, 0xFF0000);
 	}
 
 	@Override
@@ -174,25 +196,42 @@ public class GuiHome extends LMGui
 	}
 
 	@Override
-	protected void keyTyped(char typedChar, int keyCode) throws IOException
+	protected void keyTyped(char typedChar, int keyCode)
 	{
-		super.keyTyped(typedChar, keyCode);
 		if(input.textboxKeyTyped(typedChar, keyCode))
+		{
+			clearErrorMessage();
 			updateActionButtons();
+		}
+		else if(keyCode == Keyboard.KEY_RETURN && input.isFocused() && StringUtils.isNotBlank(input.getText()))
+			LandManager.NETWORK.sendToServer(new MessageHomeActionAdd(pos, input.getText()));
+		else if(keyCode == Keyboard.KEY_ESCAPE || mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode))
+			mc.player.closeScreen();
 	}
 
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
 	{
 		super.mouseClicked(mouseX, mouseY, mouseButton);
-		input.mouseClicked(mouseX, mouseY, mouseButton);
+		if(input.mouseClicked(mouseX, mouseY, mouseButton))
+		{
+			listButtons.forEach(listButton -> listButton.setSelected(false));
+			selectedMemberIndex = -1;
+			updateActionButtons();
+			clearErrorMessage();
+		}
 		if(mouseX >= input.x && mouseX < input.x + input.width && mouseY >= input.y && mouseY < input.y + input.height && mouseButton == 1)
+		{
 			input.setText("");
+			clearErrorMessage();
+		}
 	}
 
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException
 	{
+		clearErrorMessage();
+
 		if(button instanceof ListButton)
 		{
 			listButtons.forEach(listButton -> listButton.setSelected(false));

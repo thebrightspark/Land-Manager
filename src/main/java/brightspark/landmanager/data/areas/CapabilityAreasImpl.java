@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class CapabilityAreasImpl implements CapabilityAreas
 {
     private Map<String, Area> areas = new HashMap<>();
+    private Map<UUID, Integer> numAreasPerPlayer = new HashMap<>();
 
     public CapabilityAreasImpl() {}
 
@@ -122,6 +123,30 @@ public class CapabilityAreasImpl implements CapabilityAreas
         return areas.values().stream().filter(area -> area.intersects(pos)).collect(Collectors.toSet());
     }
 
+	@Override
+	public int getNumAreasJoined(UUID playerUuid)
+	{
+		return numAreasPerPlayer.computeIfAbsent(playerUuid, k -> 0);
+	}
+
+    @Override
+    public boolean canJoinArea(UUID playerUuid)
+    {
+        return LMConfig.maxAreasCanOwn < 0 || getNumAreasJoined(playerUuid) < LMConfig.maxAreasCanOwn;
+    }
+
+	@Override
+    public void increasePlayerAreasNum(UUID playerUuid)
+    {
+        numAreasPerPlayer.compute(playerUuid, (uuid, num) -> num == null ? 1 : num + 1 > LMConfig.maxAreasCanOwn ? num : ++num);
+    }
+
+    @Override
+    public void decreasePlayerAreasNum(UUID playerUuid)
+    {
+        numAreasPerPlayer.compute(playerUuid, (uuid, num) -> num == null ? 0 : num > 0 ? --num : num);
+    }
+
     //TODO: Have a more efficient method that updates for a single Area
     @Override
     public void dataChanged()
@@ -149,10 +174,14 @@ public class CapabilityAreasImpl implements CapabilityAreas
     public void deserializeNBT(NBTTagCompound nbt)
     {
         areas.clear();
+        numAreasPerPlayer.clear();
         NBTTagList tagList = nbt.getTagList("areas", Constants.NBT.TAG_COMPOUND);
         tagList.forEach(tag -> {
             Area area = new Area((NBTTagCompound) tag);
             areas.put(area.getName(), area);
+            if(area.getOwner() != null)
+            	increasePlayerAreasNum(area.getOwner());
+            area.getMembers().forEach(this::increasePlayerAreasNum);
         });
     }
 }

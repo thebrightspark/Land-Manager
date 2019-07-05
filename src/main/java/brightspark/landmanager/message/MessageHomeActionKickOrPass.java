@@ -49,10 +49,10 @@ public class MessageHomeActionKickOrPass implements IMessage
 		buf.writeLong(uuid.getLeastSignificantBits());
 	}
 
-	public static class Handler implements IMessageHandler<MessageHomeActionKickOrPass, MessageHomeActionReply>
+	public static class Handler implements IMessageHandler<MessageHomeActionKickOrPass, IMessage>
 	{
 		@Override
-		public MessageHomeActionReply onMessage(MessageHomeActionKickOrPass message, MessageContext ctx)
+		public IMessage onMessage(MessageHomeActionKickOrPass message, MessageContext ctx)
 		{
 			EntityPlayerMP player = ctx.getServerHandler().player;
 			CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
@@ -60,17 +60,21 @@ public class MessageHomeActionKickOrPass implements IMessage
 				return null;
 			Area area = cap.intersectingArea(message.pos);
 			if(!Utils.canPlayerEditArea(area, player, player.world.getMinecraftServer()))
-				return null;
+				return new MessageHomeActionReplyError("message.error.noPerm");
 			UUID uuid = message.uuid;
 			GameProfile profile = player.world.getMinecraftServer().getPlayerProfileCache().getProfileByUUID(uuid);
 			if(profile == null)
-				return null;
+				return new MessageHomeActionReplyError("message.error.noPlayer");
 
 			boolean changed = true;
 			if(message.isPass)
 				area.setOwner(uuid);
 			else
+			{
 				changed = area.removeMember(uuid);
+				if(changed)
+					cap.decreasePlayerAreasNum(uuid);
+			}
 			if(changed)
 			{
 				cap.dataChanged();

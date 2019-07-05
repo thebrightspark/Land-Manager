@@ -46,10 +46,10 @@ public class MessageHomeActionAdd implements IMessage
 		ByteBufUtils.writeUTF8String(buf, name);
 	}
 
-	public static class Handler implements IMessageHandler<MessageHomeActionAdd, MessageHomeActionReply>
+	public static class Handler implements IMessageHandler<MessageHomeActionAdd, IMessage>
 	{
 		@Override
-		public MessageHomeActionReply onMessage(MessageHomeActionAdd message, MessageContext ctx)
+		public IMessage onMessage(MessageHomeActionAdd message, MessageContext ctx)
 		{
 			EntityPlayerMP player = ctx.getServerHandler().player;
 			CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
@@ -57,21 +57,24 @@ public class MessageHomeActionAdd implements IMessage
 				return null;
 			Area area = cap.intersectingArea(message.pos);
 			if(!Utils.canPlayerEditArea(area, player, player.world.getMinecraftServer()))
-				return null;
+				return new MessageHomeActionReplyError("message.error.noPerm");
 			PlayerProfileCache cache = player.world.getMinecraftServer().getPlayerProfileCache();
 			if(!ArrayUtils.contains(cache.getUsernames(), message.name.toLowerCase(Locale.ROOT)))
-				return null;
+				return new MessageHomeActionReplyError("message.error.noPlayerName", message.name);
 			GameProfile profile = cache.getGameProfileForUsername(message.name);
 			if(profile == null)
-				return null;
+				return new MessageHomeActionReplyError("message.error.noPlayerName", message.name);
 
 			UUID uuid = profile.getId();
+			if(!cap.canJoinArea(uuid))
+				return new MessageHomeActionReplyError("message.error.cantJoin", message.name);
 			if(area.addMember(uuid))
 			{
+				cap.increasePlayerAreasNum(uuid);
 				cap.dataChanged();
 				return new MessageHomeActionReply(HomeGuiActionType.ADD, uuid, profile.getName());
 			}
-			return null;
+			return new MessageHomeActionReplyError("message.error.alreadyMember", message.name);
 		}
 	}
 }

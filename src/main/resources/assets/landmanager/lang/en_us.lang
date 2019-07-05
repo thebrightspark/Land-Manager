@@ -29,6 +29,12 @@ message.protection.place=Cannot place blocks in this area!
 message.protection.interact=Cannot interact with blocks in this area!
 message.home.none=This Home Block is not within an area!
 message.home.notMember=You are not a member of this area!
+message.error.maxJoined=You can't join any more areas! You are a member of %s areas.
+message.error.noPerm=You do not have permission to edit this area
+message.error.noPlayerName=Can't find the player '%s'
+message.error.noPlayer=Can't find the player
+message.error.cantJoin=The player '%s' can't join any more areas
+message.error.alreadyMember=The player %s is already a member of this area
 message.misc.true=True
 message.misc.false=False
 

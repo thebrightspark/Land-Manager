@@ -72,12 +72,19 @@ public class CommandMembers extends CommandTreeBase
 				throwWrongUsage(sender);
 
 			Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
+			CapabilityAreas areas = pair.getLeft();
 			checkCanEditArea(server, sender, pair.getRight());
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
+			if(!areas.canJoinArea(uuid))
+			{
+				player.sendMessage(new TextComponentTranslation("message.error.maxJoined", areas.getNumAreasJoined(uuid)));
+				return;
+			}
+
 			if(pair.getRight().addMember(uuid))
 			{
-				pair.getLeft().dataChanged();
+				areas.dataChanged();
 				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player.getDisplayName(), pair.getRight().getName()));
 			}
 			else

@@ -84,6 +84,11 @@ public class LMGui extends GuiScreen
 		drawString(text, x, y, colour, shadow);
 	}
 
+	protected void drawCenteredString(String text, int x, int y, int colour)
+	{
+		drawCenteredString(fontRenderer, text, x, y, colour);
+	}
+
 	protected class LMButton extends GuiButton
 	{
 		protected final int iconX, iconY;

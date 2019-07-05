@@ -16,6 +16,13 @@ public class LMConfig
     @Config.Comment("Whether non-op players in creative can break/place blocks in any area")
     public static boolean creativeIgnoresProtection = true;
 
+    @Config.Comment({
+	    "The max number of areas a player can own",
+	    "Use -1 for no limit"
+    })
+    @Config.RangeInt(min = -1)
+    public static int maxAreasCanOwn = -1;
+
     @Config.Comment("Max number of logs stored")
     public static int logStorageSize = 50;
 
@@ -31,6 +38,7 @@ public class LMConfig
     public static class Client
     {
         @Config.Comment("The radius within which nearby areas will show when /lmShow is showing all nearby areas")
+        @Config.RangeInt(min = 0)
         public int showAllRadius = 16;
 
         @Config.Comment("The scale of the area label that's rendered")
