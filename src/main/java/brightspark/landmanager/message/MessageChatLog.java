@@ -1,8 +1,10 @@
 package brightspark.landmanager.message;
 
 import brightspark.landmanager.LMConfig;
+import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.logs.AreaLog;
 import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.EncoderException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -33,7 +35,13 @@ public class MessageChatLog implements IMessage
     @Override
     public void toBytes(ByteBuf buf)
     {
-        log = new AreaLog(ByteBufUtils.readTag(buf));
+        try
+        {
+          log = new AreaLog(ByteBufUtils.readTag(buf));
+        } catch(EncoderException e) {
+          LandManager.LOGGER.warn("Unable to deserialize AreaLog's NBTCompound");
+          log = null;
+        }
     }
 
     public static class Handler implements IMessageHandler<MessageChatLog, IMessage>
@@ -49,6 +57,7 @@ public class MessageChatLog implements IMessage
                     if(LMConfig.client.showChatLogs)
                     {
                         AreaLog log = message.log;
+                        if(log == null) return;
                         ITextComponent text = new TextComponentString(log.getTimeString());
                         text.getStyle().setColor(TextFormatting.GRAY);
                         ITextComponent typeComp = new TextComponentTranslation(log.getType().getUnlocalisedName());
