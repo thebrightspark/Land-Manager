@@ -63,7 +63,11 @@ public class LandManager
 
     private static <REQ extends IMessage, REPLY extends IMessage> void regMessage(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> requestMessageType, Side side)
     {
-        NETWORK.registerMessage(messageHandler, requestMessageType, messageId++, side);
+        if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER && side == Side.SERVER) {
+          NETWORK.registerMessage(messageHandler, requestMessageType, messageId++, side);
+        } else if(FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+          NETWORK.registerMessage(messageHandler, requestMessageType, messageId++, side);
+        else return;
     }
 
     @Mod.EventHandler
