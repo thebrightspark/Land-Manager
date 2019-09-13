@@ -3,7 +3,9 @@ package brightspark.landmanager.command.nonop;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -18,6 +20,11 @@ import java.util.stream.Collectors;
 //lm area <areaName>
 public class CommandArea extends LMCommandArea
 {
+    public CommandArea()
+    {
+        setCanHaveNoArg();
+    }
+
     @Override
     public String getName()
     {
@@ -31,8 +38,13 @@ public class CommandArea extends LMCommandArea
     }
 
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap)
-    {
+    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException {
+        if (area == null) {
+            //Get the area the player is standing in
+            validateSenderIsPlayer(sender);
+            area = getAreaStandingIn((EntityPlayer) sender);
+        }
+
         //Get owner
         ITextComponent ownerName;
         String ownerNameString = getPlayerNameFromUuid(server, area.getOwner());

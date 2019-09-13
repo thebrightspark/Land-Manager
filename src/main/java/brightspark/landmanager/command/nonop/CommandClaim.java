@@ -12,7 +12,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -53,13 +52,7 @@ public class CommandClaim extends LMCommandArea
         {
             //Get the area the player is standing in
             cap = getWorldCapForPlayer(player);
-            BlockPos playerPos = player.getPosition();
-            area = cap.intersectingArea(playerPos);
-            if(area == null)
-            {
-                player.sendMessage(new TextComponentTranslation("lm.command.claim.none"));
-                return;
-            }
+            area = getAreaStandingIn(cap, player);
         }
 
         String areaName = area.getName();

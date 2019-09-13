@@ -52,6 +52,7 @@ lm.command.data=Failed to get areas from the world with dimension id %s
 lm.command.reqdata=Failed to get requests data
 lm.command.page=Page: %s
 lm.command.noPerm=You do not have permission to edit the area '%s'!
+lm.command.notInArea=You are not standing in an area!
 
 ##Non-op Commands
 
@@ -77,7 +78,6 @@ lm.command.areas.title=Areas - Page %s / %s
 #Claim
 lm.command.claim.usage=Use "/lm claim [areaName]" to claim an area. Providing no area will try claiming the area you're standing in
 lm.command.claim.disabled=Area claiming is not enabled! Ask an OP to allocate you an area.
-lm.command.claim.none=There is no area where you are standing!
 lm.command.claim.claimed=Area %s claimed
 lm.command.claim.already=Someone else has already claimed area %s
 lm.command.claim.request.success=Claim request successfully created for area %s

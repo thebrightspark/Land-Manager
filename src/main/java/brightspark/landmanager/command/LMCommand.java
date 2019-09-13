@@ -131,6 +131,19 @@ public abstract class LMCommand extends CommandBase
         return areaNames;
     }
 
+    protected Area getAreaStandingIn(EntityPlayer player) throws CommandException
+    {
+        return getAreaStandingIn(getWorldCapForPlayer(player), player);
+    }
+
+    protected Area getAreaStandingIn(CapabilityAreas cap, EntityPlayer player) throws CommandException
+    {
+        Area area = cap.intersectingArea(player.getPosition());
+        if (area == null)
+            throw new CommandException("lm.command.notInArea");
+        return area;
+    }
+
     protected String getPlayerNameFromUuid(MinecraftServer server, UUID uuid)
     {
         String playerName = null;
