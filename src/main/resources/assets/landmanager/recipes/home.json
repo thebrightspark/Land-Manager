@@ -1,0 +1,21 @@
+{
+    "type": "forge:ore_shaped",
+    "pattern": [
+        "W",
+        "C"
+    ],
+    "key": {
+        "W": {
+            "type": "forge:ore_dict",
+            "ore": "carpet"
+        },
+        "C": {
+            "type": "forge:ore_dict",
+            "ore": "workbench"
+        }
+    },
+    "result": {
+        "item": "landmanager:home",
+        "data": 0
+    }
+}
