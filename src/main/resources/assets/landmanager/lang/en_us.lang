@@ -4,7 +4,7 @@ itemGroup.landmanager=Land Manager
 
 ####Item
 
-item.admin.name=Admin Tool
+item.admin.name=Area Creation Tool
 item.admin.tooltip.notset=First position not set
 item.admin.tooltip.set=Dim Id: %d, BlockPos: %s
 
