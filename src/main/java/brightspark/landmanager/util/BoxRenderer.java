@@ -7,7 +7,6 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -124,15 +123,16 @@ public class BoxRenderer
 		if(LMConfig.client.areaBoxAlpha > 0f)
 		{
 			GlStateManager.enableDepth();
-			RenderGlobal.renderFilledBox(box, rgb[0], rgb[1], rgb[2], LMConfig.client.areaBoxAlpha);
+			GlStateManager.color(rgb[0], rgb[1], rgb[2], LMConfig.client.areaBoxAlpha);
+			renderSides(box);
 			GlStateManager.disableDepth();
 		}
 		if(LMConfig.client.areaBoxEdgeThickness > 0f)
 		{
 			GlStateManager.color(rgb[0], rgb[1], rgb[2], 1f);
 			renderBoxEdges(box);
-			GlStateManager.color(1f, 1f, 1f);
 		}
+		GlStateManager.color(1f, 1f, 1f);
 		Vec3d playerPos = player.getPositionEyes((float) partialTicks);
 		Vec3d nameRenderPos = box.getCenter();
 		nameRenderPos = new Vec3d(nameRenderPos.x, MathHelper.clamp(playerPos.y, box.minY + 0.5d, box.maxY - 0.5d), nameRenderPos.z);
@@ -141,6 +141,87 @@ public class BoxRenderer
 		GlStateManager.enableLighting();
 		GlStateManager.enableDepth();
 		GlStateManager.popMatrix();
+	}
+
+	private static void renderSides(AxisAlignedBB box)
+	{
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder buffer = tessellator.getBuffer();
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+
+		//North inside
+		buffer.pos(box.maxX, box.minY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.minX, box.minY, box.minZ).endVertex();
+
+		//South inside
+		buffer.pos(box.minX, box.minY, box.maxZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.minY, box.maxZ).endVertex();
+
+		//East inside
+		buffer.pos(box.minX, box.minY, box.minZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.minX, box.minY, box.maxZ).endVertex();
+
+		//West inside
+		buffer.pos(box.maxX, box.minY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.minY, box.minZ).endVertex();
+
+		//Down inside
+		buffer.pos(box.minX, box.minY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.minY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.minY, box.minZ).endVertex();
+		buffer.pos(box.minX, box.minY, box.minZ).endVertex();
+
+		//Up inside
+		buffer.pos(box.minX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.maxZ).endVertex();
+
+		//North outside
+		buffer.pos(box.minX, box.minY, box.minZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.minY, box.minZ).endVertex();
+
+		//South outside
+		buffer.pos(box.maxX, box.minY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.minX, box.minY, box.maxZ).endVertex();
+
+		//East outside
+		buffer.pos(box.minX, box.minY, box.maxZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.minX, box.minY, box.minZ).endVertex();
+
+		//West outside
+		buffer.pos(box.maxX, box.minY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.minY, box.maxZ).endVertex();
+
+		//Down outside
+		buffer.pos(box.minX, box.minY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.minY, box.minZ).endVertex();
+		buffer.pos(box.maxX, box.minY, box.maxZ).endVertex();
+		buffer.pos(box.minX, box.minY, box.maxZ).endVertex();
+
+		//Up outside
+		buffer.pos(box.minX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
+		buffer.pos(box.maxX, box.maxY, box.minZ).endVertex();
+		buffer.pos(box.minX, box.maxY, box.minZ).endVertex();
+
+		tessellator.draw();
 	}
 
 	private static void renderBoxEdges(AxisAlignedBB box)
