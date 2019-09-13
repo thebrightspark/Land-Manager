@@ -61,9 +61,25 @@ public class LandManager
         }
     };
 
-    private static <REQ extends IMessage, REPLY extends IMessage> void regMessage(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> requestMessageType, Side side)
+    private static <REQ extends IMessage, REPLY extends IMessage> void regMessage(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler, Class<REQ> requestMessageType, Side receivingSide, Side thisSide)
     {
-        NETWORK.registerMessage(messageHandler, requestMessageType, messageId++, side);
+        IMessageHandler<? super REQ, ? extends REPLY> handler =
+            thisSide == Side.CLIENT || (receivingSide == Side.SERVER && thisSide == Side.SERVER) ?
+                instantiate(messageHandler) :
+                new DummyHandler<>();
+        NETWORK.registerMessage(handler, requestMessageType, messageId++, receivingSide);
+    }
+
+    private static <REQ extends IMessage, REPLY extends IMessage> IMessageHandler<? super REQ, ? extends REPLY> instantiate(Class<? extends IMessageHandler<? super REQ, ? extends REPLY>> handler)
+    {
+        try
+        {
+            return handler.newInstance();
+        }
+        catch (ReflectiveOperationException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Mod.EventHandler
@@ -71,20 +87,21 @@ public class LandManager
     {
         LOGGER = event.getModLog();
 
+        Side side = FMLCommonHandler.instance().getEffectiveSide();
         NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());
         NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
-        regMessage(MessageCreateArea.Handler.class, MessageCreateArea.class, Side.SERVER);
-        regMessage(MessageCreateAreaReply.Handler.class, MessageCreateAreaReply.class, Side.CLIENT);
-        regMessage(MessageUpdateCapability.Handler.class, MessageUpdateCapability.class, Side.CLIENT);
-        regMessage(MessageShowArea.Handler.class, MessageShowArea.class, Side.CLIENT);
-        regMessage(MessageChatLog.Handler.class, MessageChatLog.class, Side.CLIENT);
-        regMessage(MessageOpenHomeGui.Handler.class, MessageOpenHomeGui.class, Side.CLIENT);
-        regMessage(MessageHomeActionKickOrPass.Handler.class, MessageHomeActionKickOrPass.class, Side.SERVER);
-        regMessage(MessageHomeActionAdd.Handler.class, MessageHomeActionAdd.class, Side.SERVER);
-        regMessage(MessageHomeActionReply.Handler.class, MessageHomeActionReply.class, Side.CLIENT);
-        regMessage(MessageHomeToggle.Handler.class, MessageHomeToggle.class, Side.SERVER);
-        regMessage(MessageHomeToggleReply.Handler.class, MessageHomeToggleReply.class, Side.CLIENT);
-        regMessage(MessageHomeActionReplyError.Handler.class, MessageHomeActionReplyError.class, Side.CLIENT);
+        regMessage(MessageCreateArea.Handler.class, MessageCreateArea.class, Side.SERVER, side);
+        regMessage(MessageCreateAreaReply.Handler.class, MessageCreateAreaReply.class, Side.CLIENT, side);
+        regMessage(MessageUpdateCapability.Handler.class, MessageUpdateCapability.class, Side.CLIENT, side);
+        regMessage(MessageShowArea.Handler.class, MessageShowArea.class, Side.CLIENT, side);
+        regMessage(MessageChatLog.Handler.class, MessageChatLog.class, Side.CLIENT, side);
+        regMessage(MessageOpenHomeGui.Handler.class, MessageOpenHomeGui.class, Side.CLIENT, side);
+        regMessage(MessageHomeActionKickOrPass.Handler.class, MessageHomeActionKickOrPass.class, Side.SERVER, side);
+        regMessage(MessageHomeActionAdd.Handler.class, MessageHomeActionAdd.class, Side.SERVER, side);
+        regMessage(MessageHomeActionReply.Handler.class, MessageHomeActionReply.class, Side.CLIENT, side);
+        regMessage(MessageHomeToggle.Handler.class, MessageHomeToggle.class, Side.SERVER, side);
+        regMessage(MessageHomeToggleReply.Handler.class, MessageHomeToggleReply.class, Side.CLIENT, side);
+        regMessage(MessageHomeActionReplyError.Handler.class, MessageHomeActionReplyError.class, Side.CLIENT, side);
 
         CapabilityManager.INSTANCE.register(CapabilityAreas.class, new CapStorage<>(), CapabilityAreasImpl::new);
     }
