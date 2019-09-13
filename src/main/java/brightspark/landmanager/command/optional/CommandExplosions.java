@@ -29,6 +29,12 @@ public class CommandExplosions extends LMCommandArea
     }
 
     @Override
+    public int getRequiredPermissionLevel()
+    {
+        return getPermissionLevel(LMConfig.permissions.explosions);
+    }
+
+    @Override
     public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException
     {
         checkCanEditArea(server, sender, area);

@@ -38,6 +38,17 @@ import java.util.regex.Pattern;
 
 public abstract class LMCommand extends CommandBase
 {
+	@Override
+	public int getRequiredPermissionLevel()
+	{
+		return 0;
+	}
+
+	protected int getPermissionLevel(boolean config)
+    {
+        return config ? 0 : 2;
+    }
+
     protected CapabilityAreas getWorldCap(World world) throws CommandException
     {
         CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);

@@ -29,6 +29,12 @@ public class CommandDelete extends LMCommandArea
     }
 
     @Override
+    public int getRequiredPermissionLevel()
+    {
+        return 2;
+    }
+
+    @Override
     public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap)
     {
         if(cap.removeArea(area.getName()))

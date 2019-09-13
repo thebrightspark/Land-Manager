@@ -28,6 +28,12 @@ public class CommandTool extends LMCommand
     }
 
     @Override
+    public int getRequiredPermissionLevel()
+    {
+        return getPermissionLevel(LMConfig.permissions.tool);
+    }
+
+    @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
         validateSenderIsPlayer(sender);
