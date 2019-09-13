@@ -4,6 +4,7 @@ import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.data.areas.Area;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import java.util.List;
@@ -58,10 +59,7 @@ public class CommandAreas extends LMCommand
 		sender.sendMessage(createListMessage(sender, areas, area ->
 		{
 			String ownerName = getPlayerNameFromUuid(server, area.getOwner());
-			if(ownerName == null)
-				return "  " + area.getName();
-			else
-				return String.format("  %s -> %s", area.getName(), ownerName);
+			return new TextComponentString(ownerName == null ? "  " + area.getName() : String.format("  %s -> %s", area.getName(), ownerName));
 		}, page, "lm.command.areas.title", pageNum -> "/lm areas " + pageNum + finalAreaName));
 	}
 }

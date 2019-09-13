@@ -242,11 +242,11 @@ public abstract class LMCommand extends CommandBase
     //----==== Paged Lists ====----//
     //----====|||||||||||||====----//
 
-    protected <T> ITextComponent createListMessage(ICommandSender sender, List<T> list, @Nullable Function<T, String> entryToString, int page, String titleKey, Function<Integer, String> arrowsCommandToRun)
+    protected <T> ITextComponent createListMessage(ICommandSender sender, List<T> list, @Nullable Function<T, ITextComponent> entryToTextComp, int page, String titleKey, Function<Integer, String> arrowsCommandToRun)
     {
-        if(entryToString == null)
-            entryToString = T::toString;
-        Function<T, String> finalEntryToString = entryToString;
+        if(entryToTextComp == null)
+            entryToTextComp = entry -> new TextComponentString(entry.toString());
+        Function<T, ITextComponent> finalEntryToTextComp = entryToTextComp;
 
         //Get the list of exactly what to show
         ListView<T> view = getListView(list, page, 8);
@@ -266,7 +266,7 @@ public abstract class LMCommand extends CommandBase
             text.appendSibling(createPageTitle(titleKey, page, maxPage));
         }
 
-        view.getList().forEach(entry -> text.appendText("\n").appendText(finalEntryToString.apply(entry)));
+        view.getList().forEach(entry -> text.appendText("\n").appendSibling(finalEntryToTextComp.apply(entry)));
 
         //Don't need to add the arrows when sending back to a server console
         if(isPlayer)

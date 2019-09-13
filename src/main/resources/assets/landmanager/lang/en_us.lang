@@ -138,6 +138,8 @@ lm.command.disapprove.playerMessage=Your request for area %s has been disapprove
 lm.command.requests.usage=Use "/lm op requests [page] [areaNameRegex]". You can display requests for an area without providing the page
 lm.command.requests.none=No requests found
 lm.command.requests.title=Requests - Page %s / %s
+lm.command.requests.approve=Approve request %s
+lm.command.requests.disapprove=Disapprove request %s
 
 ##Optional Commands
 

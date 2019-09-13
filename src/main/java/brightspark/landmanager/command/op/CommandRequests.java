@@ -7,7 +7,12 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.StringUtils;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -65,7 +70,25 @@ public class CommandRequests extends LMCommand
 
 		//Send message back to sender
 		sender.sendMessage(createListMessage(sender, requests, req ->
-				String.format("%s: %s -> %s [%s]", req.getId(), req.getPlayerName(server), req.getAreaName(), req.getDate()),
+			{
+				int reqId = req.getId();
+				return new TextComponentString(reqId + ": ")
+					.appendSibling(createAction(true, reqId))
+					.appendText(" ")
+					.appendSibling(createAction(false, reqId))
+					.appendText(String.format(" %s -> %s [%s]", req.getPlayerName(server), req.getAreaName(), req.getDate()));
+			},
 			page, "lm.command.requests.title", pageNum -> "/lm op requests " + pageNum + finalAreaName));
+	}
+
+	private ITextComponent createAction(boolean approve, int requestId)
+	{
+		String actionName = approve ? "approve" : "disapprove";
+		ITextComponent text = new TextComponentString("[" + (approve ? "/" : "X") + "]");
+		text.getStyle()
+			.setColor(approve ? TextFormatting.GREEN : TextFormatting.RED)
+			.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentTranslation("lm.command.requests." + actionName, requestId)))
+			.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.format("/lm op %s %s", actionName, requestId)));
+		return text;
 	}
 }
