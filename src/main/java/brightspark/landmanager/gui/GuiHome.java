@@ -149,11 +149,13 @@ public class GuiHome extends LMGui
 		input = new GuiTextField(0, fontRenderer, guiLeft + 99, guiTop + 15, 56, 10);
 		input.setEnableBackgroundDrawing(false);
 
+		listButtons.clear();
 		for(int i = 0; i < PLAYER_LIST_SIZE; i++)
 			listButtons.add(addButton(new ListButton(7, 16 + (i * 12))));
 
 		upButton = addButton(new ArrowButton(97, 29, true));
 		downButton = addButton(new ArrowButton(97, 52, false));
+		updatePlayerList();
 
 		addButton = addButton(new ActionButton(111, 29, "gui.home.add", HomeGuiActionType.ADD));
 		kickButton = addButton(new ActionButton(111, 41, "gui.home.kick", HomeGuiActionType.KICK));
@@ -166,6 +168,7 @@ public class GuiHome extends LMGui
 		passivesToggle = addButton(new ToggleButton(HomeGuiToggleType.PASSIVE_SPAWNS, 108, 98, area.canPassiveSpawn()));
 		hostilesToggle = addButton(new ToggleButton(HomeGuiToggleType.HOSTILE_SPAWNS, 108, 112, area.canHostileSpawn()));
 		explosionsToggle = addButton(new ToggleButton(HomeGuiToggleType.EXPLOSIONS, 108, 126, area.canExplosionsCauseDamage()));
+		updateToggleButtons();
 	}
 
 	@Override
@@ -345,6 +348,7 @@ public class GuiHome extends LMGui
 			super(x, y, 87, 11, 87, 144, null);
 			textOffset = 1;
 			drawWhenDisabled = false;
+			hasIcon = false;
 		}
 
 		@Override
