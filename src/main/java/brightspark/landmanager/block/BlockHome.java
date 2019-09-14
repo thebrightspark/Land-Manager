@@ -37,7 +37,7 @@ public class BlockHome extends Block
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
-		if(!world.isRemote && world instanceof WorldServer && player instanceof EntityPlayerMP && !player.isSneaking())
+		if(!world.isRemote && world instanceof WorldServer && player instanceof EntityPlayerMP && !player.isSneaking() && hand == EnumHand.MAIN_HAND)
 		{
 			CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
 			if(cap == null)
