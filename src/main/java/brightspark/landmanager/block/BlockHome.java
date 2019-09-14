@@ -57,7 +57,8 @@ public class BlockHome extends Block
 					.map(uuid -> new ImmutablePair<>(uuid, Utils.getPlayerName(server, uuid)))
 					.filter(pair -> pair.getLeft() != null)
 					.collect(Collectors.toList());
-				Pair<UUID, String> owner = new ImmutablePair<>(area.getOwner(), Utils.getPlayerName(server, area.getOwner()));
+				UUID ownerUuid = area.getOwner();
+				Pair<UUID, String> owner = ownerUuid == null ? null : new ImmutablePair<>(ownerUuid, Utils.getPlayerName(server, ownerUuid));
 				LandManager.NETWORK.sendTo(new MessageOpenHomeGui(pos, Utils.isOp(server, player), owner, members), (EntityPlayerMP) player);
 			}
 		}
