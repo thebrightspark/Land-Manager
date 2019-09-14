@@ -10,26 +10,28 @@ import brightspark.landmanager.message.MessageHomeActionKickOrPass;
 import brightspark.landmanager.message.MessageHomeToggle;
 import brightspark.landmanager.util.HomeGuiActionType;
 import brightspark.landmanager.util.HomeGuiToggleType;
+import com.google.common.collect.Lists;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
 
+import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class GuiHome extends LMGui
 {
 	private static final int PLAYER_LIST_SIZE = 4;
+	private static final Rectangle ownerIcon = new Rectangle(162, 110, 7, 7);
 
 	private boolean clientIsOp = false;
 	private boolean isOwner;
@@ -37,6 +39,7 @@ public class GuiHome extends LMGui
 	private Area area = null;
 	private GuiTextField input;
 	private int playerListStartIndex = 0;
+	private Pair<UUID, String> owner;
 	private List<Pair<UUID, String>> members;
 
 	private List<ListButton> listButtons = new ArrayList<>(PLAYER_LIST_SIZE);
@@ -66,9 +69,11 @@ public class GuiHome extends LMGui
 	/**
 	 * Used by {@link brightspark.landmanager.message.MessageOpenHomeGui} to set the members data
 	 */
-	public void setMembersData(List<Pair<UUID, String>> members)
+	public void setMembersData(Pair<UUID, String> owner, List<Pair<UUID, String>> members)
 	{
+		this.owner = owner;
 		this.members = members;
+		this.members.add(owner);
 		updatePlayerList();
 	}
 
@@ -254,7 +259,7 @@ public class GuiHome extends LMGui
 				case KICK:
 				case PASS:
 					UUID memberUuid = selectedMemberIndex >= 0 ? members.get(selectedMemberIndex).getLeft() : null;
-					if(memberUuid != null)
+					if(memberUuid != null && !memberUuid.equals(owner.getLeft()))
 						LandManager.NETWORK.sendToServer(new MessageHomeActionKickOrPass(pos, type == HomeGuiActionType.PASS, memberUuid));
 					break;
 				case ADD:
@@ -298,7 +303,7 @@ public class GuiHome extends LMGui
 			return;
 
 		//Update members list
-		members.sort(Comparator.comparing(Pair::getRight));
+		members.sort(Comparator.comparing(Pair::getRight, String::compareToIgnoreCase));
 		int membersSize = members.size();
 		for(int i = 0; i < PLAYER_LIST_SIZE; i++)
 		{
@@ -316,7 +321,7 @@ public class GuiHome extends LMGui
 	private void updateActionButtons()
 	{
 		addButton.enabled = StringUtils.isNotBlank(input.getText());
-		kickButton.enabled = passButton.enabled = selectedMemberIndex >= 0;
+		kickButton.enabled = passButton.enabled = selectedMemberIndex >= 0 && !members.get(selectedMemberIndex).getLeft().equals(owner.getLeft());
 	}
 
 	private void updateToggleButtons()
@@ -333,7 +338,9 @@ public class GuiHome extends LMGui
 
 	private class ListButton extends LMButton
 	{
-		public ListButton(int x, int y)
+		private boolean isOwner = false;
+
+		ListButton(int x, int y)
 		{
 			super(x, y, 87, 11, 87, 144, null);
 			textOffset = 1;
@@ -352,11 +359,18 @@ public class GuiHome extends LMGui
 			{
 				displayString = null;
 				enabled = false;
+				isOwner = false;
+				tooltip = null;
 			}
 			else
 			{
 				displayString = player.getRight();
 				enabled = true;
+				isOwner = player.getLeft().equals(owner.getLeft());
+				textOffset = isOwner ? 12 : 1;
+				tooltip = isOwner ?
+					Lists.newArrayList(TextFormatting.GOLD + I18n.format("gui.home.owner"), displayString) :
+					Collections.singletonList(displayString);
 			}
 		}
 
@@ -368,7 +382,12 @@ public class GuiHome extends LMGui
 		@Override
 		protected void drawText()
 		{
-			drawStringWithMaxWidth(displayString, x + textOffset, y + (height - 8) / 2, 85, getTextColour(), true);
+			if(isOwner)
+			{
+				mc.getTextureManager().bindTexture(image);
+				drawTexturedModalRect(x + 1, y + 1, ownerIcon.x, ownerIcon.y, ownerIcon.width, ownerIcon.height);
+			}
+			drawStringWithMaxWidth(displayString, x + textOffset, y + (height - 8) / 2, 85 - textOffset, getTextColour(), true);
 		}
 	}
 
@@ -376,7 +395,7 @@ public class GuiHome extends LMGui
 	{
 		private boolean isUp;
 
-		public ArrowButton(int x, int y, boolean isUp)
+		ArrowButton(int x, int y, boolean isUp)
 		{
 			super(x, y, 10, 13, 162, 84, null);
 			this.isUp = isUp;
@@ -398,7 +417,7 @@ public class GuiHome extends LMGui
 	{
 		private final HomeGuiActionType type;
 
-		public ActionButton(int x, int y, String buttonText, HomeGuiActionType type)
+		ActionButton(int x, int y, String buttonText, HomeGuiActionType type)
 		{
 			super(x, y, 45, 12, 162, 0, I18n.format(buttonText));
 			this.type = type;
@@ -417,7 +436,7 @@ public class GuiHome extends LMGui
 		public final HomeGuiToggleType type;
 		public boolean isOn;
 
-		public ToggleButton(HomeGuiToggleType type, int x, int y, boolean isOn)
+		ToggleButton(HomeGuiToggleType type, int x, int y, boolean isOn)
 		{
 			super(x, y, 12, 12, 162, 36, null);
 			this.enabled = false;

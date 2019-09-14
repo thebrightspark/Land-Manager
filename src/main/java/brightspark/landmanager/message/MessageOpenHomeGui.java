@@ -23,14 +23,16 @@ public class MessageOpenHomeGui implements IMessage
 {
 	private BlockPos pos;
 	private boolean isOp;
+	private Pair<UUID, String> owner;
 	private List<Pair<UUID, String>> members;
 
 	public MessageOpenHomeGui() {}
 
-	public MessageOpenHomeGui(BlockPos pos, boolean isOp, List<Pair<UUID, String>> members)
+	public MessageOpenHomeGui(BlockPos pos, boolean isOp, Pair<UUID, String> owner, List<Pair<UUID, String>> members)
 	{
 		this.pos = pos;
 		this.isOp = isOp;
+		this.owner = owner;
 		this.members = members;
 	}
 
@@ -39,13 +41,24 @@ public class MessageOpenHomeGui implements IMessage
 	{
 		pos = BlockPos.fromLong(buf.readLong());
 		isOp = buf.readBoolean();
+		long most, least;
+		String name;
+		if(buf.readBoolean())
+		{
+			most = buf.readLong();
+			least = buf.readLong();
+			name = ByteBufUtils.readUTF8String(buf);
+			owner = new ImmutablePair<>(new UUID(most, least), name);
+		}
+		else
+			owner = null;
 		int membersSize = buf.readInt();
 		members = new LinkedList<>();
 		for(int i = 0; i < membersSize; i++)
 		{
-			long most = buf.readLong();
-			long least = buf.readLong();
-			String name = ByteBufUtils.readUTF8String(buf);
+			most = buf.readLong();
+			least = buf.readLong();
+			name = ByteBufUtils.readUTF8String(buf);
 			members.add(new ImmutablePair<>(new UUID(most, least), name));
 		}
 	}
@@ -55,6 +68,14 @@ public class MessageOpenHomeGui implements IMessage
 	{
 		buf.writeLong(pos.toLong());
 		buf.writeBoolean(isOp);
+		boolean hasOwner = owner != null;
+		buf.writeBoolean(hasOwner);
+		if(hasOwner)
+		{
+			buf.writeLong(owner.getLeft().getMostSignificantBits());
+			buf.writeLong(owner.getLeft().getLeastSignificantBits());
+			ByteBufUtils.writeUTF8String(buf, owner.getRight());
+		}
 		buf.writeInt(members.size());
 		members.forEach(pair ->
 		{
@@ -77,7 +98,7 @@ public class MessageOpenHomeGui implements IMessage
 			if(gui instanceof GuiHome)
 			{
 				GuiHome guiHome = (GuiHome) gui;
-				guiHome.setMembersData(message.members);
+				guiHome.setMembersData(message.owner, message.members);
 				if(message.isOp)
 					guiHome.setClientIsOp();
 			}

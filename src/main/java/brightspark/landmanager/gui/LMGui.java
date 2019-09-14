@@ -63,7 +63,21 @@ public class LMGui extends GuiScreen
 
 	protected void drawText() {}
 
-	protected void drawTooltips(List<String> tooltip, int mouseX, int mouseY) {}
+	protected void drawTooltips(List<String> tooltip, int mouseX, int mouseY)
+	{
+		for(GuiButton button : buttonList)
+		{
+			if(button instanceof LMButton && button.isMouseOver())
+			{
+				List<String> buttonTooltip = ((LMButton) button).tooltip;
+				if(buttonTooltip != null)
+				{
+					tooltip.addAll(buttonTooltip);
+					break;
+				}
+			}
+		}
+	}
 
 	protected void drawString(String text, int x, int y, int colour, boolean shadow)
 	{
@@ -95,6 +109,7 @@ public class LMGui extends GuiScreen
 		protected boolean hasIcon = true;
 		protected boolean drawWhenDisabled = false;
 		protected int textOffset = 0;
+		protected List<String> tooltip = null;
 
 		public LMButton(int x, int y, int width, int height, int iconX, int iconY, String buttonText)
 		{

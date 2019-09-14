@@ -201,3 +201,4 @@ gui.home.interactions=Interact Permission
 gui.home.passives=Passive Spawning
 gui.home.hostiles=Hostiles Spawning
 gui.home.explosions=Explosions
+gui.home.owner=Owner
