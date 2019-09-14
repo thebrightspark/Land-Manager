@@ -4,10 +4,9 @@ import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.command.nonop.*;
 import brightspark.landmanager.command.optional.*;
 import net.minecraft.command.ICommandSender;
-import net.minecraftforge.server.command.CommandTreeBase;
 import net.minecraftforge.server.command.CommandTreeHelp;
 
-public class CommandLM extends CommandTreeBase
+public class CommandLM extends LMCommandTree
 {
     public CommandLM()
     {
@@ -47,11 +46,5 @@ public class CommandLM extends CommandTreeBase
     public String getUsage(ICommandSender sender)
     {
         return "lm.command.usage";
-    }
-
-    @Override
-    public int getRequiredPermissionLevel()
-    {
-        return 0;
     }
 }

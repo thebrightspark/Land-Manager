@@ -2,8 +2,10 @@ package brightspark.landmanager.util;
 
 import brightspark.landmanager.data.areas.Area;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.server.management.UserListOpsEntry;
@@ -51,5 +53,15 @@ public class Utils
 	{
 		GameProfile profile = server.getPlayerProfileCache().getProfileByUUID(uuid);
 		return profile == null ? null : profile.getName();
+	}
+
+	public static boolean checkCommandPermission(CommandBase command, MinecraftServer server, ICommandSender sender)
+	{
+		if(server.isSinglePlayer())
+			return true;
+		int requiredPermLevel = command.getRequiredPermissionLevel();
+		if(sender instanceof EntityPlayerMP)
+			return server.getPlayerList().getOppedPlayers().getPermissionLevel(((EntityPlayerMP) sender).getGameProfile()) >= requiredPermLevel;
+		return sender.canUseCommand(requiredPermLevel, command.getName());
 	}
 }

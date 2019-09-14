@@ -108,7 +108,7 @@ lm.command.show.usage=Use "/lm show [areaName]". Providing no area will show all
 lm.command.show.showing=Now showing area %s
 
 #Showoff
-lm.command.showoff.usage= Use "/lm showoff"
+lm.command.showoff.usage=Use "/lm showoff"
 lm.command.showoff=Not showing any areas
 
 ##Op Commands

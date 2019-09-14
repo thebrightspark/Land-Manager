@@ -44,6 +44,12 @@ public abstract class LMCommand extends CommandBase
 		return 0;
 	}
 
+	@Override
+	public boolean checkPermission(MinecraftServer server, ICommandSender sender)
+	{
+		return Utils.checkCommandPermission(this, server, sender);
+	}
+
 	protected int getPermissionLevel(boolean config)
     {
         return config ? 0 : 2;

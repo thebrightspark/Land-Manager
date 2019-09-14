@@ -1,6 +1,7 @@
 package brightspark.landmanager.command.nonop;
 
 import brightspark.landmanager.command.LMCommand;
+import brightspark.landmanager.command.LMCommandTree;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.util.Utils;
@@ -11,7 +12,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.server.command.CommandTreeBase;
 import net.minecraftforge.server.command.CommandTreeHelp;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 //lm members <add|remove> <areaName> <playerName>
-public class CommandMembers extends CommandTreeBase
+public class CommandMembers extends LMCommandTree
 {
 	public CommandMembers()
 	{
