@@ -163,7 +163,7 @@ public class GuiHome extends LMGui
 		updateActionButtons();
 
 		boundariesToggle = addButton(new ToggleButton(HomeGuiToggleType.BOUNDARIES, 108, 70, ClientEventHandler.isAreaBeingRendered(area.getName())));
-		boundariesToggle.enabled = true;
+		boundariesToggle.setEnabled(true);
 		interactionsToggle = addButton(new ToggleButton(HomeGuiToggleType.INTERACTIONS, 108, 84, area.canInteract()));
 		passivesToggle = addButton(new ToggleButton(HomeGuiToggleType.PASSIVE_SPAWNS, 108, 98, area.canPassiveSpawn()));
 		hostilesToggle = addButton(new ToggleButton(HomeGuiToggleType.HOSTILE_SPAWNS, 108, 112, area.canHostileSpawn()));
@@ -329,13 +329,13 @@ public class GuiHome extends LMGui
 
 	private void updateToggleButtons()
 	{
-		interactionsToggle.enabled = canUseToggle(LMConfig.permissions.interactions);
+		interactionsToggle.setEnabled(canUseToggle(LMConfig.permissions.interactions));
 		interactionsToggle.isOn = area.canInteract();
-		passivesToggle.enabled = canUseToggle(LMConfig.permissions.passiveSpawning);
+		passivesToggle.setEnabled(canUseToggle(LMConfig.permissions.passiveSpawning));
 		passivesToggle.isOn = area.canPassiveSpawn();
-		hostilesToggle.enabled = canUseToggle(LMConfig.permissions.hostileSpawning);
+		hostilesToggle.setEnabled(canUseToggle(LMConfig.permissions.hostileSpawning));
 		hostilesToggle.isOn = area.canHostileSpawn();
-		explosionsToggle.enabled = canUseToggle(LMConfig.permissions.explosions);
+		explosionsToggle.setEnabled(canUseToggle(LMConfig.permissions.explosions));
 		explosionsToggle.isOn = area.canExplosionsCauseDamage();
 	}
 
@@ -438,7 +438,7 @@ public class GuiHome extends LMGui
 	private class ToggleButton extends LMButton
 	{
 		public final HomeGuiToggleType type;
-		public boolean isOn;
+		boolean isOn;
 
 		ToggleButton(HomeGuiToggleType type, int x, int y, boolean isOn)
 		{
@@ -458,6 +458,12 @@ public class GuiHome extends LMGui
 			if(isOn)
 				y += height;
 			return y;
+		}
+
+		public void setEnabled(boolean enabled)
+		{
+			this.enabled = enabled;
+			this.tooltip = enabled ? null : Collections.singletonList(I18n.format("gui.home.toggleDisabled"));
 		}
 	}
 }

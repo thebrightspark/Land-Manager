@@ -202,3 +202,4 @@ gui.home.passives=Passive Spawning
 gui.home.hostiles=Hostiles Spawning
 gui.home.explosions=Explosions
 gui.home.owner=Owner
+gui.home.toggleDisabled=You don't have permission to change this!
