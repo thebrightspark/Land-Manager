@@ -48,7 +48,7 @@ public class CommandRename extends LMCommand
 		if(pair.getRight().setName(newName))
 		{
 			pair.getLeft().dataChanged();
-			sender.sendMessage(new TextComponentTranslation("lm.command.rename.success", newName));
+			sender.sendMessage(new TextComponentTranslation("lm.command.rename.success", oldName, newName));
 		}
 		else
 			sender.sendMessage(new TextComponentTranslation("lm.command.rename.invalid", newName));
