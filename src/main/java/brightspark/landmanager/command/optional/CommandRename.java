@@ -44,8 +44,9 @@ public class CommandRename extends LMCommand
 		Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
 		checkCanEditArea(server, sender, pair.getRight());
 
+		String oldName = pair.getRight().getName();
 		String newName = args[1];
-		if(pair.getRight().setName(newName))
+		if(pair.getLeft().renameArea(oldName, newName))
 		{
 			pair.getLeft().dataChanged();
 			sender.sendMessage(new TextComponentTranslation("lm.command.rename.success", oldName, newName));

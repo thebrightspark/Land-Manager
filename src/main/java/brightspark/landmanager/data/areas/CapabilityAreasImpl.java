@@ -59,6 +59,17 @@ public class CapabilityAreasImpl implements CapabilityAreas
     }
 
     @Override
+    public boolean renameArea(String oldName, String newName)
+    {
+        Area area = areas.remove(oldName);
+        if (area == null)
+            return false;
+        area.setName(newName);
+        areas.put(newName, area);
+        return true;
+    }
+
+    @Override
     public boolean setOwner(String areaName, UUID playerUuid)
     {
         Area area = getArea(areaName);
