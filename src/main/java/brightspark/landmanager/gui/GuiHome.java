@@ -60,6 +60,11 @@ public class GuiHome extends LMGui
 			area = cap.intersectingArea(pos);
 	}
 
+	private boolean isOwner(UUID uuid)
+	{
+		return owner != null && owner.getLeft().equals(uuid);
+	}
+
 	public void setClientIsOp()
 	{
 		clientIsOp = true;
@@ -262,7 +267,7 @@ public class GuiHome extends LMGui
 				case KICK:
 				case PASS:
 					UUID memberUuid = selectedMemberIndex >= 0 ? members.get(selectedMemberIndex).getLeft() : null;
-					if(memberUuid != null && !memberUuid.equals(owner.getLeft()))
+					if(!isOwner(memberUuid))
 						LandManager.NETWORK.sendToServer(new MessageHomeActionKickOrPass(pos, type == HomeGuiActionType.PASS, memberUuid));
 					break;
 				case ADD:
@@ -326,7 +331,7 @@ public class GuiHome extends LMGui
 	private void updateActionButtons()
 	{
 		addButton.enabled = StringUtils.isNotBlank(input.getText());
-		kickButton.enabled = passButton.enabled = selectedMemberIndex >= 0 && !members.get(selectedMemberIndex).getLeft().equals(owner.getLeft());
+		kickButton.enabled = passButton.enabled = selectedMemberIndex >= 0 && !isOwner(members.get(selectedMemberIndex).getLeft());
 	}
 
 	private void updateToggleButtons()
@@ -372,7 +377,7 @@ public class GuiHome extends LMGui
 			{
 				displayString = player.getRight();
 				enabled = true;
-				isOwner = player.getLeft().equals(owner.getLeft());
+				isOwner = isOwner(player.getLeft());
 				textOffset = isOwner ? 12 : 1;
 				tooltip = isOwner ?
 					Lists.newArrayList(TextFormatting.GOLD + I18n.format("gui.home.owner"), displayString) :
