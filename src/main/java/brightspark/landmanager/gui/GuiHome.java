@@ -305,6 +305,8 @@ public class GuiHome extends LMGui
 		if(members == null)
 			return;
 
+		members.removeIf(Objects::isNull);
+
 		//Update members list
 		members.sort(Comparator.comparing(Pair::getRight, String::compareToIgnoreCase));
 		int membersSize = members.size();

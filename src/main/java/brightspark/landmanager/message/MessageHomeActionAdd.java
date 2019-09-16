@@ -63,7 +63,7 @@ public class MessageHomeActionAdd implements IMessage
 			if(!ArrayUtils.contains(cache.getUsernames(), message.name.toLowerCase(Locale.ROOT)))
 				return new MessageHomeActionReplyError("message.error.noPlayerName", message.name);
 			GameProfile profile = cache.getGameProfileForUsername(message.name);
-			if(profile == null)
+			if(profile == null || profile.getId() == null || profile.getName() == null)
 				return new MessageHomeActionReplyError("message.error.noPlayerName", message.name);
 
 			UUID uuid = profile.getId();
