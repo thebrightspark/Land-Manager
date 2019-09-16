@@ -39,16 +39,12 @@ public class MessageUpdateCapability implements IMessage
         @Override
         public IMessage onMessage(MessageUpdateCapability message, MessageContext ctx)
         {
-            Minecraft.getMinecraft().addScheduledTask(new Runnable()
+            Minecraft.getMinecraft().addScheduledTask(() ->
             {
-                @Override
-                public void run()
-                {
-                    World world = Minecraft.getMinecraft().world;
-                    CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-                    if(cap != null)
-                        cap.deserializeNBT(message.nbt);
-                }
+                World world = Minecraft.getMinecraft().world;
+                CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
+                if(cap != null)
+                    cap.deserializeNBT(message.nbt);
             });
             return null;
         }

@@ -19,6 +19,8 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
 
     boolean removeArea(String areaName);
 
+    void updateArea(Area area);
+
     boolean renameArea(String oldName, String newName);
 
     boolean setOwner(String areaName, UUID playerUuid);
@@ -36,6 +38,8 @@ public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
     Set<Area> intersectingAreas(BlockPos pos);
 
     void dataChanged();
+
+    void dataChanged(Area area, AreaUpdateType type);
 
     void sendDataToPlayer(EntityPlayerMP player);
 

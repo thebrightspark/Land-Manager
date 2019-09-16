@@ -4,6 +4,7 @@ import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
 import net.minecraft.command.CommandException;
@@ -40,7 +41,7 @@ public class CommandPassives extends LMCommandArea
         checkCanEditArea(server, sender, area);
 
         area.togglePassiveSpawning();
-        cap.dataChanged();
+        cap.dataChanged(area, AreaUpdateType.CHANGE);
         sender.sendMessage(new TextComponentTranslation("lm.command.passives.success", area.canPassiveSpawn(), area.getName()));
         LandManager.areaLog(AreaLogType.SET_PASSIVES, area.getName(), sender);
     }

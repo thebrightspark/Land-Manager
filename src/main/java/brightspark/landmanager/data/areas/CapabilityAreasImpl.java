@@ -2,16 +2,15 @@ package brightspark.landmanager.data.areas;
 
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
-import brightspark.landmanager.event.AreaDeletedEvent;
-import brightspark.landmanager.message.MessageUpdateCapability;
+import brightspark.landmanager.message.*;
 import com.google.common.collect.Lists;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +21,11 @@ public class CapabilityAreasImpl implements CapabilityAreas
     private Map<UUID, Integer> numAreasPerPlayer = new HashMap<>();
 
     public CapabilityAreasImpl() {}
+
+    private boolean isClientSide()
+    {
+        return FMLCommonHandler.instance().getEffectiveSide().isClient();
+    }
 
     @Override
     public boolean hasArea(String areaName)
@@ -41,7 +45,7 @@ public class CapabilityAreasImpl implements CapabilityAreas
         if(hasArea(area.getName()))
             return false;
         areas.put(area.getName(), area);
-        dataChanged();
+        dataChanged(area, AreaUpdateType.ADD);
         return true;
     }
 
@@ -51,11 +55,14 @@ public class CapabilityAreasImpl implements CapabilityAreas
         Area areaRemoved = areas.remove(areaName);
         boolean removed = areaRemoved != null;
         if(removed)
-        {
-            MinecraftForge.EVENT_BUS.post(new AreaDeletedEvent(areaRemoved));
-            dataChanged();
-        }
+            dataChanged(areaRemoved, AreaUpdateType.DELETE);
         return removed;
+    }
+
+    @Override
+    public void updateArea(Area area)
+    {
+        areas.put(area.getName(), area);
     }
 
     @Override
@@ -66,6 +73,8 @@ public class CapabilityAreasImpl implements CapabilityAreas
             return false;
         area.setName(newName);
         areas.put(newName, area);
+        if(isClientSide())
+            LandManager.NETWORK.sendToAll(new MessageAreaRename(oldName, newName));
         return true;
     }
 
@@ -76,7 +85,7 @@ public class CapabilityAreasImpl implements CapabilityAreas
         if(area != null)
         {
             area.setOwner(playerUuid);
-            dataChanged();
+            dataChanged(area, AreaUpdateType.CHANGE);
             return true;
         }
         return false;
@@ -158,14 +167,31 @@ public class CapabilityAreasImpl implements CapabilityAreas
         numAreasPerPlayer.compute(playerUuid, (uuid, num) -> num == null ? 0 : num > 0 ? --num : num);
     }
 
-    //TODO: Have a more efficient method that updates for a single Area
     @Override
     public void dataChanged()
     {
+        if(isClientSide()) return;
         LandManager.NETWORK.sendToAll(new MessageUpdateCapability(serializeNBT()));
     }
 
-    @Override
+	@Override
+	public void dataChanged(Area area, AreaUpdateType type)
+	{
+        if(isClientSide()) return;
+	    switch(type)
+        {
+            case DELETE:
+                LandManager.NETWORK.sendToAll(new MessageAreaDelete(area.getName()));
+                break;
+            case ADD:
+                LandManager.NETWORK.sendToAll(new MessageAreaAdd(area));
+                break;
+            case CHANGE:
+                LandManager.NETWORK.sendToAll(new MessageAreaChange(area));
+        }
+	}
+
+	@Override
     public void sendDataToPlayer(EntityPlayerMP player)
     {
         LandManager.NETWORK.sendTo(new MessageUpdateCapability(serializeNBT()), player);

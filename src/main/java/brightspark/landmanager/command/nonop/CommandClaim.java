@@ -4,6 +4,7 @@ import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.data.requests.RequestsWorldSavedData;
@@ -86,7 +87,7 @@ public class CommandClaim extends LMCommandArea
         {
             //Claim the area
             area.setOwner(player.getUniqueID());
-            cap.dataChanged();
+            cap.dataChanged(area, AreaUpdateType.CHANGE);
             player.sendMessage(new TextComponentTranslation("lm.command.claim.claimed", area.getName()));
             LandManager.areaLog(AreaLogType.CLAIM, area.getName(), player);
         }

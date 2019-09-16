@@ -3,6 +3,7 @@ package brightspark.landmanager.command.nonop;
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.command.LMCommandTree;
 import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.util.Utils;
 import com.google.common.collect.Lists;
@@ -72,23 +73,25 @@ public class CommandMembers extends LMCommandTree
 				throwWrongUsage(sender);
 
 			Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
-			CapabilityAreas areas = pair.getLeft();
-			checkCanEditArea(server, sender, pair.getRight());
+			CapabilityAreas cap = pair.getLeft();
+			Area area = pair.getRight();
+			checkCanEditArea(server, sender, area);
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
-			if(!areas.canJoinArea(uuid))
+			if(!cap.canJoinArea(uuid))
 			{
-				player.sendMessage(new TextComponentTranslation("message.error.maxJoined", areas.getNumAreasJoined(uuid)));
+				player.sendMessage(new TextComponentTranslation("message.error.maxJoined", cap.getNumAreasJoined(uuid)));
 				return;
 			}
 
-			if(pair.getRight().addMember(uuid))
+			if(area.addMember(uuid))
 			{
-				areas.dataChanged();
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player.getDisplayName(), pair.getRight().getName()));
+				cap.increasePlayerAreasNum(uuid);
+				cap.dataChanged(area, AreaUpdateType.CHANGE);
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player.getDisplayName(), area.getName()));
 			}
 			else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player.getDisplayName(), pair.getRight().getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player.getDisplayName(), area.getName()));
 		}
 
 		@Override
@@ -128,16 +131,18 @@ public class CommandMembers extends LMCommandTree
 				throwWrongUsage(sender);
 
 			Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
-			checkCanEditArea(server, sender, pair.getRight());
+			Area area = pair.getRight();
+			checkCanEditArea(server, sender, area);
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
-			if(pair.getRight().removeMember(uuid))
+			if(area.removeMember(uuid))
 			{
-				pair.getLeft().dataChanged();
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player.getDisplayName(), pair.getRight().getName()));
+				pair.getLeft().decreasePlayerAreasNum(uuid);
+				pair.getLeft().dataChanged(area, AreaUpdateType.CHANGE);
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player.getDisplayName(), area.getName()));
 			}
 			else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player.getDisplayName(), pair.getRight().getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player.getDisplayName(), area.getName()));
 		}
 
 		@Override

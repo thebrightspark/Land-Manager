@@ -2,6 +2,7 @@ package brightspark.landmanager.message;
 
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.util.HomeGuiActionType;
 import brightspark.landmanager.util.Utils;
@@ -77,7 +78,7 @@ public class MessageHomeActionKickOrPass implements IMessage
 			}
 			if(changed)
 			{
-				cap.dataChanged();
+				cap.dataChanged(area, AreaUpdateType.CHANGE);
 				return new MessageHomeActionReply(message.isPass ? HomeGuiActionType.PASS : HomeGuiActionType.KICK, uuid, profile.getName());
 			}
 			else

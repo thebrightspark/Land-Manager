@@ -54,44 +54,40 @@ public class MessageCreateAreaReply implements IMessage
         @Override
         public IMessage onMessage(MessageCreateAreaReply message, MessageContext ctx)
         {
-            Minecraft.getMinecraft().addScheduledTask(new Runnable()
+            Minecraft.getMinecraft().addScheduledTask(() ->
             {
-                @Override
-                public void run()
+                Minecraft mc = Minecraft.getMinecraft();
+                EntityPlayer player = mc.player;
+                GuiScreen gui;
+                switch(message.result)
                 {
-                    Minecraft mc = Minecraft.getMinecraft();
-                    EntityPlayer player = mc.player;
-                    GuiScreen gui;
-                    switch(message.result)
-                    {
-                        case SUCCESS:
-                            player.sendMessage(new TextComponentTranslation("message.create.added", message.areaName));
-                            player.closeScreen();
-                            resetItem(player);
-                            ClientEventHandler.setRenderArea(message.areaName);
-                            break;
-                        case NAME_EXISTS:
-                            player.sendMessage(new TextComponentTranslation("message.create.name", message.areaName));
-                            gui = mc.currentScreen;
-                            if(gui instanceof GuiCreateArea)
-                                ((GuiCreateArea) gui).clearTextField();
-                            break;
-                        case AREA_INTERSECTS:
-                            player.sendMessage(new TextComponentTranslation("message.create.intersects"));
-                            player.closeScreen();
-                            resetItem(player);
-                            break;
-                        case INVALID_NAME:
-                            player.sendMessage(new TextComponentTranslation("message.create.invalid_name"));
-                            gui = mc.currentScreen;
-                            if(gui instanceof GuiCreateArea)
-                                ((GuiCreateArea) gui).clearTextField();
-                            break;
-                        case INVALID:
-                            player.sendMessage(new TextComponentTranslation("message.create.invalid"));
-                            player.closeScreen();
-                            resetItem(player);
-                    }
+                    case SUCCESS:
+                        player.sendMessage(new TextComponentTranslation("message.create.added", message.areaName));
+                        player.closeScreen();
+                        resetItem(player);
+                        ClientEventHandler.setRenderArea(message.areaName);
+                        break;
+                    case NAME_EXISTS:
+                        player.sendMessage(new TextComponentTranslation("message.create.name", message.areaName));
+                        gui = mc.currentScreen;
+                        if(gui instanceof GuiCreateArea)
+                            ((GuiCreateArea) gui).clearTextField();
+                        break;
+                    case AREA_INTERSECTS:
+                        player.sendMessage(new TextComponentTranslation("message.create.intersects"));
+                        player.closeScreen();
+                        resetItem(player);
+                        break;
+                    case INVALID_NAME:
+                        player.sendMessage(new TextComponentTranslation("message.create.invalid_name"));
+                        gui = mc.currentScreen;
+                        if(gui instanceof GuiCreateArea)
+                            ((GuiCreateArea) gui).clearTextField();
+                        break;
+                    case INVALID:
+                        player.sendMessage(new TextComponentTranslation("message.create.invalid"));
+                        player.closeScreen();
+                        resetItem(player);
                 }
             });
             return null;

@@ -104,6 +104,10 @@ public class LandManager
         regMessage(MessageHomeToggle.Handler.class, MessageHomeToggle.class, Side.SERVER, side);
         regMessage(MessageHomeToggleReply.Handler.class, MessageHomeToggleReply.class, Side.CLIENT, side);
         regMessage(MessageHomeActionReplyError.Handler.class, MessageHomeActionReplyError.class, Side.CLIENT, side);
+        regMessage(MessageAreaAdd.Handler.class, MessageAreaAdd.class, Side.CLIENT, side);
+        regMessage(MessageAreaChange.Handler.class, MessageAreaChange.class, Side.CLIENT, side);
+        regMessage(MessageAreaDelete.Handler.class, MessageAreaDelete.class, Side.CLIENT, side);
+        regMessage(MessageAreaRename.Handler.class, MessageAreaRename.class, Side.CLIENT, side);
 
         CapabilityManager.INSTANCE.register(CapabilityAreas.class, new CapStorage<>(), CapabilityAreasImpl::new);
 

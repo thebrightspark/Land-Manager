@@ -49,28 +49,24 @@ public class MessageChatLog implements IMessage
         @Override
         public IMessage onMessage(MessageChatLog message, MessageContext ctx)
         {
-            Minecraft.getMinecraft().addScheduledTask(new Runnable()
+            Minecraft.getMinecraft().addScheduledTask(() ->
             {
-                @Override
-                public void run()
+                if(LMConfig.client.showChatLogs)
                 {
-                    if(LMConfig.client.showChatLogs)
-                    {
-                        AreaLog log = message.log;
-                        if(log == null) return;
-                        ITextComponent text = new TextComponentString(log.getTimeString());
-                        text.getStyle().setColor(TextFormatting.GRAY);
-                        ITextComponent typeComp = new TextComponentTranslation(log.getType().getUnlocalisedName());
-                        typeComp.getStyle().setColor(log.getType().colour());
-                        text.appendText("<")
-                                .appendSibling(typeComp)
-                                .appendText("> ")
-                                .appendText(log.getAreaName())
-                                .appendText(" -> ")
-                                .appendText(log.getPlayerName());
+                    AreaLog log = message.log;
+                    if(log == null) return;
+                    ITextComponent text = new TextComponentString(log.getTimeString());
+                    text.getStyle().setColor(TextFormatting.GRAY);
+                    ITextComponent typeComp = new TextComponentTranslation(log.getType().getUnlocalisedName());
+                    typeComp.getStyle().setColor(log.getType().colour());
+                    text.appendText("<")
+                            .appendSibling(typeComp)
+                            .appendText("> ")
+                            .appendText(log.getAreaName())
+                            .appendText(" -> ")
+                            .appendText(log.getPlayerName());
 
-                        Minecraft.getMinecraft().player.sendMessage(text);
-                    }
+                    Minecraft.getMinecraft().player.sendMessage(text);
                 }
             });
             return null;

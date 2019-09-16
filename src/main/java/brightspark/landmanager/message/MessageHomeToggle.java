@@ -3,6 +3,7 @@ package brightspark.landmanager.message;
 import brightspark.landmanager.LMConfig;
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.util.HomeGuiToggleType;
 import brightspark.landmanager.util.Utils;
@@ -60,25 +61,25 @@ public class MessageHomeToggle implements IMessage
 					if(!playerIsOp && !LMConfig.permissions.interactions)
 						return null;
 					area.toggleInteractions();
-					cap.dataChanged();
+					cap.dataChanged(area, AreaUpdateType.CHANGE);
 					return new MessageHomeToggleReply(type, area.canInteract());
 				case PASSIVE_SPAWNS:
 					if(!playerIsOp && !LMConfig.permissions.passiveSpawning)
 						return null;
 					area.togglePassiveSpawning();
-					cap.dataChanged();
+					cap.dataChanged(area, AreaUpdateType.CHANGE);
 					return new MessageHomeToggleReply(type, area.canPassiveSpawn());
 				case HOSTILE_SPAWNS:
 					if(!playerIsOp && !LMConfig.permissions.hostileSpawning)
 						return null;
 					area.toggleHostileSpawning();
-					cap.dataChanged();
+					cap.dataChanged(area, AreaUpdateType.CHANGE);
 					return new MessageHomeToggleReply(type, area.canHostileSpawn());
 				case EXPLOSIONS:
 					if(!playerIsOp && !LMConfig.permissions.explosions)
 						return null;
 					area.toggleExplosions();
-					cap.dataChanged();
+					cap.dataChanged(area, AreaUpdateType.CHANGE);
 					return new MessageHomeToggleReply(type, area.canExplosionsCauseDamage());
 			}
 			return null;

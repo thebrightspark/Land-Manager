@@ -2,6 +2,7 @@ package brightspark.landmanager.message;
 
 import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
+import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.util.HomeGuiActionType;
 import brightspark.landmanager.util.Utils;
@@ -71,7 +72,7 @@ public class MessageHomeActionAdd implements IMessage
 			if(area.addMember(uuid))
 			{
 				cap.increasePlayerAreasNum(uuid);
-				cap.dataChanged();
+				cap.dataChanged(area, AreaUpdateType.CHANGE);
 				return new MessageHomeActionReply(HomeGuiActionType.ADD, uuid, profile.getName());
 			}
 			return new MessageHomeActionReplyError("message.error.alreadyMember", message.name);
