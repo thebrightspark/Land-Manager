@@ -7,8 +7,12 @@ import brightspark.landmanager.data.areas.CapabilityAreas;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import org.apache.commons.lang3.tuple.Pair;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 //lm rename <areaName> <newAreaName>
 //OR
@@ -51,5 +55,11 @@ public class CommandRename extends LMCommand
 			sender.sendMessage(new TextComponentTranslation("lm.command.rename.success", oldName, newName));
 		else
 			sender.sendMessage(new TextComponentTranslation("lm.command.rename.invalid", newName));
+	}
+
+	@Override
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
+	{
+		return args.length == 1 ? getListOfStringsMatchingLastWord(args, getAllAreaNames(server)) : super.getTabCompletions(server, sender, args, targetPos);
 	}
 }
