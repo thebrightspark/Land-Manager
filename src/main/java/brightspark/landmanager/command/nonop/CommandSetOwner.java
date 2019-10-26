@@ -1,11 +1,9 @@
 package brightspark.landmanager.command.nonop;
 
-import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
-import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.util.Utils;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -62,7 +60,6 @@ public class CommandSetOwner extends LMCommand
 			area.addMember(prevOwner);
 		pair.getLeft().dataChanged(area, AreaUpdateType.CHANGE);
 		sender.sendMessage(new TextComponentTranslation("lm.command.setowner.success", areaName, playerName));
-		LandManager.areaLog(AreaLogType.SET_OWNER, areaName, sender);
 	}
 
 	@Override

@@ -1,10 +1,8 @@
 package brightspark.landmanager.command.op;
 
-import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
-import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.data.requests.RequestsWorldSavedData;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -39,7 +37,6 @@ public class CommandDelete extends LMCommandArea
     {
         if(cap.removeArea(area.getName()))
         {
-            LandManager.areaLog(AreaLogType.DELETE, area.getName(), sender);
             RequestsWorldSavedData requests = RequestsWorldSavedData.get(server.getEntityWorld());
             if(requests != null)
                 requests.deleteAllForArea(area.getName());

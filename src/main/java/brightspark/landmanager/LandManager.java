@@ -4,12 +4,9 @@ import brightspark.landmanager.command.CommandLM;
 import brightspark.landmanager.data.areas.CapStorage;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.areas.CapabilityAreasImpl;
-import brightspark.landmanager.data.logs.AreaLogType;
-import brightspark.landmanager.data.logs.LogsWorldSavedData;
 import brightspark.landmanager.gui.GuiHandler;
 import brightspark.landmanager.item.LMItems;
 import brightspark.landmanager.message.*;
-import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -96,7 +93,6 @@ public class LandManager
         regMessage(MessageCreateAreaReply.Handler.class, MessageCreateAreaReply.class, Side.CLIENT, side);
         regMessage(MessageUpdateCapability.Handler.class, MessageUpdateCapability.class, Side.CLIENT, side);
         regMessage(MessageShowArea.Handler.class, MessageShowArea.class, Side.CLIENT, side);
-        regMessage(MessageChatLog.Handler.class, MessageChatLog.class, Side.CLIENT, side);
         regMessage(MessageOpenHomeGui.Handler.class, MessageOpenHomeGui.class, Side.CLIENT, side);
         regMessage(MessageHomeActionKickOrPass.Handler.class, MessageHomeActionKickOrPass.class, Side.SERVER, side);
         regMessage(MessageHomeActionAdd.Handler.class, MessageHomeActionAdd.class, Side.SERVER, side);
@@ -139,13 +135,6 @@ public class LandManager
                     area.setName(name.replaceAll(" ", "_"));
             });
         }
-    }
-
-    public static void areaLog(AreaLogType type, String areaName, ICommandSender sender)
-    {
-        LogsWorldSavedData logData = LogsWorldSavedData.get(sender.getEntityWorld());
-        if(logData != null)
-            logData.addLog(type, areaName, sender);
     }
 
     public static void sendToOPs(MinecraftServer server, Supplier<IMessage> message, @Nullable EntityPlayer sender)

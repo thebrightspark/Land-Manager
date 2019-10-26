@@ -1,12 +1,10 @@
 package brightspark.landmanager.command.optional;
 
 import brightspark.landmanager.LMConfig;
-import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
-import brightspark.landmanager.data.logs.AreaLogType;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -43,6 +41,5 @@ public class CommandExplosions extends LMCommandArea
         area.toggleExplosions();
         cap.dataChanged(area, AreaUpdateType.CHANGE);
         sender.sendMessage(new TextComponentTranslation("lm.command.explosions.success", area.canExplosionsCauseDamage(), area.getName()));
-        LandManager.areaLog(AreaLogType.SET_EXPLOSIONS, area.getName(), sender);
     }
 }

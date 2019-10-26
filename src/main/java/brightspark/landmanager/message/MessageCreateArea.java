@@ -4,7 +4,6 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.AddAreaResult;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
-import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.event.AreaCreationEvent;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -63,17 +62,8 @@ public class MessageCreateArea implements IMessage
                         else if(cap.intersectsAnArea(area))
                             result = AddAreaResult.AREA_INTERSECTS;
                         else if(!MinecraftForge.EVENT_BUS.post(new AreaCreationEvent(area)))
-                        {
                             //Add new area
-                            boolean success = cap.addArea(area);
-                            if(success)
-                            {
-                                result = AddAreaResult.SUCCESS;
-                                LandManager.areaLog(AreaLogType.CREATE, area.getName(), player);
-                            }
-                            else
-                                result = AddAreaResult.NAME_EXISTS;
-                        }
+	                        result = cap.addArea(area) ? AddAreaResult.SUCCESS : AddAreaResult.NAME_EXISTS;
                     }
                 }
 

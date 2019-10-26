@@ -6,7 +6,6 @@ import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
-import brightspark.landmanager.data.logs.AreaLogType;
 import brightspark.landmanager.data.requests.RequestsWorldSavedData;
 import brightspark.landmanager.event.AreaClaimEvent;
 import net.minecraft.command.CommandException;
@@ -89,7 +88,6 @@ public class CommandClaim extends LMCommandArea
             area.setOwner(player.getUniqueID());
             cap.dataChanged(area, AreaUpdateType.CHANGE);
             player.sendMessage(new TextComponentTranslation("lm.command.claim.claimed", area.getName()));
-            LandManager.areaLog(AreaLogType.CLAIM, area.getName(), player);
         }
     }
 }

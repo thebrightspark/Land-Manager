@@ -5,7 +5,6 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.areas.CapabilityAreasProvider;
-import brightspark.landmanager.data.logs.AreaLogType;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -80,8 +79,6 @@ public class CommonEventHandler
                 player.sendMessage(new TextComponentTranslation("message.protection.break"));
             lastTimeHitProtectedBlock = worldTime;
         }
-        else
-            LandManager.areaLog(AreaLogType.BREAK, area == null ? "GLOBAL" : area.getName(), player);
         event.setNewSpeed(0f);
         event.setCanceled(true);
     }
@@ -99,7 +96,6 @@ public class CommonEventHandler
             return;
         //Stop players from placing blocks
         player.sendMessage(new TextComponentTranslation("message.protection.place"));
-        LandManager.areaLog(AreaLogType.PLACE, area == null ? "GLOBAL" : area.getName(), player);
         event.setCanceled(true);
     }
 
