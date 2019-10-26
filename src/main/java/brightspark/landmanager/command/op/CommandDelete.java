@@ -35,24 +35,25 @@ public class CommandDelete extends LMCommandArea
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap)
     {
-        if(cap.removeArea(area.getName()))
+	    String areaName = area.getName();
+	    if(cap.removeArea(areaName))
         {
             RequestsWorldSavedData requests = RequestsWorldSavedData.get(server.getEntityWorld());
             if(requests != null)
-                requests.deleteAllForArea(area.getName());
-            sender.sendMessage(new TextComponentTranslation("lm.command.delete.deleted", area.getName()));
+	            requests.deleteAllForArea(areaName);
+	        sender.sendMessage(new TextComponentTranslation("lm.command.delete.deleted", areaName));
             //Notify all members of the area that the area was deleted
-            notifyPlayer(server, area.getOwner());
-            area.getMembers().forEach(memberUuid -> notifyPlayer(server, memberUuid));
+	        notifyPlayer(server, area.getOwner(), areaName);
+	        area.getMembers().forEach(memberUuid -> notifyPlayer(server, memberUuid, areaName));
         }
         else
-            sender.sendMessage(new TextComponentTranslation("lm.command.delete.failed", area.getName()));
+		    sender.sendMessage(new TextComponentTranslation("lm.command.delete.failed", areaName));
     }
 
-    private void notifyPlayer(MinecraftServer server, UUID uuid)
+	private void notifyPlayer(MinecraftServer server, UUID uuid, String areaName)
     {
         EntityPlayerMP player = getPlayerFromUuid(server, uuid);
         if(player != null)
-            player.sendMessage(new TextComponentTranslation("lm.command.delete.notify"));
+	        player.sendMessage(new TextComponentTranslation("lm.command.delete.notify", areaName));
     }
 }

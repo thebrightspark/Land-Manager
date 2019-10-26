@@ -126,6 +126,7 @@ lm.command.approve.playerMessage=Your request for area %s has been approved by %
 lm.command.delete.usage=Use "/lm op delete <areaName>" to delete an area
 lm.command.delete.deleted=Deleted area %s
 lm.command.delete.failed=Failed to delete area %s
+lm.command.delete.notify=The area %s that you were a member of has been deleted!
 
 #Disapprove
 lm.command.disapprove.usage=Use "/lm op disapprove <requestId>" to disapprove a claim request. Check for requests using the 'requests' command
