@@ -52,7 +52,7 @@ public class Utils
 	public static String getPlayerName(MinecraftServer server, UUID uuid)
 	{
 		GameProfile profile = server.getPlayerProfileCache().getProfileByUUID(uuid);
-		return profile == null ? null : profile.getName();
+		return profile == null ? "<unknown>" : profile.getName();
 	}
 
 	public static boolean checkCommandPermission(CommandBase command, MinecraftServer server, ICommandSender sender)
