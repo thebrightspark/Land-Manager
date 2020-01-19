@@ -23,9 +23,6 @@ public class LMConfig
     @Config.RangeInt(min = -1)
     public static int maxAreasCanOwn = -1;
 
-    @Config.Comment("Max number of logs stored")
-    public static int logStorageSize = 50;
-
     @Config.Comment("Client side configurations")
     public static final Client client = new Client();
 
