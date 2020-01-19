@@ -103,14 +103,12 @@ public class CommonEventHandler
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event)
     {
         EntityPlayer player = event.getEntityPlayer();
-        CapabilityAreas cap = getAreas(event.getWorld());
-        if(cap == null)
-            return;
-        if(cap.intersectingAreas(event.getPos()).stream().anyMatch(a -> a.canInteract() || a.isMember(player.getUniqueID())))
+        Area area = getArea(player, event.getPos());
+        if(area != null && (area.canInteract() || area.isMember(player.getUniqueID())))
             return;
         else if(isPlayerCreativeOrOP(player))
             return;
-        else if(LMConfig.globalSettings.canPlayersInteract)
+        else if(area == null && LMConfig.globalSettings.canPlayersInteract)
             return;
         //If player is holding shift with an itemblock, then allow it for block placing checks
         if(player.isSneaking() && event.getItemStack().getItem() instanceof ItemBlock)
