@@ -7,6 +7,9 @@ import brightspark.landmanager.data.areas.CapabilityAreasImpl;
 import brightspark.landmanager.gui.GuiHandler;
 import brightspark.landmanager.item.LMItems;
 import brightspark.landmanager.message.*;
+import brightspark.landmanager.util.AreaChangeType;
+import brightspark.landmanager.util.Utils;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -139,7 +142,7 @@ public class LandManager
 
     public static void sendToOPs(MinecraftServer server, Supplier<IMessage> message, @Nullable EntityPlayer sender)
     {
-        doForEachOP(server, op -> LandManager.NETWORK.sendTo(message.get(), op), sender);
+        doForEachOP(server, op -> NETWORK.sendTo(message.get(), op), sender);
     }
 
     public static void sendChatMessageToOPs(MinecraftServer server, ITextComponent message, @Nullable EntityPlayer sender)
@@ -156,5 +159,26 @@ public class LandManager
             if(playerOp != null && !playerOp.equals(sender))
                 toDoForOP.accept(playerOp);
         }
+    }
+
+    public static void areaChange(AreaChangeType type, String areaName, ICommandSender sender)
+    {
+        areaChange(type, areaName, sender.getName(), sender instanceof EntityPlayerMP ? (EntityPlayerMP) sender : null);
+    }
+
+    public static void areaChange(AreaChangeType type, String areaName, EntityPlayerMP sender)
+    {
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        areaChange(server, type, areaName, Utils.getPlayerName(server, sender.getUniqueID()), sender);
+    }
+
+    public static void areaChange(AreaChangeType type, String areaName, String playerName, @Nullable EntityPlayerMP sender)
+    {
+        areaChange(FMLCommonHandler.instance().getMinecraftServerInstance(), type, areaName, playerName, sender);
+    }
+
+    private static void areaChange(MinecraftServer server, AreaChangeType type, String areaName, String playerName, @Nullable EntityPlayerMP sender)
+    {
+        sendToOPs(server, () -> new MessageChatLog(System.currentTimeMillis(), type, areaName, playerName), sender);
     }
 }

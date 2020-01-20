@@ -1,11 +1,13 @@
 package brightspark.landmanager.command.op;
 
+import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommand;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.requests.Request;
 import brightspark.landmanager.data.requests.RequestsWorldSavedData;
 import brightspark.landmanager.event.AreaClaimApprovalEvent;
+import brightspark.landmanager.util.AreaChangeType;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -69,6 +71,8 @@ public class CommandApprove extends LMCommand
 		//Approve the claim request
 		pair.getLeft().setOwner(areaName, request.getPlayerUuid());
 		sender.sendMessage(new TextComponentTranslation("lm.command.approve.success", id, getPlayerNameFromUuid(server, request.getPlayerUuid()), areaName));
+		//Send chat message to OPs
+		LandManager.areaChange(AreaChangeType.CLAIM, areaName, sender);
 
 		//Delete all requests for the area
 		requests.deleteAllForArea(areaName);

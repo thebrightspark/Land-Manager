@@ -5,6 +5,7 @@ import brightspark.landmanager.data.areas.AddAreaResult;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.event.AreaCreationEvent;
+import brightspark.landmanager.util.AreaChangeType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.WorldServer;
@@ -62,8 +63,13 @@ public class MessageCreateArea implements IMessage
                         else if(cap.intersectsAnArea(area))
                             result = AddAreaResult.AREA_INTERSECTS;
                         else if(!MinecraftForge.EVENT_BUS.post(new AreaCreationEvent(area)))
+                        {
                             //Add new area
-	                        result = cap.addArea(area) ? AddAreaResult.SUCCESS : AddAreaResult.NAME_EXISTS;
+                            result = cap.addArea(area) ? AddAreaResult.SUCCESS : AddAreaResult.NAME_EXISTS;
+                            //Send chat message to OPs
+                            if(result == AddAreaResult.SUCCESS)
+                                LandManager.areaChange(AreaChangeType.CREATE, area.getName(), player);
+                        }
                     }
                 }
 

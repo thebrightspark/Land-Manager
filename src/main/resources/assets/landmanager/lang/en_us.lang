@@ -177,16 +177,11 @@ lm.command.tool.inventory=No room in inventory for tool
 
 ####Log Types
 
-arealog.type.create=CREATE
-arealog.type.delete=DELETE
-arealog.type.allocate=ALLOCATE
-arealog.type.clear_allocation=CLEAR_ALLOCATION
-arealog.type.claim=CLAIM
-arealog.type.place=PLACE
-arealog.type.break=BREAK
-arealog.type.set_passives=SET_PASSIVES
-arealog.type.set_hostiles=SET_HOSTILES
-arealog.type.set_explosions=SET_EXPLOSIONS
+area.change.create=CREATE
+area.change.delete=DELETE
+area.change.allocate=ALLOCATE
+area.change.clear_allocation=CLEAR_ALLOCATION
+area.change.claim=CLAIM
 
 ####Gui
 

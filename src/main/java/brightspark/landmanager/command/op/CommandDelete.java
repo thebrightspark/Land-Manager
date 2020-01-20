@@ -1,9 +1,11 @@
 package brightspark.landmanager.command.op;
 
+import brightspark.landmanager.LandManager;
 import brightspark.landmanager.command.LMCommandArea;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.requests.RequestsWorldSavedData;
+import brightspark.landmanager.util.AreaChangeType;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -45,6 +47,8 @@ public class CommandDelete extends LMCommandArea
             //Notify all members of the area that the area was deleted
 	        notifyPlayer(server, area.getOwner(), areaName);
 	        area.getMembers().forEach(memberUuid -> notifyPlayer(server, memberUuid, areaName));
+	        //Send chat message to OPs
+	        LandManager.areaChange(AreaChangeType.DELETE, areaName, sender);
         }
         else
 		    sender.sendMessage(new TextComponentTranslation("lm.command.delete.failed", areaName));
