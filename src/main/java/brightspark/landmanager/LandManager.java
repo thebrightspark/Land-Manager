@@ -119,7 +119,6 @@ public class LandManager
     public void serverStarting(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new CommandLM());
-        //event.registerServerCommand(new CommandLandManagerLogs());
     }
 
     @Mod.EventHandler
