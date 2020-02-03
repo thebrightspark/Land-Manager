@@ -99,6 +99,7 @@ public class LandManager {
 		regMessage(MessageAreaDelete.Handler.class, MessageAreaDelete.class, Side.CLIENT, side);
 		regMessage(MessageAreaRename.Handler.class, MessageAreaRename.class, Side.CLIENT, side);
 		regMessage(MessageChatLog.Handler.class, MessageChatLog.class, Side.CLIENT, side);
+		regMessage(MessageMovedToArea.Handler.class, MessageMovedToArea.class, Side.CLIENT, side);
 
 		CapabilityManager.INSTANCE.register(CapabilityAreas.class, new CapStorage<>(), CapabilityAreasImpl::new);
 

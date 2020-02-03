@@ -5,6 +5,7 @@ import brightspark.landmanager.LandManager;
 import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.areas.CapabilityAreasProvider;
+import brightspark.landmanager.message.MessageMovedToArea;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -23,14 +24,20 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
 public class CommonEventHandler {
 	private static final ResourceLocation AREAS_RL = new ResourceLocation(LandManager.MOD_ID, "_areas");
 
 	private static long lastTimeHitProtectedBlock = 0L;
+	private static Map<UUID, LastDetails> lastAreaInside = new HashMap<>();
 
 	private static CapabilityAreas getAreas(World world) {
 		return world.getCapability(LandManager.CAPABILITY_AREAS, null);
@@ -157,5 +164,50 @@ public class CommonEventHandler {
 			return areas.isEmpty() ? !LMConfig.globalSettings.canExplosionsDestroyBlocks :
 				areas.stream().anyMatch(area -> !area.canExplosionsCauseDamage());
 		});
+	}
+
+	@SubscribeEvent
+	public static void playerTick(TickEvent.PlayerTickEvent event) {
+		//Send title message to client when moving into different area
+		if (event.side != Side.SERVER || event.phase != TickEvent.Phase.END && event.player instanceof EntityPlayerMP)
+			return;
+		EntityPlayerMP player = (EntityPlayerMP) event.player;
+		UUID uuid = player.getUniqueID();
+		LastDetails last = lastAreaInside.get(uuid);
+		if (last == null || last.updateAndCheckPlayerPos(player)) {
+			Area area = getArea(player, player.getPosition());
+			if (last == null || last.updateAndCheckArea(area)) {
+				if (last == null) {
+					last = new LastDetails(area == null ? null : area.getName(), player);
+					lastAreaInside.put(uuid, last);
+				}
+				LandManager.NETWORK.sendTo(new MessageMovedToArea(area == null ? "" : area.getName(), area != null && area.isMember(uuid)), player);
+			}
+		}
+	}
+
+	static class LastDetails {
+		String areaName;
+		BlockPos pos;
+		int dimId;
+
+		LastDetails(String areaName, EntityPlayer player) {
+			this.areaName = areaName;
+			pos = player.getPosition();
+			dimId = player.dimension;
+		}
+
+		boolean updateAndCheckPlayerPos(EntityPlayer player) {
+			boolean result = player.getPosition().equals(pos) || player.dimension != dimId;
+			pos = player.getPosition();
+			dimId = player.dimension;
+			return result;
+		}
+
+		boolean updateAndCheckArea(Area area) {
+			boolean result = (area == null) != (areaName == null) || (area != null && !area.getName().equals(areaName));
+			areaName = area == null ? null : area.getName();
+			return result;
+		}
 	}
 }
