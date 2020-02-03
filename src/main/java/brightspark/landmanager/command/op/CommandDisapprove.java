@@ -14,50 +14,44 @@ import net.minecraft.util.text.TextFormatting;
 import org.apache.commons.lang3.tuple.Pair;
 
 //lm op disapprove <requestId>
-public class CommandDisapprove extends LMCommand
-{
+public class CommandDisapprove extends LMCommand {
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "disapprove";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender)
-	{
+	public String getUsage(ICommandSender sender) {
 		return "lm.command.disapprove.usage";
 	}
 
 	@Override
-	public int getRequiredPermissionLevel()
-	{
+	public int getRequiredPermissionLevel() {
 		return 2;
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-	{
-		if(args.length != 1)
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		if (args.length != 1)
 			throwWrongUsage(sender);
 
 		Integer id = parseIntWithDefault(args[0]);
-		if(id == null)
+		if (id == null)
 			throwWrongUsage(sender);
 
 		RequestsWorldSavedData requests = RequestsWorldSavedData.get(server.getEntityWorld());
-		if(requests == null)
+		if (requests == null)
 			throw new CommandException("lm.command.reqdata");
 
 		//noinspection ConstantConditions
 		Request request = requests.getRequestById(id);
-		if(request == null)
+		if (request == null)
 			throw new CommandException("lm.command.disapprove.noRequest", id);
 
 		//Disapprove the claim request
 		String areaName = request.getAreaName();
 		Pair<CapabilityAreas, Area> pair = getAreaAndCapNoException(server, areaName);
-		if(pair == null)
-		{
+		if (pair == null) {
 			sender.sendMessage(new TextComponentTranslation("lm.command.disapprove.noArea", areaName));
 			requests.deleteAllForArea(areaName);
 			return;
@@ -67,8 +61,7 @@ public class CommandDisapprove extends LMCommand
 
 		//Notify the player if they're online
 		EntityPlayerMP player = getPlayerFromUuid(server, request.getPlayerUuid());
-		if(player != null)
-		{
+		if (player != null) {
 			TextComponentTranslation textComp = new TextComponentTranslation("lm.command.disapprove.playerMessage", areaName, sender.getDisplayName());
 			textComp.getStyle().setColor(TextFormatting.RED);
 			player.sendMessage(textComp);

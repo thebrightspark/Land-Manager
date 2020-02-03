@@ -24,10 +24,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class BlockHome extends Block
-{
-	public BlockHome()
-	{
+public class BlockHome extends Block {
+	public BlockHome() {
 		super(Material.WOOD);
 		setRegistryName("home");
 		setTranslationKey("home");
@@ -35,23 +33,19 @@ public class BlockHome extends Block
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-	{
-		if(!world.isRemote && world instanceof WorldServer && player instanceof EntityPlayerMP && !player.isSneaking() && hand == EnumHand.MAIN_HAND)
-		{
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (!world.isRemote && world instanceof WorldServer && player instanceof EntityPlayerMP && !player.isSneaking() && hand == EnumHand.MAIN_HAND) {
 			CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-			if(cap == null)
-			{
+			if (cap == null) {
 				LandManager.LOGGER.error("Failed to get areas capability from dimension {}", world.provider.getDimension());
 				return true;
 			}
 			Area area = cap.intersectingArea(pos);
-			if(area == null)
+			if (area == null)
 				player.sendMessage(new TextComponentTranslation("message.home.none"));
-			else if(!area.isMember(player.getUniqueID()) && !Utils.isOp(world.getMinecraftServer(), player))
+			else if (!area.isMember(player.getUniqueID()) && !Utils.isOp(world.getMinecraftServer(), player))
 				player.sendMessage(new TextComponentTranslation("message.home.notMember"));
-			else
-			{
+			else {
 				MinecraftServer server = world.getMinecraftServer();
 				List<Pair<UUID, String>> members = area.getMembers().stream()
 					.map(uuid -> new ImmutablePair<>(uuid, Utils.getPlayerName(server, uuid)))

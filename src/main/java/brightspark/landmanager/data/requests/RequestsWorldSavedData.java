@@ -14,55 +14,47 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-public class RequestsWorldSavedData extends WorldSavedData
-{
+public class RequestsWorldSavedData extends WorldSavedData {
 	private static final String NAME = LandManager.MOD_ID + "requests";
 
 	private int next_id = 0;
 	private Map<String, Set<Request>> requestsByArea = new HashMap<>();
 	private Set<Request> requests = new HashSet<>();
 
-	public RequestsWorldSavedData()
-	{
+	public RequestsWorldSavedData() {
 		this(NAME);
 	}
 
-	public RequestsWorldSavedData(String name)
-	{
+	public RequestsWorldSavedData(String name) {
 		super(name);
 	}
 
-	public static RequestsWorldSavedData get(World world)
-	{
+	public static RequestsWorldSavedData get(World world) {
 		MapStorage storage = world.getMapStorage();
-		if(storage == null)
+		if (storage == null)
 			return null;
 		RequestsWorldSavedData instance = (RequestsWorldSavedData) storage.getOrLoadData(RequestsWorldSavedData.class, NAME);
-		if(instance == null)
-		{
+		if (instance == null) {
 			instance = new RequestsWorldSavedData();
 			storage.setData(NAME, instance);
 		}
 		return instance;
 	}
 
-	private boolean hasRequest(String areaName, UUID playerUuid)
-	{
+	private boolean hasRequest(String areaName, UUID playerUuid) {
 		Set<Request> areaRequests = requestsByArea.get(areaName);
-		if(areaRequests == null)
+		if (areaRequests == null)
 			return false;
 		return areaRequests.stream().anyMatch(request ->
 			request.getAreaName().equals(areaName) && request.getPlayerUuid().equals(playerUuid));
 	}
 
-	private Predicate<Request> matchById(int requestId)
-	{
+	private Predicate<Request> matchById(int requestId) {
 		return request -> request.getId() == requestId;
 	}
 
-	public Integer addRequest(String areaName, UUID playerUuid)
-	{
-		if(hasRequest(areaName, playerUuid))
+	public Integer addRequest(String areaName, UUID playerUuid) {
+		if (hasRequest(areaName, playerUuid))
 			return null;
 
 		Request request = new Request(next_id++, areaName, playerUuid);
@@ -72,24 +64,21 @@ public class RequestsWorldSavedData extends WorldSavedData
 		return request.getId();
 	}
 
-	public boolean deleteRequest(@Nullable String areaName, int requestId)
-	{
+	public boolean deleteRequest(@Nullable String areaName, int requestId) {
 		Request request;
-		if(areaName != null)
-		{
+		if (areaName != null) {
 			Set<Request> areaRequests = getRequestsByArea(areaName);
 			request = areaRequests.stream().filter(matchById(requestId)).findFirst().orElse(null);
-		}
-		else
+		} else
 			request = requests.stream().filter(matchById(requestId)).findFirst().orElse(null);
 
-		if(request == null)
+		if (request == null)
 			return false;
 
 		Request finalRequest = request;
 		Map.Entry<String, Set<Request>> entry = requestsByArea.entrySet().stream().filter(e ->
 			e.getKey().equals(finalRequest.getAreaName())).findFirst().orElse(null);
-		if(entry == null)
+		if (entry == null)
 			return false;
 
 		entry.getValue().removeIf(matchById(requestId));
@@ -98,50 +87,43 @@ public class RequestsWorldSavedData extends WorldSavedData
 		return true;
 	}
 
-	public boolean deleteAllForArea(String areaName)
-	{
+	public boolean deleteAllForArea(String areaName) {
 		boolean success = requestsByArea.remove(areaName) != null | requests.removeIf(request -> request.getAreaName().equals(areaName));
 		markDirty();
 		return success;
 	}
 
-	public Request getRequestById(int id)
-	{
+	public Request getRequestById(int id) {
 		return requests.stream().filter(req -> req.getId() == id).findFirst().orElse(null);
 	}
 
-	public Set<Request> getRequestsByArea(String areaName)
-	{
+	public Set<Request> getRequestsByArea(String areaName) {
 		return requestsByArea.computeIfAbsent(areaName, k -> new HashSet<>());
 	}
 
-	public Set<Request> getRequestsByRegex(String regex)
-	{
+	public Set<Request> getRequestsByRegex(String regex) {
 		Pattern pattern = Pattern.compile(regex);
 		Set<Request> requestsMatching = new HashSet<>();
 		requestsByArea.forEach((areaName, requests) ->
 		{
-			if(pattern.matcher(areaName).matches())
+			if (pattern.matcher(areaName).matches())
 				requestsMatching.addAll(requests);
 		});
 		return requestsMatching;
 	}
 
-	public Set<Request> getAllRequests()
-	{
+	public Set<Request> getAllRequests() {
 		return requests;
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
+	public void readFromNBT(NBTTagCompound nbt) {
 		next_id = nbt.getInteger("nextId");
 
 		requests.clear();
 		requestsByArea.clear();
 		NBTTagList list = nbt.getTagList("list", Constants.NBT.TAG_COMPOUND);
-		for(NBTBase listNbt : list)
-		{
+		for (NBTBase listNbt : list) {
 			Request request = new Request((NBTTagCompound) listNbt);
 			requests.add(request);
 			getRequestsByArea(request.getAreaName()).add(request);
@@ -149,8 +131,7 @@ public class RequestsWorldSavedData extends WorldSavedData
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-	{
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		nbt.setInteger("nextId", next_id);
 
 		NBTTagList list = new NBTTagList();

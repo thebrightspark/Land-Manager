@@ -16,24 +16,22 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.UUID;
 
-public class MessageHomeActionKickOrPass implements IMessage
-{
+public class MessageHomeActionKickOrPass implements IMessage {
 	private BlockPos pos;
 	private boolean isPass;
 	private UUID uuid;
 
-	public MessageHomeActionKickOrPass() {}
+	public MessageHomeActionKickOrPass() {
+	}
 
-	public MessageHomeActionKickOrPass(BlockPos pos, boolean isPass, UUID uuid)
-	{
+	public MessageHomeActionKickOrPass(BlockPos pos, boolean isPass, UUID uuid) {
 		this.pos = pos;
 		this.isPass = isPass;
 		this.uuid = uuid;
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
+	public void fromBytes(ByteBuf buf) {
 		pos = BlockPos.fromLong(buf.readLong());
 		isPass = buf.readBoolean();
 		long most = buf.readLong();
@@ -42,46 +40,40 @@ public class MessageHomeActionKickOrPass implements IMessage
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
+	public void toBytes(ByteBuf buf) {
 		buf.writeLong(pos.toLong());
 		buf.writeBoolean(isPass);
 		buf.writeLong(uuid.getMostSignificantBits());
 		buf.writeLong(uuid.getLeastSignificantBits());
 	}
 
-	public static class Handler implements IMessageHandler<MessageHomeActionKickOrPass, IMessage>
-	{
+	public static class Handler implements IMessageHandler<MessageHomeActionKickOrPass, IMessage> {
 		@Override
-		public IMessage onMessage(MessageHomeActionKickOrPass message, MessageContext ctx)
-		{
+		public IMessage onMessage(MessageHomeActionKickOrPass message, MessageContext ctx) {
 			EntityPlayerMP player = ctx.getServerHandler().player;
 			CapabilityAreas cap = player.world.getCapability(LandManager.CAPABILITY_AREAS, null);
-			if(cap == null)
+			if (cap == null)
 				return null;
 			Area area = cap.intersectingArea(message.pos);
-			if(!Utils.canPlayerEditArea(area, player, player.world.getMinecraftServer()))
+			if (!Utils.canPlayerEditArea(area, player, player.world.getMinecraftServer()))
 				return new MessageHomeActionReplyError("message.error.noPerm");
 			UUID uuid = message.uuid;
 			GameProfile profile = player.world.getMinecraftServer().getPlayerProfileCache().getProfileByUUID(uuid);
-			if(profile == null)
+			if (profile == null)
 				return new MessageHomeActionReplyError("message.error.noPlayer");
 
 			boolean changed = true;
-			if(message.isPass)
+			if (message.isPass)
 				area.setOwner(uuid);
-			else
-			{
+			else {
 				changed = area.removeMember(uuid);
-				if(changed)
+				if (changed)
 					cap.decreasePlayerAreasNum(uuid);
 			}
-			if(changed)
-			{
+			if (changed) {
 				cap.dataChanged(area, AreaUpdateType.CHANGE);
 				return new MessageHomeActionReply(message.isPass ? HomeGuiActionType.PASS : HomeGuiActionType.KICK, uuid, profile.getName());
-			}
-			else
+			} else
 				return null;
 		}
 	}

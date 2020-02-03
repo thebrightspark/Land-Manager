@@ -24,13 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BoxRenderer
-{
+public class BoxRenderer {
 	private static final Minecraft MC = Minecraft.getMinecraft();
 	private static final Map<EnumFacing, List<Triple<Vec3d, Vec3d, Vec3d>>> OFFSETS = new HashMap<>();
 
-	static
-	{
+	static {
 		// https://minecraft.gamepedia.com/File:Minecraft_axes.png
 		/*
 		From UP:
@@ -98,13 +96,11 @@ public class BoxRenderer
 			createVecTriple(-1, -1, 1, -1, 1, -1, 1, -1, 1)));  // Up North -> -Z, +Y
 	}
 
-	private static Triple<Vec3d, Vec3d, Vec3d> createVecTriple(int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3)
-	{
+	private static Triple<Vec3d, Vec3d, Vec3d> createVecTriple(int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3) {
 		return new ImmutableTriple<>(new Vec3d(x1, y1, z1), new Vec3d(x2, y2, z2), new Vec3d(x3, y3, z3));
 	}
 
-	public static void renderBox(Area area, Color colour, double partialTicks)
-	{
+	public static void renderBox(Area area, Color colour, double partialTicks) {
 		//Get player's actual position
 		EntityPlayerSP player = MC.player;
 		double x = player.prevPosX + (player.posX - player.prevPosX) * partialTicks;
@@ -120,15 +116,13 @@ public class BoxRenderer
 		GlStateManager.translate(-x, -y, -z);
 		float[] rgb = colour.getRGBColorComponents(null);
 		AxisAlignedBB box = new AxisAlignedBB(area.getMinPos(), area.getMaxPos().add(1, 1, 1)).grow(0.001d);
-		if(LMConfig.client.areaBoxAlpha > 0f)
-		{
+		if (LMConfig.client.areaBoxAlpha > 0f) {
 			GlStateManager.enableDepth();
 			GlStateManager.color(rgb[0], rgb[1], rgb[2], LMConfig.client.areaBoxAlpha);
 			renderSides(box);
 			GlStateManager.disableDepth();
 		}
-		if(LMConfig.client.areaBoxEdgeThickness > 0f)
-		{
+		if (LMConfig.client.areaBoxEdgeThickness > 0f) {
 			GlStateManager.color(rgb[0], rgb[1], rgb[2], 1f);
 			renderBoxEdges(box);
 		}
@@ -143,8 +137,7 @@ public class BoxRenderer
 		GlStateManager.popMatrix();
 	}
 
-	private static void renderSides(AxisAlignedBB box)
-	{
+	private static void renderSides(AxisAlignedBB box) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
@@ -224,8 +217,7 @@ public class BoxRenderer
 		tessellator.draw();
 	}
 
-	private static void renderBoxEdges(AxisAlignedBB box)
-	{
+	private static void renderBoxEdges(AxisAlignedBB box) {
 		Vec3d minXminYminZ = new Vec3d(box.minX, box.minY, box.minZ);
 		Vec3d minXminYmaxZ = new Vec3d(box.minX, box.minY, box.maxZ);
 		Vec3d minXmaxYminZ = new Vec3d(box.minX, box.maxY, box.minZ);
@@ -242,15 +234,13 @@ public class BoxRenderer
 		renderBoxEdgesForSide(EnumFacing.WEST, minXminYminZ, minXminYmaxZ, minXmaxYmaxZ, minXmaxYminZ);
 	}
 
-	private static void renderBoxEdgesForSide(EnumFacing facing, Vec3d... corners)
-	{
+	private static void renderBoxEdgesForSide(EnumFacing facing, Vec3d... corners) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		List<Triple<Vec3d, Vec3d, Vec3d>> offsetByVertex = OFFSETS.get(facing);
 		//Outer
 		buffer.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION);
-		for(int i = 0; i < 5; i++)
-		{
+		for (int i = 0; i < 5; i++) {
 			int actualI = i < 4 ? i : 0;
 			Triple<Vec3d, Vec3d, Vec3d> triple = offsetByVertex.get(actualI);
 			Vec3d v = corners[actualI].add(triple.getLeft().scale(LMConfig.client.areaBoxEdgeThickness));
@@ -261,8 +251,7 @@ public class BoxRenderer
 		tessellator.draw();
 		//Inner
 		buffer.begin(GL11.GL_QUAD_STRIP, DefaultVertexFormats.POSITION);
-		for(int i = 0; i < 5; i++)
-		{
+		for (int i = 0; i < 5; i++) {
 			int actualI = i < 4 ? i : 0;
 			Triple<Vec3d, Vec3d, Vec3d> triple = offsetByVertex.get(actualI);
 			Vec3d v = corners[actualI].add(triple.getRight().scale(LMConfig.client.areaBoxEdgeThickness));
@@ -274,8 +263,7 @@ public class BoxRenderer
 	}
 
 	//Copied a lot of this from EntityRenderer#drawNameplate and changed for my needs
-	private static void renderName(Area area, Vec3d center)
-	{
+	private static void renderName(Area area, Vec3d center) {
 		RenderManager rm = MC.getRenderManager();
 		float viewerYaw = rm.playerViewY;
 		float viewerPitch = rm.playerViewX;

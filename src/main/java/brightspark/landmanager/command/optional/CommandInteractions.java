@@ -13,33 +13,28 @@ import net.minecraft.util.text.TextComponentTranslation;
 //lm interactions <areaName>
 //OR
 //lm op interactions <areaName>
-public class CommandInteractions extends LMCommandArea
-{
-    @Override
-    public String getName()
-    {
-        return "interactions";
-    }
+public class CommandInteractions extends LMCommandArea {
+	@Override
+	public String getName() {
+		return "interactions";
+	}
 
-    @Override
-    public String getUsage(ICommandSender sender)
-    {
-        return LMConfig.permissions.interactions ?  "lm.command.interactions.usage" : "lm.command.interactions.usage.op";
-    }
+	@Override
+	public String getUsage(ICommandSender sender) {
+		return LMConfig.permissions.interactions ? "lm.command.interactions.usage" : "lm.command.interactions.usage.op";
+	}
 
-    @Override
-    public int getRequiredPermissionLevel()
-    {
-        return getPermissionLevel(LMConfig.permissions.interactions);
-    }
+	@Override
+	public int getRequiredPermissionLevel() {
+		return getPermissionLevel(LMConfig.permissions.interactions);
+	}
 
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException
-    {
-        checkCanEditArea(server, sender, area);
+	@Override
+	public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException {
+		checkCanEditArea(server, sender, area);
 
-        area.toggleInteractions();
-        cap.dataChanged(area, AreaUpdateType.CHANGE);
-        sender.sendMessage(new TextComponentTranslation("lm.command.interactions.success", area.canInteract(), area.getName()));
-    }
+		area.toggleInteractions();
+		cap.dataChanged(area, AreaUpdateType.CHANGE);
+		sender.sendMessage(new TextComponentTranslation("lm.command.interactions.success", area.canInteract(), area.getName()));
+	}
 }

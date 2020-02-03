@@ -13,33 +13,28 @@ import net.minecraft.util.text.TextComponentTranslation;
 //lm passives <areaName>
 //OR
 //lm op passives <areaName>
-public class CommandPassives extends LMCommandArea
-{
-    @Override
-    public String getName()
-    {
-        return "passives";
-    }
+public class CommandPassives extends LMCommandArea {
+	@Override
+	public String getName() {
+		return "passives";
+	}
 
-    @Override
-    public String getUsage(ICommandSender sender)
-    {
-        return LMConfig.permissions.passiveSpawning ?  "lm.command.passives.usage" : "lm.command.passives.usage.op";
-    }
+	@Override
+	public String getUsage(ICommandSender sender) {
+		return LMConfig.permissions.passiveSpawning ? "lm.command.passives.usage" : "lm.command.passives.usage.op";
+	}
 
-    @Override
-    public int getRequiredPermissionLevel()
-    {
-        return getPermissionLevel(LMConfig.permissions.passiveSpawning);
-    }
+	@Override
+	public int getRequiredPermissionLevel() {
+		return getPermissionLevel(LMConfig.permissions.passiveSpawning);
+	}
 
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException
-    {
-        checkCanEditArea(server, sender, area);
+	@Override
+	public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException {
+		checkCanEditArea(server, sender, area);
 
-        area.togglePassiveSpawning();
-        cap.dataChanged(area, AreaUpdateType.CHANGE);
-        sender.sendMessage(new TextComponentTranslation("lm.command.passives.success", area.canPassiveSpawn(), area.getName()));
-    }
+		area.togglePassiveSpawning();
+		cap.dataChanged(area, AreaUpdateType.CHANGE);
+		sender.sendMessage(new TextComponentTranslation("lm.command.passives.success", area.canPassiveSpawn(), area.getName()));
+	}
 }

@@ -17,32 +17,27 @@ import java.util.List;
 //lm rename <areaName> <newAreaName>
 //OR
 //lm op rename <areaName> <newAreaName>
-public class CommandRename extends LMCommand
-{
+public class CommandRename extends LMCommand {
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "rename";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender)
-	{
-		return LMConfig.permissions.rename ?  "lm.command.rename.usage" : "lm.command.rename.usage.op";
+	public String getUsage(ICommandSender sender) {
+		return LMConfig.permissions.rename ? "lm.command.rename.usage" : "lm.command.rename.usage.op";
 	}
 
 	@Override
-	public int getRequiredPermissionLevel()
-	{
+	public int getRequiredPermissionLevel() {
 		return getPermissionLevel(LMConfig.permissions.rename);
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-	{
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		validateSenderIsPlayer(sender);
 
-		if(args.length != 2)
+		if (args.length != 2)
 			throwWrongUsage(sender);
 
 		Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
@@ -51,15 +46,14 @@ public class CommandRename extends LMCommand
 
 		String oldName = area.getName();
 		String newName = args[1];
-		if(pair.getLeft().renameArea(oldName, newName))
+		if (pair.getLeft().renameArea(oldName, newName))
 			sender.sendMessage(new TextComponentTranslation("lm.command.rename.success", oldName, newName));
 		else
 			sender.sendMessage(new TextComponentTranslation("lm.command.rename.invalid", newName));
 	}
 
 	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
-	{
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
 		return args.length == 1 ? getListOfStringsMatchingLastWord(args, getAllAreaNames(server)) : super.getTabCompletions(server, sender, args, targetPos);
 	}
 }

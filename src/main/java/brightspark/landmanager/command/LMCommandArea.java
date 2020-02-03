@@ -12,41 +12,36 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 //Used for commands which only have a single argument for an area
-public abstract class LMCommandArea extends LMCommand
-{
-    private boolean canHaveNoArg = false;
+public abstract class LMCommandArea extends LMCommand {
+	private boolean canHaveNoArg = false;
 
-    protected void setCanHaveNoArg()
-    {
-        canHaveNoArg = true;
-    }
+	protected void setCanHaveNoArg() {
+		canHaveNoArg = true;
+	}
 
-    @Override
-    public final void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-    {
-        if(args.length == 0)
-        {
-            if(canHaveNoArg)
-                execute(server, sender, null, null);
-            else
-                throwWrongUsage(sender);
-            return;
-        }
+	@Override
+	public final void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		if (args.length == 0) {
+			if (canHaveNoArg)
+				execute(server, sender, null, null);
+			else
+				throwWrongUsage(sender);
+			return;
+		}
 
-        String areaName = argsToString(args);
-        if(areaName.isEmpty())
-            throwWrongUsage(sender);
+		String areaName = argsToString(args);
+		if (areaName.isEmpty())
+			throwWrongUsage(sender);
 
-        Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, areaName);
+		Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, areaName);
 
-        execute(server, sender, pair.getRight(), pair.getLeft());
-    }
+		execute(server, sender, pair.getRight(), pair.getLeft());
+	}
 
-    public abstract void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException;
+	public abstract void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException;
 
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
-    {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, getAllAreaNames(server)) : super.getTabCompletions(server, sender, args, targetPos);
-    }
+	@Override
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
+		return args.length == 1 ? getListOfStringsMatchingLastWord(args, getAllAreaNames(server)) : super.getTabCompletions(server, sender, args, targetPos);
+	}
 }

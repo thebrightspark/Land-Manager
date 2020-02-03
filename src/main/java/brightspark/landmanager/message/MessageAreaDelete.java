@@ -13,42 +13,36 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageAreaDelete implements IMessage
-{
+public class MessageAreaDelete implements IMessage {
 	private String areaName;
 
-	public MessageAreaDelete() {}
+	public MessageAreaDelete() {
+	}
 
-	public MessageAreaDelete(String areaName)
-	{
+	public MessageAreaDelete(String areaName) {
 		this.areaName = areaName;
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
+	public void fromBytes(ByteBuf buf) {
 		areaName = ByteBufUtils.readUTF8String(buf);
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
+	public void toBytes(ByteBuf buf) {
 		ByteBufUtils.writeUTF8String(buf, areaName);
 	}
 
-	public static class Handler implements IMessageHandler<MessageAreaDelete, IMessage>
-	{
+	public static class Handler implements IMessageHandler<MessageAreaDelete, IMessage> {
 		@Override
-		public IMessage onMessage(MessageAreaDelete message, MessageContext ctx)
-		{
+		public IMessage onMessage(MessageAreaDelete message, MessageContext ctx) {
 			Minecraft.getMinecraft().addScheduledTask(() ->
 			{
 				World world = Minecraft.getMinecraft().world;
 				CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-				if(cap != null)
-				{
+				if (cap != null) {
 					Area area = cap.getArea(message.areaName);
-					if(area != null && cap.removeArea(message.areaName))
+					if (area != null && cap.removeArea(message.areaName))
 						MinecraftForge.EVENT_BUS.post(new AreaDeletedEvent(area));
 				}
 			});

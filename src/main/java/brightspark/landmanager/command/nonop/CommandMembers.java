@@ -21,55 +21,46 @@ import java.util.List;
 import java.util.UUID;
 
 //lm members <add|remove> <areaName> <playerName>
-public class CommandMembers extends LMCommandTree
-{
-	public CommandMembers()
-	{
+public class CommandMembers extends LMCommandTree {
+	public CommandMembers() {
 		addSubcommand(new CommandMembersAdd());
 		addSubcommand(new CommandMembersRemove());
 		addSubcommand(new CommandTreeHelp(this));
 	}
 
 	@Override
-	public List<String> getAliases()
-	{
+	public List<String> getAliases() {
 		return Lists.newArrayList("member");
 	}
 
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "members";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender)
-	{
+	public String getUsage(ICommandSender sender) {
 		return "lm.command.members.usage";
 	}
 
 	//lm members add <areaName> <playerName>
-	public static class CommandMembersAdd extends LMCommand
-	{
+	public static class CommandMembersAdd extends LMCommand {
 		@Override
-		public String getName()
-		{
+		public String getName() {
 			return "add";
 		}
 
 		@Override
-		public String getUsage(ICommandSender sender)
-		{
+		public String getUsage(ICommandSender sender) {
 			return "lm.command.members.add.usage";
 		}
 
 		@Override
-		public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-		{
+		public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 			validateSenderIsPlayer(sender);
 			EntityPlayer player = (EntityPlayer) sender;
 
-			if(args.length != 2)
+			if (args.length != 2)
 				throwWrongUsage(sender);
 
 			Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
@@ -78,56 +69,50 @@ public class CommandMembers extends LMCommandTree
 			checkCanEditArea(server, sender, area);
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
-			if(!cap.canJoinArea(uuid))
-			{
+			if (!cap.canJoinArea(uuid)) {
 				player.sendMessage(new TextComponentTranslation("message.error.maxJoined", cap.getNumAreasJoined(uuid)));
 				return;
 			}
 
-			if(area.addMember(uuid))
-			{
+			if (area.addMember(uuid)) {
 				cap.increasePlayerAreasNum(uuid);
 				cap.dataChanged(area, AreaUpdateType.CHANGE);
 				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player.getDisplayName(), area.getName()));
-			}
-			else
+			} else
 				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player.getDisplayName(), area.getName()));
 		}
 
 		@Override
-		public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
-		{
-			switch(args.length)
-			{
-				case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-				case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayerNames(server));
-				default:    return super.getTabCompletions(server, sender, args, targetPos);
+		public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
+			switch (args.length) {
+				case 1:
+					return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+				case 2:
+					return getListOfStringsMatchingLastWord(args, Utils.getAllPlayerNames(server));
+				default:
+					return super.getTabCompletions(server, sender, args, targetPos);
 			}
 		}
 	}
 
 	//lm members remove <areaName> <playerName>
-	public static class CommandMembersRemove extends LMCommand
-	{
+	public static class CommandMembersRemove extends LMCommand {
 		@Override
-		public String getName()
-		{
+		public String getName() {
 			return "remove";
 		}
 
 		@Override
-		public String getUsage(ICommandSender sender)
-		{
+		public String getUsage(ICommandSender sender) {
 			return "lm.command.members.remove.usage";
 		}
 
 		@Override
-		public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-		{
+		public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 			validateSenderIsPlayer(sender);
 			EntityPlayer player = (EntityPlayer) sender;
 
-			if(args.length != 2)
+			if (args.length != 2)
 				throwWrongUsage(sender);
 
 			Pair<CapabilityAreas, Area> pair = getAreaAndCap(server, args[0]);
@@ -135,24 +120,23 @@ public class CommandMembers extends LMCommandTree
 			checkCanEditArea(server, sender, area);
 
 			UUID uuid = getUuidFromPlayerName(server, args[1]);
-			if(area.removeMember(uuid))
-			{
+			if (area.removeMember(uuid)) {
 				pair.getLeft().decreasePlayerAreasNum(uuid);
 				pair.getLeft().dataChanged(area, AreaUpdateType.CHANGE);
 				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player.getDisplayName(), area.getName()));
-			}
-			else
+			} else
 				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player.getDisplayName(), area.getName()));
 		}
 
 		@Override
-		public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
-		{
-			switch(args.length)
-			{
-				case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-				case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayerNames(server));
-				default:    return super.getTabCompletions(server, sender, args, targetPos);
+		public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
+			switch (args.length) {
+				case 1:
+					return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+				case 2:
+					return getListOfStringsMatchingLastWord(args, Utils.getAllPlayerNames(server));
+				default:
+					return super.getTabCompletions(server, sender, args, targetPos);
 			}
 		}
 	}

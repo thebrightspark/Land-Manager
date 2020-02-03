@@ -12,20 +12,17 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
-public class LMItems
-{
-    public static final Item adminItem = new ItemAdmin();
+public class LMItems {
+	public static final Item adminItem = new ItemAdmin();
 
-    @SubscribeEvent
-    public static void regItems(RegistryEvent.Register<Item> event)
-    {
-        event.getRegistry().register(adminItem);
-    }
+	@SubscribeEvent
+	public static void regItems(RegistryEvent.Register<Item> event) {
+		event.getRegistry().register(adminItem);
+	}
 
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public static void regModels(ModelRegistryEvent event)
-    {
-        ModelLoader.setCustomModelResourceLocation(adminItem, 0, new ModelResourceLocation(adminItem.getRegistryName(), "inventory"));
-    }
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public static void regModels(ModelRegistryEvent event) {
+		ModelLoader.setCustomModelResourceLocation(adminItem, 0, new ModelResourceLocation(adminItem.getRegistryName(), "inventory"));
+	}
 }

@@ -10,26 +10,22 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentTranslation;
 
 //lm showoff
-public class CommandShowOff extends LMCommand
-{
-    @Override
-    public String getName()
-    {
-        return "showoff";
-    }
+public class CommandShowOff extends LMCommand {
+	@Override
+	public String getName() {
+		return "showoff";
+	}
 
-    @Override
-    public String getUsage(ICommandSender sender)
-    {
-        return "lm.command.showoff.usage";
-    }
+	@Override
+	public String getUsage(ICommandSender sender) {
+		return "lm.command.showoff.usage";
+	}
 
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-    {
-        validateSenderIsPlayer(sender);
+	@Override
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		validateSenderIsPlayer(sender);
 
-        LandManager.NETWORK.sendTo(new MessageShowArea(""), (EntityPlayerMP) sender);
-        sender.sendMessage(new TextComponentTranslation("lm.command.showoff"));
-    }
+		LandManager.NETWORK.sendTo(new MessageShowArea(""), (EntityPlayerMP) sender);
+		sender.sendMessage(new TextComponentTranslation("lm.command.showoff"));
+	}
 }

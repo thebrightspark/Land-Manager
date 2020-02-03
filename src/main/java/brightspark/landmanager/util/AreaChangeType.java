@@ -1,7 +1,6 @@
 package brightspark.landmanager.util;
 
-public enum AreaChangeType
-{
+public enum AreaChangeType {
 	CREATE,
 	DELETE,
 	ALLOCATE,

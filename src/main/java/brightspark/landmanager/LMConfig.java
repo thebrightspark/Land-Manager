@@ -8,8 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Config(modid = LandManager.MOD_ID)
 @Config.LangKey(LandManager.MOD_ID + ".config.title")
-public class LMConfig
-{
+public class LMConfig {
     @Config.Comment("Whether non-op players can claim chunks using '/lm claim'")
     public static boolean disableClaiming = false;
 
@@ -17,8 +16,8 @@ public class LMConfig
     public static boolean creativeIgnoresProtection = true;
 
     @Config.Comment({
-	    "The max number of areas a player can own",
-	    "Use -1 for no limit"
+        "The max number of areas a player can own",
+        "Use -1 for no limit"
     })
     @Config.RangeInt(min = -1)
     public static int maxAreasCanOwn = -1;
@@ -29,11 +28,10 @@ public class LMConfig
     @Config.Comment("Non-OP player permissions for what they can change in their areas")
     public static final Permissions permissions = new Permissions();
 
-	@Config.Comment("Global settings affect all blocks outside of any areas")
+    @Config.Comment("Global settings affect all blocks outside of any areas")
     public static final GlobalSettings globalSettings = new GlobalSettings();
 
-    public static class Client
-    {
+    public static class Client {
         @Config.Comment("The radius within which nearby areas will show when /lmShow is showing all nearby areas")
         @Config.RangeInt(min = 0)
         public int showAllRadius = 16;
@@ -53,10 +51,9 @@ public class LMConfig
         public double areaBoxEdgeThickness = 0.025D;
     }
 
-    public static class Permissions
-    {
+    public static class Permissions {
         @Config.Comment({"If true then the 'claim' command will create a request rather than take instant effect",
-                "An OP will then need to use the 'approve' command to accept the request"})
+            "An OP will then need to use the 'approve' command to accept the request"})
         public boolean claimRequest = false;
 
         @Config.Comment("If area owners can toggle whether passive entities can spawn in the area")
@@ -84,34 +81,31 @@ public class LMConfig
         public boolean rename = false;
     }
 
-    public static class GlobalSettings
-    {
-    	@Config.Comment("Can passive entities spawn in global spaces")
-	    public boolean canPassiveSpawn = true;
+    public static class GlobalSettings {
+        @Config.Comment("Can passive entities spawn in global spaces")
+        public boolean canPassiveSpawn = true;
 
-	    @Config.Comment("Can hostile entities spawn in global spaces")
-	    public boolean canHostileSpawn = true;
+        @Config.Comment("Can hostile entities spawn in global spaces")
+        public boolean canHostileSpawn = true;
 
-	    @Config.Comment("Can explosions destroy global blocks")
-	    public boolean canExplosionsDestroyBlocks = true;
+        @Config.Comment("Can explosions destroy global blocks")
+        public boolean canExplosionsDestroyBlocks = true;
 
-	    @Config.Comment("Can players interact with global blocks")
-	    public boolean canPlayersInteract = true;
+        @Config.Comment("Can players interact with global blocks")
+        public boolean canPlayersInteract = true;
 
-	    @Config.Comment("Can players break global blocks")
-	    public boolean canPlayersBreakBlocks = true;
+        @Config.Comment("Can players break global blocks")
+        public boolean canPlayersBreakBlocks = true;
 
-	    @Config.Comment("Can players place global blocks")
-	    public boolean canPlayersPlaceBlocks = true;
+        @Config.Comment("Can players place global blocks")
+        public boolean canPlayersPlaceBlocks = true;
     }
 
     @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
-    private static class Handler
-    {
+    private static class Handler {
         @SubscribeEvent
-        public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
-        {
-            if(event.getModID().equals(LandManager.MOD_ID))
+        public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+            if (event.getModID().equals(LandManager.MOD_ID))
                 ConfigManager.sync(LandManager.MOD_ID, Config.Type.INSTANCE);
         }
     }

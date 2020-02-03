@@ -9,45 +9,44 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public interface CapabilityAreas extends INBTSerializable<NBTTagCompound>
-{
-    boolean hasArea(String areaName);
+public interface CapabilityAreas extends INBTSerializable<NBTTagCompound> {
+	boolean hasArea(String areaName);
 
-    Area getArea(String areaName);
+	Area getArea(String areaName);
 
-    boolean addArea(Area area);
+	boolean addArea(Area area);
 
-    boolean removeArea(String areaName);
+	boolean removeArea(String areaName);
 
-    void updateArea(Area area);
+	void updateArea(Area area);
 
-    boolean renameArea(String oldName, String newName);
+	boolean renameArea(String oldName, String newName);
 
-    boolean setOwner(String areaName, UUID playerUuid);
+	boolean setOwner(String areaName, UUID playerUuid);
 
-    List<Area> getAllAreas();
+	List<Area> getAllAreas();
 
-    List<String> getAllAreaNames();
+	List<String> getAllAreaNames();
 
-    Set<Area> getNearbyAreas(BlockPos pos);
+	Set<Area> getNearbyAreas(BlockPos pos);
 
-    boolean intersectsAnArea(Area area);
+	boolean intersectsAnArea(Area area);
 
-    Area intersectingArea(BlockPos pos);
+	Area intersectingArea(BlockPos pos);
 
-    Set<Area> intersectingAreas(BlockPos pos);
+	Set<Area> intersectingAreas(BlockPos pos);
 
-    void dataChanged();
+	void dataChanged();
 
-    void dataChanged(Area area, AreaUpdateType type);
+	void dataChanged(Area area, AreaUpdateType type);
 
-    void sendDataToPlayer(EntityPlayerMP player);
+	void sendDataToPlayer(EntityPlayerMP player);
 
-    int getNumAreasJoined(UUID playerUuid);
+	int getNumAreasJoined(UUID playerUuid);
 
-    boolean canJoinArea(UUID playerUuid);
+	boolean canJoinArea(UUID playerUuid);
 
-    void increasePlayerAreasNum(UUID playerUuid);
+	void increasePlayerAreasNum(UUID playerUuid);
 
-    void decreasePlayerAreasNum(UUID playerUuid);
+	void decreasePlayerAreasNum(UUID playerUuid);
 }

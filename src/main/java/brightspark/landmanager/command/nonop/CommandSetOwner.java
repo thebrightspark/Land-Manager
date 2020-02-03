@@ -19,27 +19,23 @@ import java.util.List;
 import java.util.UUID;
 
 //lm setowner <areaName> [playerName]
-public class CommandSetOwner extends LMCommand
-{
+public class CommandSetOwner extends LMCommand {
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "setowner";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender)
-	{
+	public String getUsage(ICommandSender sender) {
 		return "lm.command.setowner.usage";
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-	{
-		if(args.length < 1)
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		if (args.length < 1)
 			throwWrongUsage(sender);
 		//Only OPs can set the owner to null
-		if(args.length == 1 && !Utils.isOp(server, sender))
+		if (args.length == 1 && !Utils.isOp(server, sender))
 			throw new CommandException("lm.command.setowner.op");
 
 		String areaName = args[0];
@@ -47,8 +43,7 @@ public class CommandSetOwner extends LMCommand
 		Area area = pair.getRight();
 		String playerName = argsToString(args, 1);
 		UUID playerUuid = null;
-		if(args.length > 1)
-		{
+		if (args.length > 1) {
 			checkCanEditArea(server, sender, area);
 			playerUuid = getUuidFromPlayerName(server, playerName);
 		}
@@ -56,9 +51,9 @@ public class CommandSetOwner extends LMCommand
 		//Set the owner and update members
 		UUID prevOwner = area.getOwner();
 		area.setOwner(playerUuid);
-		if(playerUuid != null)
+		if (playerUuid != null)
 			area.removeMember(playerUuid);
-		if(prevOwner != null)
+		if (prevOwner != null)
 			area.addMember(prevOwner);
 		pair.getLeft().dataChanged(area, AreaUpdateType.CHANGE);
 		sender.sendMessage(new TextComponentTranslation("lm.command.setowner.success", areaName, playerName));
@@ -67,13 +62,14 @@ public class CommandSetOwner extends LMCommand
 	}
 
 	@Override
-	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
-	{
-		switch(args.length)
-		{
-			case 1:     return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
-			case 2:     return getListOfStringsMatchingLastWord(args, Utils.getAllPlayerNames(server));
-			default:    return super.getTabCompletions(server, sender, args, targetPos);
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
+		switch (args.length) {
+			case 1:
+				return getListOfStringsMatchingLastWord(args, getAllAreaNames(server));
+			case 2:
+				return getListOfStringsMatchingLastWord(args, Utils.getAllPlayerNames(server));
+			default:
+				return super.getTabCompletions(server, sender, args, targetPos);
 		}
 	}
 }

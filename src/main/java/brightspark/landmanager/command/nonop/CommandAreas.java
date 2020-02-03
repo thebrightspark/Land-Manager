@@ -10,34 +10,28 @@ import net.minecraft.util.text.TextComponentTranslation;
 import java.util.List;
 
 //lm areas [page] [areaNameRegex]
-public class CommandAreas extends LMCommand
-{
+public class CommandAreas extends LMCommand {
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "areas";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender)
-	{
+	public String getUsage(ICommandSender sender) {
 		return "lm.command.areas.usage";
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args)
-	{
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) {
 		//Get page num from args if provided
 		int page = args.length > 0 ? parseIntWithDefault(args[0], Integer.MIN_VALUE) : Integer.MIN_VALUE;
 
 		//Get area name from args if provided
 		String areaName = null;
-		if(page == Integer.MIN_VALUE)
-		{
-			if(args.length > 0)
+		if (page == Integer.MIN_VALUE) {
+			if (args.length > 0)
 				areaName = argsToString(args, 0);
-		}
-		else if(args.length > 1)
+		} else if (args.length > 1)
 			areaName = argsToString(args, 1);
 
 		page = Math.max(0, page);
@@ -46,8 +40,7 @@ public class CommandAreas extends LMCommand
 		List<Area> areas = areaName == null ?
 			getAllAreas(server) :
 			getAreasByNameRegex(server, areaName);
-		if(areas.isEmpty())
-		{
+		if (areas.isEmpty()) {
 			sender.sendMessage(new TextComponentTranslation("lm.command.areas.none"));
 			return;
 		}

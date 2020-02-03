@@ -9,8 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class Request implements INBTSerializable<NBTTagCompound>
-{
+public class Request implements INBTSerializable<NBTTagCompound> {
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 	private int id;
@@ -18,53 +17,44 @@ public class Request implements INBTSerializable<NBTTagCompound>
 	private UUID playerUuid;
 	private long timestamp;
 
-	public Request(int id, String areaName, UUID playerUuid)
-	{
+	public Request(int id, String areaName, UUID playerUuid) {
 		this.id = id;
 		this.areaName = areaName;
 		this.playerUuid = playerUuid;
 		timestamp = System.currentTimeMillis();
 	}
 
-	public Request(NBTTagCompound nbt)
-	{
+	public Request(NBTTagCompound nbt) {
 		deserializeNBT(nbt);
 	}
 
-	public int getId()
-	{
+	public int getId() {
 		return id;
 	}
 
-	public String getAreaName()
-	{
+	public String getAreaName() {
 		return areaName;
 	}
 
-	public UUID getPlayerUuid()
-	{
+	public UUID getPlayerUuid() {
 		return playerUuid;
 	}
 
-	public String getPlayerName(MinecraftServer server)
-	{
+	public String getPlayerName(MinecraftServer server) {
 		GameProfile profile = server.getPlayerProfileCache().getProfileByUUID(playerUuid);
 		return profile == null ? null : profile.getName();
 	}
 
-	public long getTimestamp()
-	{
+	public long getTimestamp() {
 		return timestamp;
 	}
 
-	public String getDate()
-	{
+	public String getDate() {
 		return DATE_FORMAT.format(new Date(timestamp));
 	}
 
 	@Override
-	public NBTTagCompound serializeNBT()
-	{
+	public NBTTagCompound serializeNBT() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setInteger("id", id);
 		nbt.setString("areaName", areaName);
@@ -74,8 +64,7 @@ public class Request implements INBTSerializable<NBTTagCompound>
 	}
 
 	@Override
-	public void deserializeNBT(NBTTagCompound nbt)
-	{
+	public void deserializeNBT(NBTTagCompound nbt) {
 		id = nbt.getInteger("id");
 		areaName = nbt.getString("areaName");
 		playerUuid = nbt.getUniqueId("player");

@@ -5,17 +5,14 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.command.CommandTreeBase;
 
-public abstract class LMCommandTree extends CommandTreeBase
-{
+public abstract class LMCommandTree extends CommandTreeBase {
 	@Override
-	public int getRequiredPermissionLevel()
-	{
+	public int getRequiredPermissionLevel() {
 		return 0;
 	}
 
 	@Override
-	public boolean checkPermission(MinecraftServer server, ICommandSender sender)
-	{
+	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
 		return Utils.checkCommandPermission(this, server, sender);
 	}
 }

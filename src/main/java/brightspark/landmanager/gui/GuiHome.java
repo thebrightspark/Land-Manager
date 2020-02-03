@@ -28,8 +28,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
-public class GuiHome extends LMGui
-{
+public class GuiHome extends LMGui {
 	private static final int PLAYER_LIST_SIZE = 4;
 	private static final Rectangle ownerIcon = new Rectangle(162, 110, 7, 7);
 
@@ -51,22 +50,19 @@ public class GuiHome extends LMGui
 	private String errorMessage = null;
 	private String[] errorMessageArgs = null;
 
-	public GuiHome(World world, BlockPos pos)
-	{
+	public GuiHome(World world, BlockPos pos) {
 		super("gui_home", 162, 144);
 		this.pos = pos;
 		CapabilityAreas cap = world.getCapability(LandManager.CAPABILITY_AREAS, null);
-		if(cap != null)
+		if (cap != null)
 			area = cap.intersectingArea(pos);
 	}
 
-	private boolean isOwner(UUID uuid)
-	{
+	private boolean isOwner(UUID uuid) {
 		return owner != null && owner.getLeft().equals(uuid);
 	}
 
-	public void setClientIsOp()
-	{
+	public void setClientIsOp() {
 		clientIsOp = true;
 		updateToggleButtons();
 	}
@@ -74,31 +70,26 @@ public class GuiHome extends LMGui
 	/**
 	 * Used by {@link brightspark.landmanager.message.MessageOpenHomeGui} to set the members data
 	 */
-	public void setMembersData(Pair<UUID, String> owner, List<Pair<UUID, String>> members)
-	{
+	public void setMembersData(Pair<UUID, String> owner, List<Pair<UUID, String>> members) {
 		this.owner = owner;
 		this.members = members;
 		this.members.add(owner);
 		updatePlayerList();
 	}
 
-	public void addMember(UUID uuid, String player)
-	{
+	public void addMember(UUID uuid, String player) {
 		members.add(new ImmutablePair<>(uuid, player));
 		updatePlayerList();
 	}
 
-	public void removeMember(UUID player)
-	{
+	public void removeMember(UUID player) {
 		members.removeIf(pair -> pair.getLeft().equals(player));
 		playerListStartIndex = MathHelper.clamp(playerListStartIndex, 0, Math.max(0, members.size() - PLAYER_LIST_SIZE));
 		updatePlayerList();
 	}
 
-	public void setToggle(HomeGuiToggleType type, boolean state)
-	{
-		switch(type)
-		{
+	public void setToggle(HomeGuiToggleType type, boolean state) {
+		switch (type) {
 			case INTERACTIONS:
 				area.setInteractions(state);
 				break;
@@ -114,39 +105,32 @@ public class GuiHome extends LMGui
 		updateToggleButtons();
 	}
 
-	public void clearInput()
-	{
+	public void clearInput() {
 		input.setText("");
 	}
 
-	public void clearSelection()
-	{
+	public void clearSelection() {
 		selectedMemberIndex = -1;
 	}
 
-	public void setErrorMessage(String errorMessage, String[] args)
-	{
+	public void setErrorMessage(String errorMessage, String[] args) {
 		this.errorMessage = errorMessage;
 		this.errorMessageArgs = args;
 	}
 
-	private void clearErrorMessage()
-	{
-		if(errorMessage != null)
-		{
+	private void clearErrorMessage() {
+		if (errorMessage != null) {
 			errorMessage = null;
 			errorMessageArgs = null;
 		}
 	}
 
-	private boolean canUseToggle(boolean config)
-	{
+	private boolean canUseToggle(boolean config) {
 		return clientIsOp || (config && isOwner);
 	}
 
 	@Override
-	public void initGui()
-	{
+	public void initGui() {
 		super.initGui();
 
 		isOwner = area.isOwner(mc.player.getUniqueID());
@@ -155,7 +139,7 @@ public class GuiHome extends LMGui
 		input.setEnableBackgroundDrawing(false);
 
 		listButtons.clear();
-		for(int i = 0; i < PLAYER_LIST_SIZE; i++)
+		for (int i = 0; i < PLAYER_LIST_SIZE; i++)
 			listButtons.add(addButton(new ListButton(7, 16 + (i * 12))));
 
 		upButton = addButton(new ArrowButton(97, 29, true));
@@ -177,14 +161,12 @@ public class GuiHome extends LMGui
 	}
 
 	@Override
-	public boolean doesGuiPauseGame()
-	{
+	public boolean doesGuiPauseGame() {
 		return false;
 	}
 
 	@Override
-	protected void drawText()
-	{
+	protected void drawText() {
 		input.drawTextBox();
 
 		int colour = 4210752;
@@ -202,85 +184,68 @@ public class GuiHome extends LMGui
 	}
 
 	@Override
-	public void updateScreen()
-	{
-		if(input != null)
+	public void updateScreen() {
+		if (input != null)
 			input.updateCursorCounter();
 	}
 
 	@Override
-	protected void keyTyped(char typedChar, int keyCode)
-	{
-		if(input.textboxKeyTyped(typedChar, keyCode))
-		{
+	protected void keyTyped(char typedChar, int keyCode) {
+		if (input.textboxKeyTyped(typedChar, keyCode)) {
 			clearErrorMessage();
 			updateActionButtons();
-		}
-		else if(keyCode == Keyboard.KEY_RETURN && input.isFocused() && StringUtils.isNotBlank(input.getText()))
+		} else if (keyCode == Keyboard.KEY_RETURN && input.isFocused() && StringUtils.isNotBlank(input.getText()))
 			LandManager.NETWORK.sendToServer(new MessageHomeActionAdd(pos, input.getText()));
-		else if(keyCode == Keyboard.KEY_ESCAPE || mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode))
+		else if (keyCode == Keyboard.KEY_ESCAPE || mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode))
 			mc.player.closeScreen();
 	}
 
 	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-	{
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
-		if(input.mouseClicked(mouseX, mouseY, mouseButton))
-		{
+		if (input.mouseClicked(mouseX, mouseY, mouseButton)) {
 			listButtons.forEach(listButton -> listButton.setSelected(false));
 			selectedMemberIndex = -1;
 			updateActionButtons();
 			clearErrorMessage();
 		}
-		if(mouseX >= input.x && mouseX < input.x + input.width && mouseY >= input.y && mouseY < input.y + input.height && mouseButton == 1)
-		{
+		if (mouseX >= input.x && mouseX < input.x + input.width && mouseY >= input.y && mouseY < input.y + input.height && mouseButton == 1) {
 			input.setText("");
 			clearErrorMessage();
 		}
 	}
 
 	@Override
-	protected void actionPerformed(GuiButton button) throws IOException
-	{
+	protected void actionPerformed(GuiButton button) throws IOException {
 		clearErrorMessage();
 
-		if(button instanceof ListButton)
-		{
+		if (button instanceof ListButton) {
 			listButtons.forEach(listButton -> listButton.setSelected(false));
 			ListButton listButton = (ListButton) button;
 			listButton.setSelected(true);
 			selectedMemberIndex = listButton.id + playerListStartIndex;
 			updateActionButtons();
-		}
-		else if(button instanceof ArrowButton)
-		{
+		} else if (button instanceof ArrowButton) {
 			int change = ((ArrowButton) button).isUp() ? -1 : 1;
 			playerListStartIndex += change;
 			updatePlayerList();
-		}
-		else if(button instanceof ActionButton)
-		{
+		} else if (button instanceof ActionButton) {
 			HomeGuiActionType type = ((ActionButton) button).type;
-			switch(type)
-			{
+			switch (type) {
 				case KICK:
 				case PASS:
 					UUID memberUuid = selectedMemberIndex >= 0 ? members.get(selectedMemberIndex).getLeft() : null;
-					if(!isOwner(memberUuid))
+					if (!isOwner(memberUuid))
 						LandManager.NETWORK.sendToServer(new MessageHomeActionKickOrPass(pos, type == HomeGuiActionType.PASS, memberUuid));
 					break;
 				case ADD:
 					String inputText = input.getText();
-					if(StringUtils.isNotBlank(inputText))
+					if (StringUtils.isNotBlank(inputText))
 						LandManager.NETWORK.sendToServer(new MessageHomeActionAdd(pos, inputText));
 			}
-		}
-		else if(button instanceof ToggleButton)
-		{
+		} else if (button instanceof ToggleButton) {
 			ToggleButton toggleButton = (ToggleButton) button;
-			switch(toggleButton.type)
-			{
+			switch (toggleButton.type) {
 				case BOUNDARIES:
 					toggleButton.isOn = !toggleButton.isOn;
 					ClientEventHandler.setRenderArea(area.getName(), toggleButton.isOn);
@@ -295,19 +260,16 @@ public class GuiHome extends LMGui
 		super.actionPerformed(button);
 	}
 
-	private boolean canScrollUp()
-	{
+	private boolean canScrollUp() {
 		return playerListStartIndex > 0;
 	}
 
-	private boolean canScrollDown()
-	{
+	private boolean canScrollDown() {
 		return members.size() > playerListStartIndex + PLAYER_LIST_SIZE;
 	}
 
-	private void updatePlayerList()
-	{
-		if(members == null)
+	private void updatePlayerList() {
+		if (members == null)
 			return;
 
 		members.removeIf(Objects::isNull);
@@ -315,8 +277,7 @@ public class GuiHome extends LMGui
 		//Update members list
 		members.sort(Comparator.comparing(Pair::getRight, String::compareToIgnoreCase));
 		int membersSize = members.size();
-		for(int i = 0; i < PLAYER_LIST_SIZE; i++)
-		{
+		for (int i = 0; i < PLAYER_LIST_SIZE; i++) {
 			int playerListI = playerListStartIndex + i;
 			ListButton button = listButtons.get(i);
 			button.setPlayer(playerListI < membersSize ? members.get(playerListI) : null);
@@ -328,14 +289,12 @@ public class GuiHome extends LMGui
 		downButton.enabled = canScrollDown();
 	}
 
-	private void updateActionButtons()
-	{
+	private void updateActionButtons() {
 		addButton.enabled = StringUtils.isNotBlank(input.getText());
 		kickButton.enabled = passButton.enabled = selectedMemberIndex >= 0 && !isOwner(members.get(selectedMemberIndex).getLeft());
 	}
 
-	private void updateToggleButtons()
-	{
+	private void updateToggleButtons() {
 		interactionsToggle.setEnabled(canUseToggle(LMConfig.permissions.interactions));
 		interactionsToggle.isOn = area.canInteract();
 		passivesToggle.setEnabled(canUseToggle(LMConfig.permissions.passiveSpawning));
@@ -346,12 +305,10 @@ public class GuiHome extends LMGui
 		explosionsToggle.isOn = area.canExplosionsCauseDamage();
 	}
 
-	private class ListButton extends LMButton
-	{
+	private class ListButton extends LMButton {
 		private boolean isOwner = false;
 
-		ListButton(int x, int y)
-		{
+		ListButton(int x, int y) {
 			super(x, y, 87, 11, 87, 144, null);
 			textOffset = 1;
 			drawWhenDisabled = false;
@@ -359,22 +316,17 @@ public class GuiHome extends LMGui
 		}
 
 		@Override
-		protected int getTextColour()
-		{
+		protected int getTextColour() {
 			return 14737632;
 		}
 
-		public void setPlayer(Pair<UUID, String> player)
-		{
-			if(player == null)
-			{
+		public void setPlayer(Pair<UUID, String> player) {
+			if (player == null) {
 				displayString = null;
 				enabled = false;
 				isOwner = false;
 				tooltip = null;
-			}
-			else
-			{
+			} else {
 				displayString = player.getRight();
 				enabled = true;
 				isOwner = isOwner(player.getLeft());
@@ -385,16 +337,13 @@ public class GuiHome extends LMGui
 			}
 		}
 
-		public void setSelected(boolean selected)
-		{
+		public void setSelected(boolean selected) {
 			hasIcon = selected;
 		}
 
 		@Override
-		protected void drawText()
-		{
-			if(isOwner)
-			{
+		protected void drawText() {
+			if (isOwner) {
 				mc.getTextureManager().bindTexture(image);
 				drawTexturedModalRect(x + 1, y + 1, ownerIcon.x, ownerIcon.y, ownerIcon.width, ownerIcon.height);
 			}
@@ -402,53 +351,44 @@ public class GuiHome extends LMGui
 		}
 	}
 
-	private class ArrowButton extends LMButton
-	{
+	private class ArrowButton extends LMButton {
 		private boolean isUp;
 
-		ArrowButton(int x, int y, boolean isUp)
-		{
+		ArrowButton(int x, int y, boolean isUp) {
 			super(x, y, 10, 13, 162, 84, null);
 			this.isUp = isUp;
 		}
 
-		public boolean isUp()
-		{
+		public boolean isUp() {
 			return isUp;
 		}
 
 		@Override
-		protected int getIconY()
-		{
+		protected int getIconY() {
 			return isUp ? iconY : iconY + height;
 		}
 	}
 
-	private class ActionButton extends LMButton
-	{
+	private class ActionButton extends LMButton {
 		private final HomeGuiActionType type;
 
-		ActionButton(int x, int y, String buttonText, HomeGuiActionType type)
-		{
+		ActionButton(int x, int y, String buttonText, HomeGuiActionType type) {
 			super(x, y, 45, 12, 162, 0, I18n.format(buttonText));
 			this.type = type;
 			textOffset = 12;
 		}
 
 		@Override
-		protected int getIconY()
-		{
+		protected int getIconY() {
 			return iconY + (type.ordinal() * height);
 		}
 	}
 
-	private class ToggleButton extends LMButton
-	{
+	private class ToggleButton extends LMButton {
 		public final HomeGuiToggleType type;
 		boolean isOn;
 
-		ToggleButton(HomeGuiToggleType type, int x, int y, boolean isOn)
-		{
+		ToggleButton(HomeGuiToggleType type, int x, int y, boolean isOn) {
 			super(x, y, 12, 12, 162, 36, null);
 			this.enabled = false;
 			this.type = type;
@@ -457,18 +397,16 @@ public class GuiHome extends LMGui
 		}
 
 		@Override
-		protected int getIconY()
-		{
+		protected int getIconY() {
 			int y = iconY;
-			if(!enabled)
+			if (!enabled)
 				y += height * 2;
-			if(isOn)
+			if (isOn)
 				y += height;
 			return y;
 		}
 
-		public void setEnabled(boolean enabled)
-		{
+		public void setEnabled(boolean enabled) {
 			this.enabled = enabled;
 			this.tooltip = enabled ? null : Collections.singletonList(I18n.format("gui.home.toggleDisabled"));
 		}

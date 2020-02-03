@@ -18,68 +18,63 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 //lm area <areaName>
-public class CommandArea extends LMCommandArea
-{
-    public CommandArea()
-    {
-        setCanHaveNoArg();
-    }
+public class CommandArea extends LMCommandArea {
+	public CommandArea() {
+		setCanHaveNoArg();
+	}
 
-    @Override
-    public String getName()
-    {
-        return "area";
-    }
+	@Override
+	public String getName() {
+		return "area";
+	}
 
-    @Override
-    public String getUsage(ICommandSender sender)
-    {
-        return "lm.command.area.usage";
-    }
+	@Override
+	public String getUsage(ICommandSender sender) {
+		return "lm.command.area.usage";
+	}
 
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException {
-        if (area == null) {
-            //Get the area the player is standing in
-            validateSenderIsPlayer(sender);
-            area = getAreaStandingIn((EntityPlayer) sender);
-        }
+	@Override
+	public void execute(MinecraftServer server, ICommandSender sender, Area area, CapabilityAreas cap) throws CommandException {
+		if (area == null) {
+			//Get the area the player is standing in
+			validateSenderIsPlayer(sender);
+			area = getAreaStandingIn((EntityPlayer) sender);
+		}
 
-        //Get owner
-        ITextComponent ownerName;
-        String ownerNameString = getPlayerNameFromUuid(server, area.getOwner());
-        if(ownerNameString == null)
-            ownerName = new TextComponentTranslation("lm.command.area.none");
-        else
-            ownerName = new TextComponentString(ownerNameString);
+		//Get owner
+		ITextComponent ownerName;
+		String ownerNameString = getPlayerNameFromUuid(server, area.getOwner());
+		if (ownerNameString == null)
+			ownerName = new TextComponentTranslation("lm.command.area.none");
+		else
+			ownerName = new TextComponentString(ownerNameString);
 
-        //Get members
-        ITextComponent members = null;
-        Set<UUID> memberSet = area.getMembers();
-        if(!memberSet.isEmpty())
-        {
-            List<String> names = memberSet.stream().map(uuid -> getPlayerNameFromUuid(server, uuid)).sorted().collect(Collectors.toList());
-            members = new TextComponentString(String.join(", ", names));
-        }
+		//Get members
+		ITextComponent members = null;
+		Set<UUID> memberSet = area.getMembers();
+		if (!memberSet.isEmpty()) {
+			List<String> names = memberSet.stream().map(uuid -> getPlayerNameFromUuid(server, uuid)).sorted().collect(Collectors.toList());
+			members = new TextComponentString(String.join(", ", names));
+		}
 
-        ITextComponent text = new TextComponentString("");
-        text.getStyle().setColor(TextFormatting.WHITE);
-        ITextComponent areaNameComponent = new TextComponentTranslation("lm.command.area.name");
-        areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
-        text.appendSibling(areaNameComponent).appendText(" " + area.getName());
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.owner")).appendText(" ").appendSibling(ownerName);
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members")).appendText(" ");
-        if(members == null)
-            text.appendSibling(new TextComponentTranslation("lm.command.area.none"));
-        else
-            text.appendSibling(members);
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.dim")).appendText(" " + area.getDimensionId());
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmin")).appendText(" " + posToString(area.getMinPos()));
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmax")).appendText(" " + posToString(area.getMaxPos()));
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.passives")).appendText(" ").appendSibling(booleanToText(area.canPassiveSpawn()));
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.hostiles")).appendText(" ").appendSibling(booleanToText(area.canHostileSpawn()));
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.explosions")).appendText(" ").appendSibling(booleanToText(area.canHostileSpawn()));
-        text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.interactions")).appendText(" ").appendSibling(booleanToText(area.canInteract()));
-        sender.sendMessage(text);
-    }
+		ITextComponent text = new TextComponentString("");
+		text.getStyle().setColor(TextFormatting.WHITE);
+		ITextComponent areaNameComponent = new TextComponentTranslation("lm.command.area.name");
+		areaNameComponent.getStyle().setColor(TextFormatting.YELLOW);
+		text.appendSibling(areaNameComponent).appendText(" " + area.getName());
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.owner")).appendText(" ").appendSibling(ownerName);
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.members")).appendText(" ");
+		if (members == null)
+			text.appendSibling(new TextComponentTranslation("lm.command.area.none"));
+		else
+			text.appendSibling(members);
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.dim")).appendText(" " + area.getDimensionId());
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmin")).appendText(" " + posToString(area.getMinPos()));
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.posmax")).appendText(" " + posToString(area.getMaxPos()));
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.passives")).appendText(" ").appendSibling(booleanToText(area.canPassiveSpawn()));
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.hostiles")).appendText(" ").appendSibling(booleanToText(area.canHostileSpawn()));
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.explosions")).appendText(" ").appendSibling(booleanToText(area.canHostileSpawn()));
+		text.appendText("\n ").appendSibling(goldTextComponent("lm.command.area.interactions")).appendText(" ").appendSibling(booleanToText(area.canInteract()));
+		sender.sendMessage(text);
+	}
 }

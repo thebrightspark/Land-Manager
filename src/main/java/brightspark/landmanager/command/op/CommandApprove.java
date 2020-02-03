@@ -18,54 +18,48 @@ import net.minecraftforge.common.MinecraftForge;
 import org.apache.commons.lang3.tuple.Pair;
 
 //lm op approve <requestId>
-public class CommandApprove extends LMCommand
-{
+public class CommandApprove extends LMCommand {
 	@Override
-	public String getName()
-	{
+	public String getName() {
 		return "approve";
 	}
 
 	@Override
-	public String getUsage(ICommandSender sender)
-	{
+	public String getUsage(ICommandSender sender) {
 		return "lm.command.approve.usage";
 	}
 
 	@Override
-	public int getRequiredPermissionLevel()
-	{
+	public int getRequiredPermissionLevel() {
 		return 2;
 	}
 
 	@Override
-	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
-	{
-		if(args.length != 1)
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		if (args.length != 1)
 			throwWrongUsage(sender);
 
 		Integer id = parseIntWithDefault(args[0]);
-		if(id == null)
+		if (id == null)
 			throwWrongUsage(sender);
 
 		RequestsWorldSavedData requests = RequestsWorldSavedData.get(server.getEntityWorld());
-		if(requests == null)
+		if (requests == null)
 			throw new CommandException("lm.command.reqdata");
 
 		//noinspection ConstantConditions
 		Request request = requests.getRequestById(id);
-		if(request == null)
+		if (request == null)
 			throw new CommandException("lm.command.approve.noRequest", id);
 
 		String areaName = request.getAreaName();
 		Pair<CapabilityAreas, Area> pair = getAreaAndCapNoException(server, areaName);
-		if(pair == null)
-		{
+		if (pair == null) {
 			sender.sendMessage(new TextComponentTranslation("lm.command.approve.noArea", areaName));
 			requests.deleteAllForArea(areaName);
 			return;
 		}
-		if(MinecraftForge.EVENT_BUS.post(new AreaClaimApprovalEvent(pair.getRight(), request, sender)))
+		if (MinecraftForge.EVENT_BUS.post(new AreaClaimApprovalEvent(pair.getRight(), request, sender)))
 			return;
 
 		//Approve the claim request
@@ -79,8 +73,7 @@ public class CommandApprove extends LMCommand
 
 		//Notify the player if they're online
 		EntityPlayerMP player = getPlayerFromUuid(server, request.getPlayerUuid());
-		if(player != null)
-		{
+		if (player != null) {
 			TextComponentTranslation textComp = new TextComponentTranslation("lm.command.approve.playerMessage", areaName, sender.getDisplayName());
 			textComp.getStyle().setColor(TextFormatting.DARK_GREEN);
 			player.sendMessage(textComp);

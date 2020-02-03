@@ -15,52 +15,45 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class Utils
-{
-	public static boolean isOp(MinecraftServer server, ICommandSender sender)
-	{
-		if(!(sender instanceof EntityPlayer))
+public class Utils {
+	public static boolean isOp(MinecraftServer server, ICommandSender sender) {
+		if (!(sender instanceof EntityPlayer))
 			return false;
 		EntityPlayer player = (EntityPlayer) sender;
-		if(player.getName().equals(server.getServerOwner()))
+		if (player.getName().equals(server.getServerOwner()))
 			return true;
 		UserListOpsEntry op = server.getPlayerList().getOppedPlayers().getEntry(player.getGameProfile());
 		return op != null;
 	}
 
-	public static boolean canPlayerEditArea(Area area, EntityPlayer player, MinecraftServer server)
-	{
-		if(area == null || player == null || server == null)
+	public static boolean canPlayerEditArea(Area area, EntityPlayer player, MinecraftServer server) {
+		if (area == null || player == null || server == null)
 			return false;
 		return area.isOwner(player.getUniqueID()) || isOp(server, player);
 	}
 
-	public static List<String> getAllPlayerNames(MinecraftServer server)
-	{
+	public static List<String> getAllPlayerNames(MinecraftServer server) {
 		List<String> players = new LinkedList<>();
 		PlayerProfileCache profileCache = server.getPlayerProfileCache();
-		for(String name : profileCache.getUsernames())
-		{
+		for (String name : profileCache.getUsernames()) {
 			GameProfile profile = profileCache.getGameProfileForUsername(name);
-			if(profile != null)
+			if (profile != null)
 				players.add(profile.getName());
 		}
 		players.sort(Comparator.naturalOrder());
 		return players;
 	}
 
-	public static String getPlayerName(MinecraftServer server, UUID uuid)
-	{
+	public static String getPlayerName(MinecraftServer server, UUID uuid) {
 		GameProfile profile = server.getPlayerProfileCache().getProfileByUUID(uuid);
 		return profile == null ? "<unknown>" : profile.getName();
 	}
 
-	public static boolean checkCommandPermission(CommandBase command, MinecraftServer server, ICommandSender sender)
-	{
-		if(server.isSinglePlayer())
+	public static boolean checkCommandPermission(CommandBase command, MinecraftServer server, ICommandSender sender) {
+		if (server.isSinglePlayer())
 			return true;
 		int requiredPermLevel = command.getRequiredPermissionLevel();
-		if(sender instanceof EntityPlayerMP)
+		if (sender instanceof EntityPlayerMP)
 			return server.getPlayerList().getOppedPlayers().getPermissionLevel(((EntityPlayerMP) sender).getGameProfile()) >= requiredPermLevel;
 		return sender.canUseCommand(requiredPermLevel, command.getName());
 	}

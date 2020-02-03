@@ -19,17 +19,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class MessageOpenHomeGui implements IMessage
-{
+public class MessageOpenHomeGui implements IMessage {
 	private BlockPos pos;
 	private boolean isOp;
 	private Pair<UUID, String> owner;
 	private List<Pair<UUID, String>> members;
 
-	public MessageOpenHomeGui() {}
+	public MessageOpenHomeGui() {
+	}
 
-	public MessageOpenHomeGui(BlockPos pos, boolean isOp, Pair<UUID, String> owner, List<Pair<UUID, String>> members)
-	{
+	public MessageOpenHomeGui(BlockPos pos, boolean isOp, Pair<UUID, String> owner, List<Pair<UUID, String>> members) {
 		this.pos = pos;
 		this.isOp = isOp;
 		this.owner = owner;
@@ -37,25 +36,21 @@ public class MessageOpenHomeGui implements IMessage
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
+	public void fromBytes(ByteBuf buf) {
 		pos = BlockPos.fromLong(buf.readLong());
 		isOp = buf.readBoolean();
 		long most, least;
 		String name;
-		if(buf.readBoolean())
-		{
+		if (buf.readBoolean()) {
 			most = buf.readLong();
 			least = buf.readLong();
 			name = ByteBufUtils.readUTF8String(buf);
 			owner = new ImmutablePair<>(new UUID(most, least), name);
-		}
-		else
+		} else
 			owner = null;
 		int membersSize = buf.readInt();
 		members = new LinkedList<>();
-		for(int i = 0; i < membersSize; i++)
-		{
+		for (int i = 0; i < membersSize; i++) {
 			most = buf.readLong();
 			least = buf.readLong();
 			name = ByteBufUtils.readUTF8String(buf);
@@ -64,14 +59,12 @@ public class MessageOpenHomeGui implements IMessage
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
+	public void toBytes(ByteBuf buf) {
 		buf.writeLong(pos.toLong());
 		buf.writeBoolean(isOp);
 		boolean hasOwner = owner != null;
 		buf.writeBoolean(hasOwner);
-		if(hasOwner)
-		{
+		if (hasOwner) {
 			buf.writeLong(owner.getLeft().getMostSignificantBits());
 			buf.writeLong(owner.getLeft().getLeastSignificantBits());
 			ByteBufUtils.writeUTF8String(buf, owner.getRight());
@@ -85,24 +78,20 @@ public class MessageOpenHomeGui implements IMessage
 		});
 	}
 
-	public static class Handler implements IMessageHandler<MessageOpenHomeGui, IMessage>
-	{
+	public static class Handler implements IMessageHandler<MessageOpenHomeGui, IMessage> {
 		@Override
-		public IMessage onMessage(MessageOpenHomeGui message, MessageContext ctx)
-		{
+		public IMessage onMessage(MessageOpenHomeGui message, MessageContext ctx) {
 			EntityPlayer player = Minecraft.getMinecraft().player;
 			World world = player.world;
 			BlockPos pos = message.pos;
 			player.openGui(LandManager.INSTANCE, 1, world, pos.getX(), pos.getY(), pos.getZ());
 			GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-			if(gui instanceof GuiHome)
-			{
+			if (gui instanceof GuiHome) {
 				GuiHome guiHome = (GuiHome) gui;
 				guiHome.setMembersData(message.owner, message.members);
-				if(message.isOp)
+				if (message.isOp)
 					guiHome.setClientIsOp();
-			}
-			else
+			} else
 				LandManager.LOGGER.warn("The home GUI wasn't open! Unable to set members data.");
 			return null;
 		}
