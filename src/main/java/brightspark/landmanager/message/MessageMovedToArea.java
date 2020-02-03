@@ -40,6 +40,8 @@ public class MessageMovedToArea implements IMessage {
 	public static class Handler implements IMessageHandler<MessageMovedToArea, IMessage> {
 		@Override
 		public IMessage onMessage(MessageMovedToArea message, MessageContext ctx) {
+			if (!LMConfig.client.titleOnAreaChange)
+				return null;
 			ITextComponent text = message.name.isEmpty() ? new TextComponentTranslation("misc.wilderness") : new TextComponentString(message.name);
 			TextColour colour = message.name.isEmpty() ? LMConfig.client.titleColourWilderness : message.member ? LMConfig.client.titleColourAreaMember : LMConfig.client.titleColourAreaOutsider;
 			text.getStyle().setColor(colour.colour);

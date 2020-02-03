@@ -51,6 +51,9 @@ public class LMConfig {
         @Config.RangeDouble(min = 0D)
         public double areaBoxEdgeThickness = 0.025D;
 
+        @Config.Comment("Whether title messages should be displayed when moving into a different area")
+        public boolean titleOnAreaChange = true;
+
         @Config.Comment("The colour of the area change title when you move into the Wilderness")
         public TextColour titleColourWilderness = TextColour.GRAY;
 
