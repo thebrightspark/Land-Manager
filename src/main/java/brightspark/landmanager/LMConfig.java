@@ -1,5 +1,6 @@
 package brightspark.landmanager;
 
+import brightspark.landmanager.util.TextColour;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -49,6 +50,15 @@ public class LMConfig {
         @Config.Comment("The thickness of area box edges rendered in the world")
         @Config.RangeDouble(min = 0D)
         public double areaBoxEdgeThickness = 0.025D;
+
+        @Config.Comment("The colour of the area change title when you move into the Wilderness")
+        public TextColour titleColourWilderness = TextColour.GRAY;
+
+        @Config.Comment("The colour of the area change title when you move into an area you're a member of")
+        public TextColour titleColourAreaMember = TextColour.GREEN;
+
+        @Config.Comment("The colour of the area change title when you move into an area you're not a member of")
+        public TextColour titleColourAreaOutsider = TextColour.RED;
     }
 
     public static class Permissions {
