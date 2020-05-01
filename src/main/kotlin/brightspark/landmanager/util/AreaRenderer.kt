@@ -5,6 +5,7 @@ import brightspark.landmanager.data.areas.Area
 import com.mojang.blaze3d.platform.GlStateManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.entity.EntityRendererManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
@@ -61,17 +62,16 @@ object AreaRenderer {
 	private fun createVecTriple(x1: Int, y1: Int, z1: Int, x2: Int, y2: Int, z2: Int, x3: Int, y3: Int, z3: Int): Triple<Vec3d, Vec3d, Vec3d> =
 		Triple(Vec3d(x1.toDouble(), y1.toDouble(), z1.toDouble()), Vec3d(x2.toDouble(), y2.toDouble(), z2.toDouble()), Vec3d(x3.toDouble(), y3.toDouble(), z3.toDouble()))
 
-	fun renderArea(area: Area, colour: Color, partialTicks: Float) {
-		val player = mc.player
-		val pos = player.getEyePosition(partialTicks)
-
+	fun renderArea(area: Area, colour: Color, renderManager: EntityRendererManager) {
 		GlStateManager.pushMatrix()
 		GlStateManager.enableAlphaTest()
 		GlStateManager.enableBlend()
 		GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO)
 		GlStateManager.disableTexture()
 		GlStateManager.disableLighting()
-		GlStateManager.translated(-pos.x, -pos.y, -pos.z)
+
+		val projectedView = renderManager.info.projectedView
+		GlStateManager.translated(-projectedView.x, -projectedView.y, -projectedView.z)
 
 		val (r, g, b) = colour.getRGBColorComponents(null).let { Triple(it[0], it[1], it[2]) }
 		val box = AxisAlignedBB(area.minPos, area.maxPos.add(1, 1, 1)).grow(0.001)
@@ -86,8 +86,8 @@ object AreaRenderer {
 			renderBoxEdges(box)
 		}
 		GlStateManager.color3f(1F, 1F, 1F)
-		val nameRenderPos = box.center.let { Vec3d(it.x, MathHelper.clamp(pos.y, box.minY + 0.5, box.maxY - 0.5), it.z) }
-		renderName(area, nameRenderPos)
+		val namePos = box.center.let { Vec3d(it.x, MathHelper.clamp(projectedView.y, box.minY + 0.5, box.maxY - 0.5), it.z) }
+		renderName(area, namePos, renderManager)
 
 		GlStateManager.enableDepthTest()
 		GlStateManager.enableLighting()
@@ -220,16 +220,11 @@ object AreaRenderer {
 		}
 	}
 
-	private fun renderName(area: Area, pos: Vec3d) {
-		val rm = mc.renderManager
-		val viewerYaw = rm.playerViewY
-		val viewerPitch = rm.playerViewX
-		val isThirdPersonFrontal = rm.options.thirdPersonView == 2
-
+	private fun renderName(area: Area, pos: Vec3d, renderManager: EntityRendererManager) {
 		GlStateManager.translated(pos.x, pos.y, pos.z)
 		GlStateManager.normal3f(0.0F, 1.0F, 0.0F)
-		GlStateManager.rotatef(-viewerYaw, 0.0F, 1.0F, 0.0F)
-		GlStateManager.rotatef((if (isThirdPersonFrontal) -1F else 1F) * viewerPitch, 1.0F, 0.0F, 0.0F)
+		GlStateManager.rotatef(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F)
+		GlStateManager.rotatef(renderManager.playerViewX, 1.0F, 0.0F, 0.0F)
 		val scale = 0.04F * LMConfig.areaNameScale.toFloat()
 		GlStateManager.scalef(-scale, -scale, scale)
 		GlStateManager.disableTexture()

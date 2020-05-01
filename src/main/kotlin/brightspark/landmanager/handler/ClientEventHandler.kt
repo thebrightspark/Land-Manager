@@ -68,14 +68,14 @@ object ClientEventHandler {
 			return
 
 		val cap = mc.world.areasCap
-		val partialTicks = event.partialTicks
+		val renderManager = mc.renderManager
 		if (renderAll)
-			cap.getNearbyAreas(mc.player.position).forEach { AreaRenderer.renderArea(it, getColour(it.name), partialTicks) }
+			cap.getNearbyAreas(mc.player.position).forEach { AreaRenderer.renderArea(it, getColour(it.name), renderManager) }
 		else
 			areasToRender.stream()
 				.map { cap.getArea(it) }
 				.filter { it != null }
-				.forEach { AreaRenderer.renderArea(it!!, getColour(it.name), partialTicks) }
+				.forEach { AreaRenderer.renderArea(it!!, getColour(it.name), renderManager) }
 	}
 
 	@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
