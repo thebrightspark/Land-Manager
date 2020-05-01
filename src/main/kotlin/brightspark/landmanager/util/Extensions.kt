@@ -88,11 +88,6 @@ fun ICommandSource.isOp(): Boolean {
 fun ICommandSource?.canEditArea(area: Area?): Boolean =
 	this != null && area != null && (this is MinecraftServer || (this is PlayerEntity && (area.isOwner(this.uniqueID) || this.isOp())))
 
-fun PlayerEntity.interpolatePos(partialTicks: Float): Vec3d = Vec3d(
-	this.prevPosX + (this.posX - this.prevPosX) * partialTicks,
-	this.prevPosY + (this.posY - this.prevPosY) * partialTicks,
-	this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks
-)
 
 fun ServerPlayerEntity?.canEditArea(area: Area?): Boolean {
 	return this != null && area != null && (area.isOwner(this.uniqueID) || this.isOp())

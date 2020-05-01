@@ -63,7 +63,7 @@ object AreaRenderer {
 
 	fun renderArea(area: Area, colour: Color, partialTicks: Float) {
 		val player = mc.player
-		val pos = player.interpolatePos(partialTicks)
+		val pos = player.getEyePosition(partialTicks)
 
 		GlStateManager.pushMatrix()
 		GlStateManager.enableAlphaTest()
@@ -86,8 +86,7 @@ object AreaRenderer {
 			renderBoxEdges(box)
 		}
 		GlStateManager.color3f(1F, 1F, 1F)
-		val eyePos = player.getEyePosition(partialTicks)
-		val nameRenderPos = box.center.let { Vec3d(it.x, MathHelper.clamp(eyePos.y, box.minY + 0.5, box.minY - 0.5), it.z) }
+		val nameRenderPos = box.center.let { Vec3d(it.x, MathHelper.clamp(pos.y, box.minY + 0.5, box.maxY - 0.5), it.z) }
 		renderName(area, nameRenderPos)
 
 		GlStateManager.enableDepthTest()
