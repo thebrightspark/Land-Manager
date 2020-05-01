@@ -1,6 +1,6 @@
 package brightspark.landmanager.data.areas
 
-import brightspark.ksparklib.api.runWhenOnServer
+import brightspark.ksparklib.api.runWhenOnServerSide
 import brightspark.ksparklib.api.sendToAll
 import brightspark.ksparklib.api.sendToPlayer
 import brightspark.landmanager.LMConfig
@@ -46,7 +46,7 @@ class AreasCapabilityImpl : AreasCapability {
 		val area = areas.remove(oldName) ?: return false
 		area.setName(newName)
 		areas[newName] = area
-		runWhenOnServer { LandManager.NETWORK.sendToAll(MessageAreaRename(oldName, newName)) }
+		runWhenOnServerSide { LandManager.NETWORK.sendToAll(MessageAreaRename(oldName, newName)) }
 		return true
 	}
 
@@ -97,9 +97,9 @@ class AreasCapabilityImpl : AreasCapability {
 		}
 	}
 
-	override fun dataChanged() = runWhenOnServer { LandManager.NETWORK.sendToAll(MessageUpdateAreasCap(serializeNBT())) }
+	override fun dataChanged() = runWhenOnServerSide { LandManager.NETWORK.sendToAll(MessageUpdateAreasCap(serializeNBT())) }
 
-	override fun dataChanged(area: Area, type: AreaUpdateType) = runWhenOnServer {
+	override fun dataChanged(area: Area, type: AreaUpdateType) = runWhenOnServerSide {
 		LandManager.NETWORK.sendToAll(when (type) {
 			AreaUpdateType.DELETE -> MessageAreaDelete(area.name)
 			AreaUpdateType.ADD -> MessageAreaAdd(area)

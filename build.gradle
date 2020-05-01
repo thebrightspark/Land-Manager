@@ -8,9 +8,6 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-//        classpath(group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true) {
-//            exclude group: 'trove', module: 'trove'
-//        }
         classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlin_version
         classpath group: 'com.wynprice.cursemaven', name: 'CurseMaven', version: '2.1.1'
     }
@@ -96,7 +93,7 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft "net.minecraftforge:forge:${project.mc_version}-${project.forge_version}"
 
-    compile "brightspark.ksparklib:KSparkLib:${project.mc_version}-1.2.1-DEV"
+    compile "brightspark.ksparklib:KSparkLib:${project.mc_version}-1.2.2"
 //    compile fg.deobf("curse.maven:ksparklib:${project.ksparklib_version}")
     compile group: 'curse.maven', name: 'kottle', version: project.kottle_version
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'

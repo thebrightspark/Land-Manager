@@ -57,15 +57,10 @@ object CommonEventHandler {
 
 	@SubscribeEvent
 	fun onBlockPlace(event: BlockEvent.EntityPlaceEvent) = event.run {
-		if (world !is World) {
-			LandManager.LOGGER.warn("Couldn't action against a BlockEvent.EntityPlaceEvent because the world provided (${event.world.dimension}) is not an instance of World!")
-			return
-		}
 		if (entity !is PlayerEntity)
 			return
-		val world = world as World
 		val player = event.entity as PlayerEntity
-		val area = getArea(world, pos)
+		val area = getArea(world.world, pos)
 		if ((area != null && area.isMember(player.uniqueID)) ||
 			isCreativeOrOp(player) ||
 			(area == null && LMConfig.canPlayersBreakBlocks))
@@ -94,11 +89,7 @@ object CommonEventHandler {
 
 	@SubscribeEvent
 	fun onEntitySpawn(event: LivingSpawnEvent.CheckSpawn) = event.run {
-		if (world !is World) {
-			LandManager.LOGGER.warn("Couldn't action against a LivingSpawnEvent.CheckSpawn because the world provided (${world.dimension}) is not an instance of World!")
-			return
-		}
-		val cap = (world as World).areasCap
+		val cap = world.world.areasCap
 		val areas = cap.intersectingAreas(Vec3d(x, y, z))
 		val hostile = !entityLiving.type.classification.peacefulCreature
 

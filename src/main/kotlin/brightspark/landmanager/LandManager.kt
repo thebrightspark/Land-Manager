@@ -33,6 +33,10 @@ object LandManager {
 	const val MOD_ID = "landmanager"
 	val LOGGER = getLogger()
 
+	val group = object : ItemGroup(MOD_ID) {
+		override fun createIcon() = ItemStack(area_create!!)
+	}
+
 	val NETWORK = regSimpleChannel(ResourceLocation(MOD_ID, "main"), "1", messages = arrayOf(
 		MessageAreaAdd::class,
 		MessageAreaChange::class,
@@ -47,6 +51,7 @@ object LandManager {
 		MessageHomeActionReplyError::class,
 		MessageHomeToggle::class,
 		MessageHomeToggleReply::class,
+		MessageOpenCreateAreaGui::class,
 		MessageOpenHomeGui::class,
 		MessageShowArea::class,
 		MessageUpdateAreasCap::class
@@ -71,10 +76,6 @@ object LandManager {
 		regCommandArgType<RequestArgument>("request")
 
 		registerConfig(client = LMConfig.CLIENT_SPEC, server = LMConfig.SERVER_SPEC)
-	}
-
-	val group = object : ItemGroup(MOD_ID) {
-		override fun createIcon() = ItemStack(area_create!!)
 	}
 
 	fun areaChange(context: CommandContext<CommandSource>, type: AreaChangeType, areaName: String) =

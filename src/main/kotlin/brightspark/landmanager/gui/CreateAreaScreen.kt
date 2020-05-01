@@ -8,11 +8,10 @@ import net.minecraft.client.gui.widget.TextFieldWidget
 import net.minecraft.client.gui.widget.button.Button
 import net.minecraft.client.gui.widget.button.CheckboxButton
 import net.minecraft.client.resources.I18n
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.BlockPos
 import org.lwjgl.glfw.GLFW
 
-class CreateAreaScreen(private val player: PlayerEntity, private val pos1: BlockPos, private val pos2: BlockPos) : LMScreen("Create Area", "gui_create_area", 113, 46) {
+class CreateAreaScreen(private val pos1: BlockPos, private val pos2: BlockPos) : LMScreen("Create Area", "gui_create_area", 113, 46) {
 	private lateinit var nameInputField: TextFieldWidget
 	private lateinit var extendCheckBox: CheckboxButton
 
@@ -21,12 +20,12 @@ class CreateAreaScreen(private val player: PlayerEntity, private val pos1: Block
 
 	override fun init() {
 		super.init()
-		nameInputField = TextFieldWidget(font, 5, 16, width - 10, font.FONT_HEIGHT + 2, "")
+		nameInputField = TextFieldWidget(font, guiLeft + 5, guiTop + 16, guiWidth - 10, font.FONT_HEIGHT + 2, "")
 		nameInputField.setCanLoseFocus(false)
 		nameInputField.changeFocus(true)
 		children += nameInputField
-		extendCheckBox = addButton(CheckboxButton(5, 31, 150, 20, I18n.format("gui.landmanager.create.checkbox"), false))
-		addButton(object : Button(68, 31, 40, font.FONT_HEIGHT + 2, I18n.format("gui.landmanager.create.confirm"), { complete() }) {
+		extendCheckBox = addButton(CheckboxButton(guiLeft + 5, guiTop + 31, 150, 20, I18n.format("gui.landmanager.create.checkbox"), false))
+		addButton(object : Button(guiLeft + 68, guiTop + 31, 40, font.FONT_HEIGHT + 2, I18n.format("gui.landmanager.create.confirm"), { complete() }) {
 			override fun renderButton(p_renderButton_1_: Int, p_renderButton_2_: Int, p_renderButton_3_: Float) {
 				minecraft!!.textureManager.bindTexture(imageResLoc)
 				GlStateManager.color3f(1F, 1F, 1F)

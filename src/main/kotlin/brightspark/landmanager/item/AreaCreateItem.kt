@@ -1,11 +1,12 @@
 package brightspark.landmanager.item
 
+import brightspark.ksparklib.api.sendToPlayer
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Position
-import brightspark.landmanager.gui.CreateAreaScreen
-import net.minecraft.client.Minecraft
+import brightspark.landmanager.message.MessageOpenCreateAreaGui
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.ItemUseContext
@@ -35,19 +36,15 @@ class AreaCreateItem : Item(Properties().apply {
 			pos1 == null -> {
 				// Store pos in item
 				setPos(stack, Position(player.dimension.id, pos2))
-				if (context.world.isRemote)
-					player.sendMessage(TranslationTextComponent("message.landmanager.tool.saved", pos2.x, pos2.y, pos2.z))
+				player.sendMessage(TranslationTextComponent("message.landmanager.tool.saved", pos2.x, pos2.y, pos2.z))
 			}
 			pos1.dimensionId != player.dimension.id -> {
 				//  Stored pos in different dimension! Remove stored pos
 				setPos(stack, null)
-				if (context.world.isRemote)
-					player.sendMessage(TranslationTextComponent("message.landmanager.tool.diffdim"))
+				player.sendMessage(TranslationTextComponent("message.landmanager.tool.diffdim"))
 			}
-			else -> {
-				if (context.world.isRemote)
-					Minecraft.getInstance().displayGuiScreen(CreateAreaScreen(player, pos1.position, pos2))
-			}
+			else -> if (!context.world.isRemote)
+				LandManager.NETWORK.sendToPlayer(MessageOpenCreateAreaGui(pos1.position, pos2), player as ServerPlayerEntity)
 		}
 
 		return ActionResultType.SUCCESS

@@ -109,7 +109,6 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 
 	fun setClientIsOp() {
 		clientIsOp = true
-		updateToggleButtons()
 	}
 
 	// Used by MessageOpenHomeGui to set the members data
