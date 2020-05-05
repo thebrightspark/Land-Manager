@@ -51,8 +51,8 @@ class MessageHomeToggle : Message {
 			val playerIsOp = player.isOp()
 			when (type) {
 				HomeGuiToggleType.INTERACTIONS -> handleType(cap, player, area, playerIsOp, LMConfig.interactions, { it.toggleInteractions() }, { it.interactions })
-				HomeGuiToggleType.PASSIVE_SPAWNS -> handleType(cap, player, area, playerIsOp, LMConfig.passiveSpawning, { it.togglePassiveSpawning() }, { it.canPassiveSpawn })
-				HomeGuiToggleType.HOSTILE_SPAWNS -> handleType(cap, player, area, playerIsOp, LMConfig.hostileSpawning, { it.toggleHostileSpawning() }, { it.canHostileSpawn })
+				HomeGuiToggleType.PASSIVES -> handleType(cap, player, area, playerIsOp, LMConfig.passiveSpawning, { it.togglePassiveSpawning() }, { it.canPassiveSpawn })
+				HomeGuiToggleType.HOSTILES -> handleType(cap, player, area, playerIsOp, LMConfig.hostileSpawning, { it.toggleHostileSpawning() }, { it.canHostileSpawn })
 				HomeGuiToggleType.EXPLOSIONS -> handleType(cap, player, area, playerIsOp, LMConfig.explosions, { it.toggleExplosions() }, { it.explosions })
 				else -> Unit
 			}

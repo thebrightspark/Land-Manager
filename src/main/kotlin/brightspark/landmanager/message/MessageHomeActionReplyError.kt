@@ -35,7 +35,7 @@ class MessageHomeActionReplyError : Message {
 		context.get().enqueueWork {
 			val gui = Minecraft.getInstance().currentScreen
 			if (gui is HomeScreen)
-				gui.errorMessage = TranslationTextComponent(errorMessage, args)
+				gui.errorMessage = TranslationTextComponent(errorMessage, *args)
 		}
 	}
 }

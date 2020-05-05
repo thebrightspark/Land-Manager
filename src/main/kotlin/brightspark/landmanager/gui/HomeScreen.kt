@@ -33,7 +33,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 	}
 
 	private var clientIsOp = false
-	private var isOwner = false
+	private var clientIsOwner = false
 	private val area: Area = player.world.areasCap.intersectingArea(pos)!!
 
 	private lateinit var inputTextField: TextFieldWidget
@@ -48,17 +48,17 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 	private lateinit var addButton: ActionButton
 	private lateinit var kickButton: ActionButton
 	private lateinit var passButton: ActionButton
-	private lateinit var boundariesToggle: ToggleButton
-	private lateinit var interactionsToggle: ToggleButton
-	private lateinit var passivesToggle: ToggleButton
-	private lateinit var hostilesToggle: ToggleButton
-	private lateinit var explosionsToggle: ToggleButton
+	private lateinit var boundariesToggle: HomeToggleButton
+	private lateinit var interactionsToggle: HomeToggleButton
+	private lateinit var passivesToggle: HomeToggleButton
+	private lateinit var hostilesToggle: HomeToggleButton
+	private lateinit var explosionsToggle: HomeToggleButton
 
 	var errorMessage: TranslationTextComponent? = null
 
 	private fun isOwner(uuid: UUID): Boolean = owner?.first == uuid
 
-	private fun canUseToggle(config: Boolean): Boolean = clientIsOp || (config && isOwner)
+	private fun canUseToggle(config: Boolean): Boolean = clientIsOp || (config && clientIsOwner)
 
 	private fun canScrollUp(): Boolean = playerListStartIndex > 0
 
@@ -115,7 +115,6 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 	fun setMembersData(owner: Pair<UUID, String>?, members: List<Pair<UUID, String>>) {
 		this.owner = owner
 		this.members = members.toMutableList().apply { owner?.let { add(it) } }
-		updatePlayerList()
 	}
 
 	fun addMember(uuid: UUID, player: String) {
@@ -132,8 +131,8 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 	fun setToggle(type: HomeGuiToggleType, state: Boolean) {
 		when (type) {
 			INTERACTIONS -> area.interactions = state
-			PASSIVE_SPAWNS -> area.canPassiveSpawn = state
-			HOSTILE_SPAWNS -> area.canHostileSpawn = state
+			PASSIVES -> area.canPassiveSpawn = state
+			HOSTILES -> area.canHostileSpawn = state
 			EXPLOSIONS -> area.explosions = state
 			else -> Unit
 		}
@@ -168,7 +167,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 				if (selectedMemberIndex < 0)
 					return
 				val uuid = members[selectedMemberIndex].first
-				if (isOwner(uuid))
+				if (!isOwner(uuid))
 					LandManager.NETWORK.sendToServer(MessageHomeActionKickOrPass(pos, button.type == PASS, uuid))
 			}
 			ADD -> addMember(inputTextField.text)
@@ -180,7 +179,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 			LandManager.NETWORK.sendToServer(MessageHomeActionAdd(pos, name))
 	}
 
-	private fun onToggleButtonPress(button: ToggleButton) {
+	private fun onToggleButtonPress(button: HomeToggleButton) {
 		errorMessage = null
 
 		when (button.type) {
@@ -188,7 +187,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 				button.isOn = !button.isOn
 				ClientEventHandler.setRenderArea(area.name, button.isOn)
 			}
-			INTERACTIONS, PASSIVE_SPAWNS, HOSTILE_SPAWNS, EXPLOSIONS ->
+			INTERACTIONS, PASSIVES, HOSTILES, EXPLOSIONS ->
 				LandManager.NETWORK.sendToServer(MessageHomeToggle(pos, button.type))
 		}
 	}
@@ -196,9 +195,13 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 	override fun init() {
 		super.init()
 
-		isOwner = area.isOwner(minecraft!!.player.uniqueID)
+		clientIsOwner = area.isOwner(minecraft!!.player.uniqueID)
 
 		inputTextField = object : TextFieldWidget(font, guiLeft + 99, guiTop + 15, 56, 10, "") {
+			init {
+				setEnableBackgroundDrawing(false)
+			}
+
 			override fun charTyped(char: Char, keyCode: Int): Boolean {
 				val result = super.charTyped(char, keyCode)
 				if (result) {
@@ -217,7 +220,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 					selectedMemberIndex = -1
 					updateActionButtons()
 					errorMessage = null
-				} else {
+				} else if (mouseButton == 1) {
 					// Handle right clicking text field
 					text = ""
 					errorMessage = null
@@ -233,21 +236,37 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		downButton = addButton(ArrowButton(97, 52, false))
 		updatePlayerList()
 
-		addButton = addButton(ActionButton(111, 29, "gui.landmanager.home.add", ADD))
-		kickButton = addButton(ActionButton(111, 41, "gui.landmanager.home.kick", KICK))
-		passButton = addButton(ActionButton(111, 53, "gui.landmanager.home.pass", PASS))
+		addButton = addButton(ActionButton(111, 29, "gui.lm.home.add", ADD))
+		kickButton = addButton(ActionButton(111, 41, "gui.lm.home.kick", KICK))
+		passButton = addButton(ActionButton(111, 53, "gui.lm.home.pass", PASS))
 		updateActionButtons()
 
-		boundariesToggle = addButton(ToggleButton(108, 70, ClientEventHandler.isAreaBeingRendered(area.name), BOUNDARIES).apply { active = true })
-		interactionsToggle = addButton(ToggleButton(108, 84, area.interactions, INTERACTIONS))
-		passivesToggle = addButton(ToggleButton(108, 98, area.canPassiveSpawn, PASSIVE_SPAWNS))
-		hostilesToggle = addButton(ToggleButton(108, 112, area.canHostileSpawn, HOSTILE_SPAWNS))
-		explosionsToggle = addButton(ToggleButton(108, 126, area.explosions, EXPLOSIONS))
+		boundariesToggle = addButton(HomeToggleButton(6, 70, ClientEventHandler.isAreaBeingRendered(area.name), BOUNDARIES).apply { active = true })
+		interactionsToggle = addButton(HomeToggleButton(6, 84, area.interactions, INTERACTIONS))
+		passivesToggle = addButton(HomeToggleButton(6, 98, area.canPassiveSpawn, PASSIVES))
+		hostilesToggle = addButton(HomeToggleButton(6, 112, area.canHostileSpawn, HOSTILES))
+		explosionsToggle = addButton(HomeToggleButton(6, 126, area.explosions, EXPLOSIONS))
 		updateToggleButtons()
+	}
+
+	override fun tick() {
+		super.tick()
+		inputTextField.tick()
+	}
+
+	override fun render(mouseX: Int, mouseY: Int, partialTicks: Float) {
+		super.render(mouseX, mouseY, partialTicks)
+		inputTextField.render(mouseX, mouseY, partialTicks)
+
+		errorMessage?.let {
+			drawCenteredString(font, it.formattedText, width / 2, guiTop - 15, 0xFF0000)
+		}
 	}
 
 	private inner class ListButton(x: Int, y: Int, val num: Int)
 		: LMButton(x, y, 87, 11, 87, 144, "", { onListButtonPress(it as ListButton) }) {
+		private var isOwner: Boolean = false
+
 		init {
 			textOffset = 1
 			drawWhenDisabled = false
@@ -263,7 +282,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 			if (isOwner) {
 				textOffset = 12
 				setTooltip(
-					TranslationTextComponent("gui.landmanager.home.owner").applyTextStyle(TextFormatting.GOLD),
+					TranslationTextComponent("gui.lm.home.owner").applyTextStyle(TextFormatting.GOLD),
 					StringTextComponent(message)
 				)
 			} else {
@@ -284,7 +303,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		override fun drawText(font: FontRenderer) {
 			if (isOwner) {
 				minecraft!!.textureManager.bindTexture(imageResLoc)
-				blit(x + 1, y + 1, ownerIcon.x, ownerIcon.y, ownerIcon.width, ownerIcon.height)
+				blit(x + 1, y + 1, ownerIcon.x.toFloat(), ownerIcon.y.toFloat(), ownerIcon.width, ownerIcon.height, imageWidth, imageHeight)
 			}
 			drawStringWithMaxWidth(message, x + textOffset, y + (height - 8) / 2, 85 - textOffset, getTextColour(), true)
 		}
@@ -304,12 +323,15 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		override fun getIconY(): Int = iconY + (type.ordinal * height)
 	}
 
-	private inner class ToggleButton(x: Int, y: Int, var isOn: Boolean, val type: HomeGuiToggleType)
-		: LMButton(x, y, 12, 12, 162, 36, "", { onToggleButtonPress(it as ToggleButton) }) {
+	private inner class HomeToggleButton(x: Int, y: Int, isOn: Boolean, val type: HomeGuiToggleType)
+		: ToggleButton(x, y, 162, 36, I18n.format("gui.lm.home.${type.name.toLowerCase()}"), { onToggleButtonPress(it as HomeToggleButton) }) {
 		init {
+			this.isOn = isOn
 			active = false
 			drawWhenDisabled = true
 		}
+
+		override fun getTextColour(): Int = 4210752
 
 		override fun getIconY(): Int {
 			var y = iconY
@@ -325,7 +347,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 			if (active)
 				setTooltip()
 			else
-				setTooltip(TranslationTextComponent("gui.landmanager.home.toggleDisabled"))
+				setTooltip(TranslationTextComponent("gui.lm.home.toggleDisabled"))
 		}
 	}
 }

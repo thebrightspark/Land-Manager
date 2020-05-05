@@ -148,20 +148,20 @@
 	"area.change.clear_allocation": "CLEAR_ALLOCATION",
 	"area.change.claim": "CLAIM",
 
-	"gui.landmanager.create.checkbox": "Min/Max Y",
-	"gui.landmanager.create.confirm": "Confirm",
-	"gui.landmanager.create.area": "Area name:",
+	"gui.lm.create.checkbox": "Min/Max Y",
+	"gui.lm.create.confirm": "Confirm",
+	"gui.lm.create.area": "Area name:",
 
-	"gui.landmanager.home.add": "Add",
-	"gui.landmanager.home.kick": "Kick",
-	"gui.landmanager.home.pass": "Pass",
-	"gui.landmanager.home.boundaries": "Show Boundaries",
-	"gui.landmanager.home.interactions": "Interactions",
-	"gui.landmanager.home.passives": "Passive Spawning",
-	"gui.landmanager.home.hostiles": "Hostiles Spawning",
-	"gui.landmanager.home.explosions": "Explosions",
-	"gui.landmanager.home.owner": "Owner",
-	"gui.landmanager.home.toggleDisabled": "You don't have permission to change this!",
+	"gui.lm.home.add": "Add",
+	"gui.lm.home.kick": "Kick",
+	"gui.lm.home.pass": "Pass",
+	"gui.lm.home.boundaries": "Show Boundaries",
+	"gui.lm.home.interactions": "Interactions",
+	"gui.lm.home.passives": "Passive Spawning",
+	"gui.lm.home.hostiles": "Hostiles Spawning",
+	"gui.lm.home.explosions": "Explosions",
+	"gui.lm.home.owner": "Owner",
+	"gui.lm.home.toggleDisabled": "You don't have permission to change this!",
 
 	"misc.landmanager.wilderness": "Wilderness"
 }

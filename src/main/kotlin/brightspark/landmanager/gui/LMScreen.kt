@@ -15,7 +15,9 @@ open class LMScreen(
 	title: String,
 	imageName: String,
 	protected val guiWidth: Int,
-	protected val guiHeight: Int
+	protected val guiHeight: Int,
+	protected val imageWidth: Int = 256,
+	protected val imageHeight: Int = 256
 ) : Screen(StringTextComponent(title)) {
 	protected val imageResLoc = ResourceLocation(LandManager.MOD_ID, "textures/gui/$imageName.png")
 	protected var guiLeft = 0
@@ -31,7 +33,7 @@ open class LMScreen(
 		renderBackground()
 		GlStateManager.color3f(1F, 1F, 1F)
 		minecraft!!.textureManager.bindTexture(imageResLoc)
-		blit(guiLeft, guiTop, 0, 0, guiWidth, guiHeight)
+		blit(guiLeft, guiTop, 0F, 0F, guiWidth, guiHeight, imageWidth, imageHeight)
 		super.render(mouseX, mouseY, partialTicks)
 		buttons.firstOrNull { it is LMButton && it.isHovered && it.tooltip.isNotEmpty() }?.let { button ->
 			renderTooltip((button as LMButton).tooltip.map { it.formattedText }, mouseX, mouseY, font)
@@ -68,7 +70,7 @@ open class LMScreen(
 		protected val iconY: Int,
 		text: String,
 		onPress: (Button) -> Unit
-	) : Button(x, y, width, height, text, onPress) {
+	) : Button(guiLeft + x, guiTop + y, width, height, text, onPress) {
 		protected var hasIcon = true
 		protected var drawWhenDisabled = false
 		protected var textOffset = 0
@@ -93,10 +95,29 @@ open class LMScreen(
 			if (hasIcon) {
 				mc.textureManager.bindTexture(imageResLoc)
 				GlStateManager.color3f(1F, 1F, 1F)
-				blit(x, y, iconX, iconY, width, height)
+				blit(x, y, iconX.toFloat(), getIconY().toFloat(), width, height, imageWidth, imageHeight)
 			}
 			if (message.isNotBlank())
 				drawText(mc.fontRenderer)
+		}
+	}
+
+	protected open inner class ToggleButton(x: Int, y: Int, iconX: Int, iconY: Int, text: String, onPress: (Button) -> Unit = {})
+		: LMButton(x, y, 12, 12, iconX, iconY, text, onPress) {
+		var isOn: Boolean = false
+
+		init {
+			textOffset = width + 2
+		}
+
+		override fun drawText(font: FontRenderer): Unit =
+			drawString(message, x + textOffset, y + (height - 8) / 2, getTextColour(), false)
+
+		override fun getIconY(): Int = if (isOn) iconY + height else iconY
+
+		override fun onPress() {
+			isOn = !isOn
+			super.onPress()
 		}
 	}
 }

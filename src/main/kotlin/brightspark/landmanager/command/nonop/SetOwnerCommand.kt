@@ -53,7 +53,7 @@ object SetOwnerCommand : Command {
 		area.owner = playerUuid
 		playerUuid?.let { area.removeMember(it) }
 		cap.dataChanged(area, AreaUpdateType.CHANGE)
-		context.source.sendFeedback(TranslationTextComponent("lm.command.setowner.success"), true)
+		context.source.sendFeedback(TranslationTextComponent("lm.command.setowner.success", area.name, player?.name?.unformattedComponentText ?: "None"), true)
 		LandManager.areaChange(context.source.server, playerUuid?.let { AreaChangeType.CLEAR_ALLOCATION }
 			?: AreaChangeType.ALLOCATE, area.name)
 		return 1

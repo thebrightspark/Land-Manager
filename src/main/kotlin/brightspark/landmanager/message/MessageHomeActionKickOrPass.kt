@@ -56,9 +56,11 @@ class MessageHomeActionKickOrPass : Message {
 			}
 
 			var changed = true
-			if (isPass)
-				area!!.owner = uuid
-			else {
+			if (isPass) {
+				area!!.owner?.let { area.addMember(it) }
+				area.owner = uuid
+				area.removeMember(uuid)
+			} else {
 				changed = area!!.removeMember(uuid)
 				if (changed)
 					cap.decreasePlayerAreasNum(uuid)
