@@ -183,10 +183,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		errorMessage = null
 
 		when (button.type) {
-			BOUNDARIES -> {
-				button.isOn = !button.isOn
-				ClientEventHandler.setRenderArea(area.name, button.isOn)
-			}
+			BOUNDARIES -> ClientEventHandler.setRenderArea(area.name, button.isOn)
 			INTERACTIONS, PASSIVES, HOSTILES, EXPLOSIONS ->
 				LandManager.NETWORK.sendToServer(MessageHomeToggle(pos, button.type))
 		}
