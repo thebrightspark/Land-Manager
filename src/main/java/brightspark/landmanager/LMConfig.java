@@ -10,15 +10,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Config(modid = LandManager.MOD_ID)
 @Config.LangKey(LandManager.MOD_ID + ".config.title")
 public class LMConfig {
-    @Config.Comment("Whether non-op players can claim chunks using '/lm claim'")
-    public static boolean disableClaiming = false;
+	@Config.Comment("Whether to enable debug logging")
+	public static boolean debug = false;
 
-    @Config.Comment("Whether non-op players in creative can break/place blocks in any area")
-    public static boolean creativeIgnoresProtection = true;
+	@Config.Comment("Whether non-op players can claim chunks using '/lm claim'")
+	public static boolean disableClaiming = false;
 
-    @Config.Comment({
-        "The max number of areas a player can own",
-        "Use -1 for no limit"
+	@Config.Comment("Whether non-op players in creative can break/place blocks in any area")
+	public static boolean creativeIgnoresProtection = true;
+
+	@Config.Comment({
+		"The max number of areas a player can own",
+		"Use -1 for no limit"
     })
     @Config.RangeInt(min = -1)
     public static int maxAreasCanOwn = -1;

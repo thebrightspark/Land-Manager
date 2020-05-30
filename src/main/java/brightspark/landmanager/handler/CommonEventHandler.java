@@ -6,6 +6,7 @@ import brightspark.landmanager.data.areas.Area;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.data.areas.CapabilityAreasProvider;
 import brightspark.landmanager.message.MessageMovedToArea;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -14,6 +15,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
@@ -32,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static brightspark.landmanager.LandManager.log;
+
 @Mod.EventBusSubscriber(modid = LandManager.MOD_ID)
 public class CommonEventHandler {
 	private static final ResourceLocation AREAS_RL = new ResourceLocation(LandManager.MOD_ID, "_areas");
@@ -49,8 +53,11 @@ public class CommonEventHandler {
 
 	private static Area getArea(EntityPlayer player, BlockPos pos) {
 		CapabilityAreas cap = getAreas(player.world);
-		if (cap == null)
+		if (cap == null) {
+			DimensionType dim = player.world.provider.getDimensionType();
+			log("getArea: WARNING! No capability found in dimension {} ({})!", dim.getName(), dim.getId());
 			return null;
+		}
 		return cap.intersectingArea(pos);
 	}
 
@@ -64,14 +71,20 @@ public class CommonEventHandler {
 
 	@SubscribeEvent
 	public static void onBlockStartBreak(net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed event) {
+		log("onBlockStartBreak: Starting block break checks for block at {}", event.getPos());
 		EntityPlayer player = event.getEntityPlayer();
 		Area area = getArea(player, event.getPos());
-		if (area != null && area.isMember(player.getUniqueID()))
+		if (area != null && area.isMember(player.getUniqueID())) {
+			log("onBlockStartBreak: Player {} is a member of area {} - block break allowed!", player.getName(), area.getName());
 			return;
-		else if (isPlayerCreativeOrOP(player))
+		} else if (isPlayerCreativeOrOP(player)) {
+			log("onBlockStartBreak: Player {} is an OP or in creative (and config is enabled) - block break allowed!", player.getName());
 			return;
-		else if (area == null && LMConfig.globalSettings.canPlayersBreakBlocks)
+		} else if (area == null && LMConfig.globalSettings.canPlayersBreakBlocks) {
+			log("onBlockStartBreak: No area found, and global config allows block breaking - block break allowed!");
 			return;
+		}
+		log("onBlockStartBreak: Block break cancelled!");
 		//Stop players from breaking blocks
 		if (player.world.isRemote) {
 			long worldTime = player.world.getTotalWorldTime();
@@ -85,14 +98,20 @@ public class CommonEventHandler {
 
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.PlaceEvent event) {
+		log("onBlockPlace: Starting block place checks for block at {}", event.getPos());
 		EntityPlayer player = event.getPlayer();
 		Area area = getArea(player, event.getPos());
-		if (area != null && area.isMember(player.getUniqueID()))
+		if (area != null && area.isMember(player.getUniqueID())) {
+			log("onBlockPlace: Player {} is a member of area {} - block place allowed!", player.getName(), area.getName());
 			return;
-		else if (isPlayerCreativeOrOP(player))
+		} else if (isPlayerCreativeOrOP(player)) {
+			log("onBlockPlace: Player {} is an OP or in creative (and config is enabled) - block place allowed!", player.getName());
 			return;
-		else if (area == null && LMConfig.globalSettings.canPlayersPlaceBlocks)
+		} else if (area == null && LMConfig.globalSettings.canPlayersPlaceBlocks) {
+			log("onBlockPlace: No area found, and global config allows block placing - block place allowed!");
 			return;
+		}
+		log("onBlockPlace: Block place cancelled!");
 		//Stop players from placing blocks
 		player.sendMessage(new TextComponentTranslation("message.protection.place"));
 		event.setCanceled(true);
@@ -100,17 +119,28 @@ public class CommonEventHandler {
 
 	@SubscribeEvent
 	public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+		log("onRightClickBlock: Starting block right click checks for block at {}", event.getPos());
 		EntityPlayer player = event.getEntityPlayer();
 		Area area = getArea(player, event.getPos());
-		if (area != null && (area.canInteract() || area.isMember(player.getUniqueID())))
+		if (area != null && area.canInteract()) {
+			log("onRightClickBlock: Interactions are enabled for area {} - block right click allowed!", area.getName());
 			return;
-		else if (isPlayerCreativeOrOP(player))
+		} else if (area != null && area.isMember(player.getUniqueID())) {
+			log("onRightClickBlock: Player {} is a member of area {} - block right click allowed!", player.getName(), area.getName());
 			return;
-		else if (area == null && LMConfig.globalSettings.canPlayersInteract)
+		} else if (isPlayerCreativeOrOP(player)) {
+			log("onRightClickBlock: Player {} is an OP or in creative (and config is enabled) - block right click allowed!", player.getName());
 			return;
+		} else if (area == null && LMConfig.globalSettings.canPlayersInteract) {
+			log("onRightClickBlock: No area found, and global config allows block interactions - block right click allowed!");
+			return;
+		}
 		//If player is holding shift with an itemblock, then allow it for block placing checks
-		if (player.isSneaking() && event.getItemStack().getItem() instanceof ItemBlock)
+		if (player.isSneaking() && event.getItemStack().getItem() instanceof ItemBlock) {
+			log("onRightClickBlock: Player {} is sneaking and right clicking with an ItemBlock - block right click allowed!", player.getName());
 			return;
+		}
+		log("onRightClickBlock: Block right click cancelled!");
 		//Stop players from right clicking blocks
 		if (event.getWorld().isRemote && event.getHand() == EnumHand.MAIN_HAND)
 			player.sendMessage(new TextComponentTranslation("message.protection.interact"));
@@ -138,22 +168,33 @@ public class CommonEventHandler {
 
 	@SubscribeEvent
 	public static void onEntitySpawn(LivingSpawnEvent.CheckSpawn event) {
+		EntityLivingBase entity = event.getEntityLiving();
+		log("onEntitySpawn: Starting entity spawn checks for entity {} at {}, {}, {}", entity.getName(), event.getX(), event.getY(), event.getZ());
 		//Stop entity spawning if it's within an area that's preventing the spawning
 		CapabilityAreas cap = getAreas(event.getWorld());
 		if (cap == null)
 			return;
 		Set<Area> areas = cap.intersectingAreas(new BlockPos(event.getX(), event.getY(), event.getZ()));
-		boolean hostile = event.getEntityLiving().isCreatureType(EnumCreatureType.MONSTER, false);
+		boolean hostile = entity.isCreatureType(EnumCreatureType.MONSTER, false);
+		log("onEntitySpawn: Is entity hostile: {}", hostile);
 		if (areas.isEmpty()) {
-			if (!(hostile ? LMConfig.globalSettings.canHostileSpawn : LMConfig.globalSettings.canPassiveSpawn))
+			log("onEntitySpawn: No areas found for location where entity is spawning");
+			if (!(hostile ? LMConfig.globalSettings.canHostileSpawn : LMConfig.globalSettings.canPassiveSpawn)) {
+				log("onEntitySpawn: Global config does not allow entity spawning - spawn cancelled!");
 				event.setResult(Event.Result.DENY);
+			}
 		}
-		if (areas.stream().anyMatch(area -> !(hostile ? area.canHostileSpawn() : area.canPassiveSpawn())))
+		Area area = areas.stream().filter(a -> !(hostile ? a.canHostileSpawn() : a.canPassiveSpawn())).findFirst().orElse(null);
+		if (area != null) {
+			log("onEntitySpawn: Area {} does not allow entity spawning - spawn cancelled!", area.getName());
 			event.setResult(Event.Result.DENY);
+		} else
+			log("onRightClickBlock: Entity spawning allowed!");
 	}
 
 	@SubscribeEvent
 	public static void onExplosion(ExplosionEvent.Detonate event) {
+		log("onExplosion: Starting explosion break checks");
 		//Prevent blocks from being destroyed by explosions if it's an area that prevents it
 		CapabilityAreas cap = getAreas(event.getWorld());
 		if (cap == null)
@@ -161,8 +202,20 @@ public class CommonEventHandler {
 		event.getAffectedBlocks().removeIf(pos ->
 		{
 			Set<Area> areas = cap.intersectingAreas(pos);
-			return areas.isEmpty() ? !LMConfig.globalSettings.canExplosionsDestroyBlocks :
-				areas.stream().anyMatch(area -> !area.canExplosionsCauseDamage());
+			if (areas.isEmpty()) {
+				if (!LMConfig.globalSettings.canExplosionsDestroyBlocks) {
+					log("onExplosion: No areas found for pos {} and global config does not allow explosions - removing affected block pos!", pos);
+					return true;
+				}
+			} else {
+				Area area = areas.stream().filter(a -> !a.canExplosionsCauseDamage()).findFirst().orElse(null);
+				if (area != null) {
+					log("onExplosion: Area {} at pos {} does not allow explosions - removing affected block pos!", area.getName(), pos);
+					return true;
+				}
+			}
+			log("onExplosion: Allowing affected block pos {}", pos);
+			return false;
 		});
 	}
 

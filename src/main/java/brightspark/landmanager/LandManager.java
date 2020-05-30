@@ -162,4 +162,9 @@ public class LandManager {
 	private static void areaChange(MinecraftServer server, AreaChangeType type, String areaName, String playerName, @Nullable EntityPlayerMP sender) {
 		sendToOPs(server, () -> new MessageChatLog(System.currentTimeMillis(), type, areaName, playerName), sender);
 	}
+
+	public static void log(String message, Object... args) {
+		if (LMConfig.debug)
+			LOGGER.info("LM DEBUG -> " + message, args);
+	}
 }
