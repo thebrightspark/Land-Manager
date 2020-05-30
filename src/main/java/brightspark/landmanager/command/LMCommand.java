@@ -152,11 +152,15 @@ public abstract class LMCommand extends CommandBase {
 		return playerName;
 	}
 
-	protected UUID getUuidFromPlayerName(MinecraftServer server, String playerName) throws CommandException {
+	protected GameProfile getProfileFromPlayerName(MinecraftServer server, String playerName) throws CommandException {
 		GameProfile profile = server.getPlayerProfileCache().getGameProfileForUsername(playerName);
-		if (profile != null)
-			return profile.getId();
-		throw new CommandException("lm.command.noplayer", playerName);
+		if (profile == null)
+			throw new CommandException("lm.command.noplayer", playerName);
+		return profile;
+	}
+
+	protected UUID getUuidFromPlayerName(MinecraftServer server, String playerName) throws CommandException {
+		return getProfileFromPlayerName(server, playerName).getId();
 	}
 
 	protected EntityPlayerMP getPlayerFromUuid(MinecraftServer server, UUID uuid) {

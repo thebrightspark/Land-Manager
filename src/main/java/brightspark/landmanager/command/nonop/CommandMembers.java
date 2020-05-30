@@ -7,6 +7,7 @@ import brightspark.landmanager.data.areas.AreaUpdateType;
 import brightspark.landmanager.data.areas.CapabilityAreas;
 import brightspark.landmanager.util.Utils;
 import com.google.common.collect.Lists;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -68,7 +69,8 @@ public class CommandMembers extends LMCommandTree {
 			Area area = pair.getRight();
 			checkCanEditArea(server, sender, area);
 
-			UUID uuid = getUuidFromPlayerName(server, args[1]);
+			GameProfile profile = getProfileFromPlayerName(server, args[1]);
+			UUID uuid = profile.getId();
 			if (!cap.canJoinArea(uuid)) {
 				player.sendMessage(new TextComponentTranslation("message.error.maxJoined", cap.getNumAreasJoined(uuid)));
 				return;
@@ -77,9 +79,9 @@ public class CommandMembers extends LMCommandTree {
 			if (area.addMember(uuid)) {
 				cap.increasePlayerAreasNum(uuid);
 				cap.dataChanged(area, AreaUpdateType.CHANGE);
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", player.getDisplayName(), area.getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.success", profile.getName(), area.getName()));
 			} else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", player.getDisplayName(), area.getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.add.already", profile.getName(), area.getName()));
 		}
 
 		@Override
@@ -119,13 +121,14 @@ public class CommandMembers extends LMCommandTree {
 			Area area = pair.getRight();
 			checkCanEditArea(server, sender, area);
 
-			UUID uuid = getUuidFromPlayerName(server, args[1]);
+			GameProfile profile = getProfileFromPlayerName(server, args[1]);
+			UUID uuid = profile.getId();
 			if (area.removeMember(uuid)) {
 				pair.getLeft().decreasePlayerAreasNum(uuid);
 				pair.getLeft().dataChanged(area, AreaUpdateType.CHANGE);
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", player.getDisplayName(), area.getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.success", profile.getName(), area.getName()));
 			} else
-				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", player.getDisplayName(), area.getName()));
+				player.sendMessage(new TextComponentTranslation("lm.command.members.remove.already", profile.getName(), area.getName()));
 		}
 
 		@Override
