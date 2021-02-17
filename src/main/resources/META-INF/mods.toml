@@ -1,5 +1,5 @@
 modLoader="kotlinforforge"
-loaderVersion="[1.9,)"
+loaderVersion="[1,)"
 issueTrackerURL="https://github.com/thebrightspark/Land-Manager/issues"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/land-manager"
 #logoFile="banner.png"
@@ -37,6 +37,6 @@ displayURL="https://www.curseforge.com/minecraft/mc-mods/land-manager"
 [[dependencies.landmanager]]
     modId="kotlinforforge"
     mandatory=true
-    versionRange="[1.9,)"
+    versionRange="[1,)"
     ordering="BEFORE"
     side="BOTH"
