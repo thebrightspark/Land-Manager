@@ -1,7 +1,7 @@
 package brightspark.landmanager.message
 
 import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.sendToPlayer
+import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.AreaCreationEvent
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.AddAreaResult
@@ -37,7 +37,7 @@ class MessageCreateArea : Message {
 			val player = context.get().sender ?: return@enqueueWork
 			val world = player.world
 			var result = AddAreaResult.INVALID
-			if (area.dimId == player.dimension.id && area.minPos.y >= 0 && area.maxPos.y <= world.height) {
+			if (area.dim == player.world.dimensionKey.location && area.minPos.y >= 0 && area.maxPos.y <= world.height) {
 				val cap = world.areasCap
 				when {
 					!Area.validateName(area.name) -> result = AddAreaResult.INVALID_NAME
@@ -46,7 +46,12 @@ class MessageCreateArea : Message {
 					!MinecraftForge.EVENT_BUS.post(AreaCreationEvent(area)) -> {
 						result = if (cap.addArea(area)) AddAreaResult.SUCCESS else AddAreaResult.NAME_EXISTS
 						if (result == AddAreaResult.SUCCESS)
-							LandManager.areaChange((world as ServerWorld).server, AreaChangeType.CREATE, area.name, player)
+							LandManager.areaChange(
+								(world as ServerWorld).server,
+								AreaChangeType.CREATE,
+								area.name,
+								player
+							)
 					}
 				}
 			}

@@ -3,7 +3,7 @@ package brightspark.landmanager.data.areas
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.vector.Vector3d
 import net.minecraftforge.common.util.INBTSerializable
 import java.util.*
 
@@ -32,7 +32,7 @@ interface AreasCapability : INBTSerializable<CompoundNBT> {
 
 	fun intersectingArea(pos: BlockPos): Area?
 
-	fun intersectingAreas(pos: Vec3d): Set<Area>
+	fun intersectingAreas(pos: Vector3d): Set<Area>
 
 	fun intersectingAreas(pos: BlockPos): Set<Area>
 

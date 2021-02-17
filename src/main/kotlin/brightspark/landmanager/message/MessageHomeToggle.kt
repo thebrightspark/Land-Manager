@@ -1,8 +1,8 @@
 package brightspark.landmanager.message
 
 import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.readEnumValue
-import brightspark.ksparklib.api.sendToPlayer
+import brightspark.ksparklib.api.extensions.readEnumValue
+import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Area

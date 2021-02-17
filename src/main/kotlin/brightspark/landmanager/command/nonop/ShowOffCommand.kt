@@ -1,16 +1,14 @@
 package brightspark.landmanager.command.nonop
 
 import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.literal
-import brightspark.ksparklib.api.sendToPlayer
+import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.message.MessageShowArea
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.CommandSource
 import net.minecraft.util.text.TranslationTextComponent
 
-object ShowOffCommand : Command {
-	override val builder: LiteralArgumentBuilder<CommandSource> = literal("showoff") {
+object ShowOffCommand : Command(
+	"showoff",
+	{
 		// showoff
 		executes {
 			LandManager.NETWORK.sendToPlayer(MessageShowArea(""), it.source.asPlayer())
@@ -18,4 +16,4 @@ object ShowOffCommand : Command {
 			return@executes 1
 		}
 	}
-}
+)

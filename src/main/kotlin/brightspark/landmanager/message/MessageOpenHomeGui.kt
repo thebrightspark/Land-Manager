@@ -1,5 +1,6 @@
 package brightspark.landmanager.message
 
+
 import brightspark.ksparklib.api.Message
 import brightspark.landmanager.gui.HomeScreen
 import net.minecraft.client.Minecraft
@@ -53,7 +54,7 @@ class MessageOpenHomeGui : Message {
 	override fun consume(context: Supplier<NetworkEvent.Context>) {
 		context.get().enqueueWork {
 			val mc = Minecraft.getInstance()
-			mc.displayGuiScreen(HomeScreen(mc.player, pos).apply {
+			mc.displayGuiScreen(HomeScreen(mc.player!!, pos).apply {
 				setMembersData(owner, members)
 				if (isOp)
 					setClientIsOp()

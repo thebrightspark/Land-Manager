@@ -1,6 +1,8 @@
 package brightspark.landmanager
 
 import brightspark.ksparklib.api.*
+import brightspark.ksparklib.api.extensions.register
+import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.block.HomeBlock
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.argumentType.AreaArgument
@@ -23,39 +25,46 @@ import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.common.capabilities.CapabilityInject
+import net.minecraftforge.event.RegisterCommandsEvent
 import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.config.ModConfig
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent
+import org.apache.logging.log4j.LogManager
+import thedarkcolour.kotlinforforge.forge.registerConfig
 
-@Mod(LandManager.MOD_ID)
+@Mod("langmanager")
 object LandManager {
 	const val MOD_ID = "landmanager"
-	val LOGGER = getLogger()
+	val LOGGER = LogManager.getLogger(LandManager::class.java)
 
 	val group = object : ItemGroup(MOD_ID) {
 		override fun createIcon() = ItemStack(area_create!!)
 	}
 
-	val NETWORK = regSimpleChannel(ResourceLocation(MOD_ID, "main"), "1", messages = arrayOf(
-		MessageAreaAdd::class,
-		MessageAreaChange::class,
-		MessageAreaDelete::class,
-		MessageAreaRename::class,
-		MessageChatLog::class,
-		MessageCreateArea::class,
-		MessageCreateAreaReply::class,
-		MessageHomeActionAdd::class,
-		MessageHomeActionKickOrPass::class,
-		MessageHomeActionReply::class,
-		MessageHomeActionReplyError::class,
-		MessageHomeToggle::class,
-		MessageHomeToggleReply::class,
-		MessageOpenCreateAreaGui::class,
-		MessageOpenHomeGui::class,
-		MessageShowArea::class,
-		MessageUpdateAreasCap::class
-	))
+	val NETWORK = regSimpleChannel(
+		name = ResourceLocation(MOD_ID, "main"),
+		protocolVersion = "1",
+		messages = arrayOf(
+			MessageAreaAdd::class,
+			MessageAreaChange::class,
+			MessageAreaDelete::class,
+			MessageAreaRename::class,
+			MessageChatLog::class,
+			MessageCreateArea::class,
+			MessageCreateAreaReply::class,
+			MessageHomeActionAdd::class,
+			MessageHomeActionKickOrPass::class,
+			MessageHomeActionReply::class,
+			MessageHomeActionReplyError::class,
+			MessageHomeToggle::class,
+			MessageHomeToggleReply::class,
+			MessageOpenCreateAreaGui::class,
+			MessageOpenHomeGui::class,
+			MessageShowArea::class,
+			MessageUpdateAreasCap::class
+		)
+	)
 
 	@CapabilityInject(AreasCapability::class)
 	@JvmStatic
@@ -70,12 +79,14 @@ object LandManager {
 		addModListener<FMLCommonSetupEvent> {
 			regCapability<AreasCapability, World, AreasCapabilityProvider>(::AreasCapabilityImpl, KEY_AREAS)
 		}
-		addForgeListener<FMLServerStartingEvent> { it.commandDispatcher.register(LMCommand) }
+
+		addForgeListener<RegisterCommandsEvent> { it.dispatcher.register(LMCommand) }
 
 		regCommandArgType<AreaArgument>("area")
 		regCommandArgType<RequestArgument>("request")
 
-		registerConfig(client = LMConfig.CLIENT_SPEC, server = LMConfig.SERVER_SPEC)
+		registerConfig(ModConfig.Type.CLIENT, LMConfig.CLIENT_SPEC)
+		registerConfig(ModConfig.Type.SERVER, LMConfig.SERVER_SPEC)
 	}
 
 	fun areaChange(context: CommandContext<CommandSource>, type: AreaChangeType, areaName: String) =

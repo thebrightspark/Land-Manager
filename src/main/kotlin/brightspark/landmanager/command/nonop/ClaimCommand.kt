@@ -1,8 +1,7 @@
 package brightspark.landmanager.command.nonop
 
 import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.literal
-import brightspark.ksparklib.api.thenArgument
+import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.AreaClaimEvent
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.LandManager
@@ -14,7 +13,6 @@ import brightspark.landmanager.util.AreaChangeType
 import brightspark.landmanager.util.areasCap
 import brightspark.landmanager.util.requests
 import brightspark.landmanager.util.sendToOps
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
@@ -24,23 +22,25 @@ import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.common.MinecraftForge
 
-object ClaimCommand : Command {
-	private val NOT_IN_AREA = SimpleCommandExceptionType(TranslationTextComponent("lm.command.notInArea"))
-	private val ALREADY_CLAIMED = DynamicCommandExceptionType { TranslationTextComponent("lm.command.claim.already", it) }
-
-	override val builder: LiteralArgumentBuilder<CommandSource> = literal("claim") {
+object ClaimCommand : Command(
+	"claim",
+	{
 		// claim
 		executes {
 			val player = it.source.asPlayer()
 			val cap = player.world.areasCap
-			val area = cap.intersectingArea(player.position) ?: throw NOT_IN_AREA.create()
-			return@executes doCommand(it, area, player)
+			val area = cap.intersectingArea(player.position) ?: throw ClaimCommand.NOT_IN_AREA.create()
+			return@executes ClaimCommand.doCommand(it, area, player)
 		}
 		thenArgument(AREA, AreaArgument) {
 			// claim <area>
-			executes { doCommand(it, AreaArgument.get(it, AREA), it.source.asPlayer()) }
+			executes { ClaimCommand.doCommand(it, AreaArgument.get(it, AREA), it.source.asPlayer()) }
 		}
 	}
+) {
+	private val NOT_IN_AREA = SimpleCommandExceptionType(TranslationTextComponent("lm.command.notInArea"))
+	private val ALREADY_CLAIMED =
+		DynamicCommandExceptionType { TranslationTextComponent("lm.command.claim.already", it) }
 
 	private fun doCommand(context: CommandContext<CommandSource>, area: Area, player: PlayerEntity): Int {
 		area.owner?.let { throw ALREADY_CLAIMED.create(area.name) }

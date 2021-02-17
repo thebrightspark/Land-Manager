@@ -1,7 +1,7 @@
 package brightspark.landmanager.message
 
 import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.readEnumValue
+import brightspark.ksparklib.api.extensions.readEnumValue
 import brightspark.landmanager.gui.HomeScreen
 import brightspark.landmanager.util.HomeGuiActionType
 import net.minecraft.client.Minecraft
@@ -52,8 +52,9 @@ class MessageHomeActionReply : Message {
 					gui.clearSelection()
 				}
 				HomeGuiActionType.PASS -> {
-					if (mc.player.uniqueID == uuid)
-						mc.player.closeScreen()
+					val player = mc.player!!
+					if (player.uniqueID == uuid)
+						player.closeScreen()
 				}
 			}
 		}

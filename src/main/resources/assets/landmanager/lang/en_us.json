@@ -1,12 +1,9 @@
 {
 	"itemGroup.landmanager": "Land Manager",
-
 	"item.landmanager.area_create": "Area Creation Tool",
 	"item.landmanager.area_create.tooltip.notset": "First position not set",
-	"item.landmanager.area_create.tooltip.set": "Dim Id: %d, BlockPos: %s",
-
+	"item.landmanager.area_create.tooltip.set": "Dim: %d, BlockPos: %s",
 	"block.landmanager.home": "Home Block",
-
 	"message.landmanager.tool.saved": "Saved block position %d, %d, %d",
 	"message.landmanager.tool.diffdim": "Cannot form area with two positions in different dimensions!",
 	"message.landmanager.tool.cleared": "Cleared saved position",

@@ -1,8 +1,8 @@
 package brightspark.landmanager.command.op
 
 import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.literal
-import brightspark.ksparklib.api.thenArgument
+import brightspark.ksparklib.api.extensions.sendMessage
+import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.AreaClaimDisapprovalEvent
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.LMCommand.REQUEST
@@ -10,14 +10,13 @@ import brightspark.landmanager.command.argumentType.RequestArgument
 import brightspark.landmanager.util.getSenderName
 import brightspark.landmanager.util.getWorldCapForArea
 import brightspark.landmanager.util.requests
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.CommandSource
 import net.minecraft.util.text.TextFormatting
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.common.MinecraftForge
 
-object DisapproveCommand : Command {
-	override val builder: LiteralArgumentBuilder<CommandSource> = literal("disapprove") {
+object DisapproveCommand : Command(
+	"disapprove",
+	{
 		thenArgument(REQUEST, RequestArgument) {
 			executes { context ->
 				val request = RequestArgument.get(context, REQUEST)
@@ -34,11 +33,21 @@ object DisapproveCommand : Command {
 
 				// Disapprove request
 				requests.delete(areaName, request.id)
-				context.source.sendFeedback(TranslationTextComponent("lm.command.disapprove.success", request.id, request.getPlayerName(server), areaName), true)
+				context.source.sendFeedback(
+					TranslationTextComponent(
+						"lm.command.disapprove.success",
+						request.id,
+						request.getPlayerName(server),
+						areaName
+					), true
+				)
 				// Notify the player if they're online
-				server.playerList.getPlayerByUUID(request.playerUuid)?.sendMessage(TranslationTextComponent("lm.command.disapprove.playerMessage", areaName, context.getSenderName()).applyTextStyle(TextFormatting.RED))
+				server.playerList.getPlayerByUUID(request.playerUuid)?.sendMessage(
+					TranslationTextComponent("lm.command.disapprove.playerMessage", areaName, context.getSenderName())
+						.mergeStyle(TextFormatting.RED)
+				)
 				return@executes 1
 			}
 		}
 	}
-}
+)

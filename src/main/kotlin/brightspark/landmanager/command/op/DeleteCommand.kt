@@ -1,8 +1,8 @@
 package brightspark.landmanager.command.op
 
 import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.literal
-import brightspark.ksparklib.api.thenArgument
+import brightspark.ksparklib.api.extensions.sendMessage
+import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.AreaDeletedEvent
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.command.LMCommand
@@ -11,15 +11,14 @@ import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.util.AreaChangeType
 import brightspark.landmanager.util.getWorldCapForArea
 import brightspark.landmanager.util.requests
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import net.minecraft.command.CommandSource
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.common.MinecraftForge
 import java.util.*
 
-object DeleteCommand : Command {
-	override val builder: LiteralArgumentBuilder<CommandSource> = literal("delete") {
+object DeleteCommand : Command(
+	"delete",
+	{
 		thenArgument(AREA, AreaArgument) {
 			executes { context ->
 				val server = context.source.server
@@ -31,8 +30,8 @@ object DeleteCommand : Command {
 					server.requests.deleteAllForArea(areaName)
 					context.source.sendFeedback(TranslationTextComponent("lm.command.delete.deleted", areaName), true)
 					// Notify all area members that the area was deleted
-					area.owner?.let { notifyPlayer(server, it, areaName) }
-					area.members.forEach { notifyPlayer(server, it, areaName) }
+					area.owner?.let { DeleteCommand.notifyPlayer(server, it, areaName) }
+					area.members.forEach { DeleteCommand.notifyPlayer(server, it, areaName) }
 					// Send chat message to OPs
 					LandManager.areaChange(context, AreaChangeType.DELETE, areaName)
 					return@executes 1
@@ -42,7 +41,8 @@ object DeleteCommand : Command {
 			}
 		}
 	}
-
+) {
 	private fun notifyPlayer(server: MinecraftServer, uuid: UUID, areaName: String) =
-		server.playerList.getPlayerByUUID(uuid)?.sendMessage(TranslationTextComponent("lm.command.delete.notify", areaName))
+		server.playerList.getPlayerByUUID(uuid)
+			?.sendMessage(TranslationTextComponent("lm.command.delete.notify", areaName))
 }

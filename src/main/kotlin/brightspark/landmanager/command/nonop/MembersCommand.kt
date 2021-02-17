@@ -1,9 +1,8 @@
 package brightspark.landmanager.command.nonop
 
 import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.literal
-import brightspark.ksparklib.api.thenArgument
-import brightspark.ksparklib.api.thenLiteral
+import brightspark.ksparklib.api.extensions.thenArgument
+import brightspark.ksparklib.api.extensions.thenLiteral
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.LMCommand.PLAYER
@@ -11,16 +10,13 @@ import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.data.areas.AreaUpdateType
 import brightspark.landmanager.util.canEditArea
 import brightspark.landmanager.util.getWorldCapForArea
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
-import net.minecraft.command.CommandSource
 import net.minecraft.command.arguments.EntityArgument
 import net.minecraft.util.text.TranslationTextComponent
 
-object MembersCommand : Command {
-	private val CANT_JOIN = DynamicCommandExceptionType { TranslationTextComponent("message.landmanager.error.maxJoined", it) }
-
-	override val builder: LiteralArgumentBuilder<CommandSource> = literal("members") {
+object MembersCommand : Command(
+	"members",
+	{
 		thenLiteral("add") {
 			thenArgument(AREA, AreaArgument) {
 				thenArgument(PLAYER, EntityArgument.player()) {
@@ -35,7 +31,7 @@ object MembersCommand : Command {
 						val cap = server.getWorldCapForArea(area) ?: throw LMCommand.ERROR_NO_AREA.create(area.name)
 						val uuid = player.uniqueID
 						if (!cap.canJoinArea(uuid))
-							throw CANT_JOIN.create(cap.getNumAreasJoined(uuid))
+							throw MembersCommand.CANT_JOIN.create(cap.getNumAreasJoined(uuid))
 
 						if (area.addMember(uuid)) {
 							cap.increasePlayerAreasNum(uuid)
@@ -63,19 +59,34 @@ object MembersCommand : Command {
 						val cap = server.getWorldCapForArea(area) ?: throw LMCommand.ERROR_NO_AREA.create(area.name)
 						val uuid = player.uniqueID
 						if (!cap.canJoinArea(uuid))
-							throw CANT_JOIN.create(cap.getNumAreasJoined(uuid))
+							throw MembersCommand.CANT_JOIN.create(cap.getNumAreasJoined(uuid))
 
 						if (area.removeMember(uuid)) {
 							cap.decreasePlayerAreasNum(uuid)
 							cap.dataChanged(area, AreaUpdateType.CHANGE)
-							context.source.sendFeedback(TranslationTextComponent("lm.command.members.remove.success", player.displayName, area.name), true)
+							context.source.sendFeedback(
+								TranslationTextComponent(
+									"lm.command.members.remove.success",
+									player.displayName,
+									area.name
+								), true
+							)
 							return@executes 1
 						}
-						context.source.sendFeedback(TranslationTextComponent("lm.command.members.remove.already", player.displayName, area.name), true)
+						context.source.sendFeedback(
+							TranslationTextComponent(
+								"lm.command.members.remove.already",
+								player.displayName,
+								area.name
+							), true
+						)
 						return@executes 0
 					}
 				}
 			}
 		}
 	}
+) {
+	private val CANT_JOIN =
+		DynamicCommandExceptionType { TranslationTextComponent("message.landmanager.error.maxJoined", it) }
 }

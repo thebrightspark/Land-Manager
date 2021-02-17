@@ -7,6 +7,7 @@ import brightspark.landmanager.util.AreaRenderer
 import brightspark.landmanager.util.areasCap
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.StringTextComponent
 import net.minecraft.util.text.TextFormatting
@@ -54,7 +55,11 @@ object ClientEventHandler {
 		renderAll = areasToRender.isNotEmpty() || !renderAll
 		areasToRender.clear()
 		colourCache.clear()
-		mc.player.sendStatusMessage(TranslationTextComponent("message.landmanager.areas.${if (renderAll) "show" else "hide"}").applyTextStyle(TextFormatting.GREEN), true)
+		mc.player!!.sendStatusMessage(
+			TranslationTextComponent("message.landmanager.areas.${if (renderAll) "show" else "hide"}")
+				.mergeStyle(TextFormatting.GREEN),
+			true
+		)
 	}
 
 	private fun randFloat(min: Float) = min + rand.nextFloat() * (1F - min)
@@ -67,15 +72,17 @@ object ClientEventHandler {
 		if (!renderAll && areasToRender.isEmpty())
 			return
 
-		val cap = mc.world.areasCap
-		val renderManager = mc.renderManager
+		val cap = mc.world!!.areasCap
+		val matrixStack = event.matrixStack
+		val buffer = mc.renderTypeBuffers.bufferSource
 		if (renderAll)
-			cap.getNearbyAreas(mc.player.position).forEach { AreaRenderer.renderArea(it, getColour(it.name), renderManager) }
+			cap.getNearbyAreas(mc.player!!.position)
+				.forEach { AreaRenderer.renderArea(it, getColour(it.name), matrixStack, buffer) }
 		else
 			areasToRender.stream()
 				.map { cap.getArea(it) }
 				.filter { it != null }
-				.forEach { AreaRenderer.renderArea(it!!, getColour(it.name), renderManager) }
+				.forEach { AreaRenderer.renderArea(it!!, getColour(it.name), matrixStack, buffer) }
 	}
 
 	@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
@@ -104,16 +111,18 @@ object ClientEventHandler {
 				// Display area change message
 				val text = area?.let { StringTextComponent(it.name) }
 					?: TranslationTextComponent("misc.landmanager.wilderness")
-				text.applyTextStyle(when {
-					area == null -> LMConfig.titleColourWilderness
-					area.isMember(player.uniqueID) -> LMConfig.titleColourAreaMember
-					else -> LMConfig.titleColourAreaOutsider
-				})
+				text.mergeStyle(
+					when {
+						area == null -> LMConfig.titleColourWilderness
+						area.isMember(player.uniqueID) -> LMConfig.titleColourAreaMember
+						else -> LMConfig.titleColourAreaOutsider
+					}
+				)
 				mc.ingameGUI.run {
 					// Set area name as sub-title
-					displayTitle(null, text.formattedText, 0, 0, 0)
+					func_238452_a_(null, text, 0, 0, 0) // displayTitle
 					// Display empty title so that sub-title is shown
-					displayTitle("", null, 0, 0, 0)
+					func_238452_a_(StringTextComponent(""), null, 0, 0, 0) // displayTitle
 				}
 			}
 		}
@@ -121,12 +130,12 @@ object ClientEventHandler {
 
 	class LastDetails(var area: Area?, player: PlayerEntity) {
 		var pos: BlockPos = player.position
-		var dimId: Int = player.dimension.id
+		var dim: ResourceLocation = player.world.dimensionKey.location
 
 		fun updateAndCheckPlayerPos(player: PlayerEntity): Boolean {
-			val result = player.position != pos || player.dimension.id != dimId
+			val result = player.position != pos || player.world.dimensionKey.location != dim
 			pos = player.position
-			dimId = player.dimension.id
+			dim = player.world.dimensionKey.location
 			return result
 		}
 

@@ -1,10 +1,7 @@
 package brightspark.landmanager.util
 
-import brightspark.ksparklib.api.appendStyledText
-import net.minecraft.util.text.ITextComponent
-import net.minecraft.util.text.StringTextComponent
-import net.minecraft.util.text.TextFormatting
-import net.minecraft.util.text.TranslationTextComponent
+import brightspark.ksparklib.api.extensions.appendStyledString
+import net.minecraft.util.text.*
 import net.minecraft.util.text.event.ClickEvent
 import net.minecraft.util.text.event.HoverEvent
 import org.apache.commons.lang3.StringUtils
@@ -35,40 +32,40 @@ object Util {
 			createPageTitle(titleLangKey, page, maxPage)
 		else
 		// Print on a new line in the server console for readability
-			StringTextComponent("\n").appendSibling(createPageTitle(titleLangKey, page, maxPage))
+			StringTextComponent("\n").append(createPageTitle(titleLangKey, page, maxPage))
 
-		view.list.forEach { text.appendText("\n").appendSibling(entryToText(it)) }
+		view.list.forEach { text.appendString("\n").append(entryToText(it)) }
 
 		// Don't need to add the arrows when sending back to the server console
 		if (senderIsPlayer)
-			createPageArrows(page, maxPage, arrowsCommandToRun)?.let {
-				text.appendText("\n").appendSibling(it)
-			}
+			createPageArrows(page, maxPage, arrowsCommandToRun)?.let { text.appendString("\n").append(it) }
 		return text
 	}
 
-	private fun createPageTitle(titleLangKey: String, page: Int, maxPage: Int): ITextComponent =
-		StringTextComponent("============= ").applyTextStyle(TextFormatting.YELLOW)
-			.appendSibling(TranslationTextComponent(titleLangKey, page + 1, maxPage + 1).applyTextStyle(TextFormatting.GOLD))
-			.appendStyledText(" =============", TextFormatting.YELLOW)
+	private fun createPageTitle(titleLangKey: String, page: Int, maxPage: Int): IFormattableTextComponent =
+		StringTextComponent("============= ").mergeStyle(TextFormatting.YELLOW)
+			.append(TranslationTextComponent(titleLangKey, page + 1, maxPage + 1).mergeStyle(TextFormatting.GOLD))
+			.appendStyledString(" =============", TextFormatting.YELLOW)
 
-	private fun createPageArrows(page: Int, maxPage: Int, commandToRun: (Int) -> String): ITextComponent? {
+	private fun createPageArrows(page: Int, maxPage: Int, commandToRun: (Int) -> String): IFormattableTextComponent? {
 		if (page < 0 || page > maxPage)
 			return null
 		return StringTextComponent(arrowPadding)
-			.appendSibling(if (page > 0) createArrow(true, page, commandToRun) else createBlank())
-			.appendText(arrowPadding)
-			.appendSibling(if (page < maxPage) createArrow(false, page, commandToRun) else createBlank())
+			.append(if (page > 0) createArrow(true, page, commandToRun) else createBlank())
+			.appendString(arrowPadding)
+			.append(if (page < maxPage) createArrow(false, page, commandToRun) else createBlank())
 	}
 
-	private fun createArrow(left: Boolean, page: Int, commandToRun: (Int) -> String): ITextComponent {
+	private fun createArrow(left: Boolean, page: Int, commandToRun: (Int) -> String): IFormattableTextComponent {
 		val nextPage = if (left) page else page + 2
 		return StringTextComponent(if (left) arrowLeft else arrowRight).apply {
-			applyTextStyles(TextFormatting.BOLD, TextFormatting.YELLOW)
-			style.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, TranslationTextComponent("lm.command.page", nextPage))
+			mergeStyle(TextFormatting.BOLD, TextFormatting.YELLOW)
+			style.hoverEvent =
+				HoverEvent(HoverEvent.Action.SHOW_TEXT, TranslationTextComponent("lm.command.page", nextPage))
 			style.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, commandToRun(nextPage))
 		}
 	}
 
-	private fun createBlank(): ITextComponent = StringTextComponent(arrowBlank).applyTextStyle(TextFormatting.GOLD)
+	private fun createBlank(): IFormattableTextComponent =
+		StringTextComponent(arrowBlank).mergeStyle(TextFormatting.GOLD)
 }

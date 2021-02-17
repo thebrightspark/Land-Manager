@@ -1,12 +1,13 @@
 package brightspark.landmanager.message
 
 import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.readEnumValue
+import brightspark.ksparklib.api.extensions.readEnumValue
 import brightspark.landmanager.data.areas.AddAreaResult
 import brightspark.landmanager.gui.CreateAreaScreen
 import brightspark.landmanager.handler.ClientEventHandler
 import brightspark.landmanager.item.AreaCreateItem
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screen.Screen
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.PacketBuffer
 import net.minecraft.util.text.TextFormatting
@@ -39,45 +40,52 @@ class MessageCreateAreaReply : Message {
 	override fun consume(context: Supplier<NetworkEvent.Context>) {
 		context.get().enqueueWork {
 			val mc = Minecraft.getInstance()
-			val player = mc.player
+			val player = mc.player!!
 			val gui = mc.currentScreen
 			when (result) {
 				AddAreaResult.SUCCESS -> {
-					player.sendStatusMessage(TranslationTextComponent("message.landmanager.create.added", areaName).applyTextStyle(TextFormatting.GREEN), true)
-					if (gui is CreateAreaScreen)
-						player.closeScreen()
-					resetItem(player)
+					sendStatusMessage(player, TextFormatting.GREEN, "message.landmanager.create.added", areaName)
+					closeScreen(gui, player)
 					ClientEventHandler.setRenderArea(areaName)
 				}
 				AddAreaResult.NAME_EXISTS -> {
-					player.sendStatusMessage(TranslationTextComponent("message.landmanager.create.name", areaName).applyTextStyle(TextFormatting.RED), true)
-					if (gui is CreateAreaScreen)
-						gui.clearTextField()
+					sendStatusMessage(player, TextFormatting.RED, "message.landmanager.create.name", areaName)
+					clearTextField(gui)
 				}
 				AddAreaResult.AREA_INTERSECTS -> {
-					player.sendStatusMessage(TranslationTextComponent("message.landmanager.create.intersects").applyTextStyle(TextFormatting.RED), true)
-					if (gui is CreateAreaScreen)
-						player.closeScreen()
-					resetItem(player)
+					sendStatusMessage(player, TextFormatting.RED, "message.landmanager.create.intersects")
+					closeScreen(gui, player)
 				}
 				AddAreaResult.INVALID_NAME -> {
-					player.sendStatusMessage(TranslationTextComponent("message.landmanager.create.invalid_name").applyTextStyle(TextFormatting.RED), true)
-					if (gui is CreateAreaScreen)
-						gui.clearTextField()
+					sendStatusMessage(player, TextFormatting.RED, "message.landmanager.create.invalid_name")
+					clearTextField(gui)
 				}
 				AddAreaResult.INVALID -> {
-					player.sendStatusMessage(TranslationTextComponent("message.landmanager.create.invalid").applyTextStyle(TextFormatting.RED), true)
-					if (gui is CreateAreaScreen)
-						player.closeScreen()
-					resetItem(player)
+					sendStatusMessage(player, TextFormatting.RED, "message.landmanager.create.invalid")
+					closeScreen(gui, player)
 				}
 			}
 		}
 	}
 
-	private fun resetItem(player: PlayerEntity) {
+	private fun sendStatusMessage(
+		player: PlayerEntity,
+		colour: TextFormatting,
+		translationKey: String,
+		vararg args: String
+	) =
+		player.sendStatusMessage(TranslationTextComponent(translationKey, *args).mergeStyle(colour), true)
+
+	private fun closeScreen(gui: Screen?, player: PlayerEntity) {
+		if (gui is CreateAreaScreen)
+			player.closeScreen()
 		val stack = player.heldItemMainhand
 		if (AreaCreateItem.getPos(stack) != null)
 			AreaCreateItem.setPos(stack, null)
+	}
+
+	private fun clearTextField(gui: Screen?) {
+		if (gui is CreateAreaScreen)
+			gui.clearTextField()
 	}
 }

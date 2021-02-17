@@ -28,7 +28,7 @@ class MessageAreaAdd : Message {
 
 	override fun consume(context: Supplier<NetworkEvent.Context>) {
 		context.get().enqueueWork {
-			Minecraft.getInstance().world.areasCap.addArea(area)
+			Minecraft.getInstance().world!!.areasCap.addArea(area)
 		}
 	}
 }

@@ -9,7 +9,7 @@ import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.vector.Vector3d
 import net.minecraft.util.text.TextFormatting
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraft.world.World
@@ -37,7 +37,7 @@ object CommonEventHandler {
 	}
 
 	private fun warnPlayer(player: PlayerEntity, langKey: String): Unit =
-		player.sendStatusMessage(TranslationTextComponent(langKey).apply { style.color = TextFormatting.RED }, true)
+		player.sendStatusMessage(TranslationTextComponent(langKey).mergeStyle(TextFormatting.RED), true)
 
 	@SubscribeEvent
 	fun onBlockStartBreak(event: PlayerEvent.BreakSpeed) = event.run {
@@ -57,13 +57,14 @@ object CommonEventHandler {
 
 	@SubscribeEvent
 	fun onBlockPlace(event: BlockEvent.EntityPlaceEvent) = event.run {
-		if (entity !is PlayerEntity)
+		if (entity !is PlayerEntity || world !is World)
 			return
 		val player = event.entity as PlayerEntity
-		val area = getArea(world.world, pos)
+		val area = getArea(world as World, pos)
 		if ((area != null && area.isMember(player.uniqueID)) ||
 			isCreativeOrOp(player) ||
-			(area == null && LMConfig.canPlayersBreakBlocks))
+			(area == null && LMConfig.canPlayersBreakBlocks)
+		)
 			return
 
 		// Stop players from placing blocks
@@ -89,8 +90,10 @@ object CommonEventHandler {
 
 	@SubscribeEvent
 	fun onEntitySpawn(event: LivingSpawnEvent.CheckSpawn) = event.run {
-		val cap = world.world.areasCap
-		val areas = cap.intersectingAreas(Vec3d(x, y, z))
+		if (world !is World)
+			return
+		val cap = (world as World).areasCap
+		val areas = cap.intersectingAreas(Vector3d(x, y, z))
 		val hostile = !entityLiving.type.classification.peacefulCreature
 
 		// Stop entity spawning if within an area that prevents it

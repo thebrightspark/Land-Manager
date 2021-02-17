@@ -1,7 +1,8 @@
 package brightspark.landmanager.gui
 
 import brightspark.landmanager.LandManager
-import com.mojang.blaze3d.platform.GlStateManager
+import com.mojang.blaze3d.matrix.MatrixStack
+import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.screen.Screen
@@ -29,35 +30,64 @@ open class LMScreen(
 		guiTop = (height - guiHeight) / 2
 	}
 
-	override fun render(mouseX: Int, mouseY: Int, partialTicks: Float) {
-		renderBackground()
-		GlStateManager.color3f(1F, 1F, 1F)
+	override fun render(matrixStack: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
+		renderBackground(matrixStack)
+		RenderSystem.color3f(1F, 1F, 1F)
 		minecraft!!.textureManager.bindTexture(imageResLoc)
-		blit(guiLeft, guiTop, 0F, 0F, guiWidth, guiHeight, imageWidth, imageHeight)
-		super.render(mouseX, mouseY, partialTicks)
+		blit(matrixStack, guiLeft, guiTop, guiWidth, guiHeight, imageWidth, imageHeight)
+		super.render(matrixStack, mouseX, mouseY, partialTicks)
 		buttons.firstOrNull { it is LMButton && it.isHovered && it.tooltip.isNotEmpty() }?.let { button ->
-			renderTooltip((button as LMButton).tooltip.map { it.formattedText }, mouseX, mouseY, font)
+			renderToolTip(
+				matrixStack,
+				(button as LMButton).tooltip.flatMap { font.trimStringToWidth(it, 100) },
+				mouseX,
+				mouseY,
+				font
+			)
 		}
 	}
 
-	fun drawString(text: String, x: Int, y: Int, colour: Int = 4210752, shadow: Boolean = false) {
+	fun drawString(
+		matrixStack: MatrixStack,
+		text: String,
+		x: Int,
+		y: Int,
+		colour: Int = 4210752,
+		shadow: Boolean = false
+	) {
 		if (shadow)
-			font.drawStringWithShadow(text, x.toFloat(), y.toFloat(), colour)
+			font.drawStringWithShadow(matrixStack, text, x.toFloat(), y.toFloat(), colour)
 		else
-			font.drawString(text, x.toFloat(), y.toFloat(), colour)
+			font.drawString(matrixStack, text, x.toFloat(), y.toFloat(), colour)
 	}
 
-	fun drawLangString(key: String, x: Int, y: Int, colour: Int = 4210752, shadow: Boolean = false) {
-		drawString(I18n.format(key), x, y, colour, shadow)
-	}
+	fun drawLangString(
+		matrixStack: MatrixStack,
+		key: String,
+		x: Int,
+		y: Int,
+		colour: Int = 4210752,
+		shadow: Boolean = false
+	): Unit = drawString(matrixStack, I18n.format(key), x, y, colour, shadow)
 
-	fun drawStringWithMaxWidth(text: String, x: Int, y: Int, maxWidth: Int, colour: Int = 4210752, shadow: Boolean = false) {
-		val textWidth = font.getStringWidth(text)
-		val ellipsisWidth = font.getStringWidth("...")
-		var textToDraw = text
-		if (textWidth > maxWidth - 6 && textWidth > ellipsisWidth)
-			textToDraw = font.trimStringToWidth(text, maxWidth - 6 - ellipsisWidth).trim() + "..."
-		drawString(textToDraw, x, y, colour, shadow)
+	fun drawStringWithMaxWidth(
+		matrixStack: MatrixStack,
+		text: ITextComponent,
+		x: Int,
+		y: Int,
+		maxWidth: Int,
+		colour: Int = 4210752,
+		shadow: Boolean = false
+	) {
+//		val textWidth = font.getStringWidth(text)
+//		val ellipsisWidth = font.getStringWidth("...")
+//		var textToDraw = text
+//		if (textWidth > maxWidth - 6 && textWidth > ellipsisWidth)
+//			textToDraw = font.trimStringToWidth(text, maxWidth - 6 - ellipsisWidth).trim() + "..."
+		val matrix = matrixStack.last.matrix
+		font.trimStringToWidth(text, maxWidth).forEach {
+			font.func_238415_a_(it, x.toFloat(), y.toFloat(), colour, matrix, shadow)
+		}
 	}
 
 	protected open inner class LMButton(
@@ -70,7 +100,7 @@ open class LMScreen(
 		protected val iconY: Int,
 		text: String,
 		onPress: (Button) -> Unit
-	) : Button(guiLeft + x, guiTop + y, width, height, text, onPress) {
+	) : Button(guiLeft + x, guiTop + y, width, height, StringTextComponent(text), onPress) {
 		protected var hasIcon = true
 		protected var drawWhenDisabled = false
 		protected var textOffset = 0
@@ -85,33 +115,39 @@ open class LMScreen(
 			textComponents.forEach { tooltip.add(it) }
 		}
 
-		protected open fun drawText(font: FontRenderer): Unit =
-			drawString(message, x + textOffset, y + (height - 8) / 2, getTextColour(), true)
+		protected open fun drawText(matrixStack: MatrixStack, font: FontRenderer): Unit =
+			drawString(matrixStack, font, message, x + textOffset, y + (height - 8) / 2, getTextColour())
 
-		override fun renderButton(p_renderButton_1_: Int, p_renderButton_2_: Int, p_renderButton_3_: Float) {
+		override fun renderButton(matrixStack: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
 			if (!visible || (!drawWhenDisabled && !active))
 				return
 			val mc = Minecraft.getInstance()
 			if (hasIcon) {
 				mc.textureManager.bindTexture(imageResLoc)
-				GlStateManager.color3f(1F, 1F, 1F)
-				blit(x, y, iconX.toFloat(), getIconY().toFloat(), width, height, imageWidth, imageHeight)
+				RenderSystem.color3f(1F, 1F, 1F)
+				blit(matrixStack, x, y, iconX.toFloat(), getIconY().toFloat(), width, height, imageWidth, imageHeight)
 			}
-			if (message.isNotBlank())
-				drawText(mc.fontRenderer)
+			if (message.unformattedComponentText.isNotBlank())
+				drawText(matrixStack, mc.fontRenderer)
 		}
 	}
 
-	protected open inner class ToggleButton(x: Int, y: Int, iconX: Int, iconY: Int, text: String, onPress: (Button) -> Unit = {})
-		: LMButton(x, y, 12, 12, iconX, iconY, text, onPress) {
+	protected open inner class ToggleButton(
+		x: Int,
+		y: Int,
+		iconX: Int,
+		iconY: Int,
+		text: String,
+		onPress: (Button) -> Unit = {}
+	) : LMButton(x, y, 12, 12, iconX, iconY, text, onPress) {
 		var isOn: Boolean = false
 
 		init {
 			textOffset = width + 2
 		}
 
-		override fun drawText(font: FontRenderer): Unit =
-			drawString(message, x + textOffset, y + (height - 8) / 2, getTextColour(), false)
+		override fun drawText(matrixStack: MatrixStack, font: FontRenderer): Unit =
+			drawString(matrixStack, font, message, x + textOffset, y + (height - 8) / 2, getTextColour())
 
 		override fun getIconY(): Int = if (isOn) iconY + height else iconY
 

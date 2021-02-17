@@ -12,6 +12,7 @@ import brightspark.landmanager.util.HomeGuiActionType.*
 import brightspark.landmanager.util.HomeGuiToggleType
 import brightspark.landmanager.util.HomeGuiToggleType.*
 import brightspark.landmanager.util.areasCap
+import com.mojang.blaze3d.matrix.MatrixStack
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.widget.TextFieldWidget
 import net.minecraft.client.resources.I18n
@@ -192,9 +193,9 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 	override fun init() {
 		super.init()
 
-		clientIsOwner = area.isOwner(minecraft!!.player.uniqueID)
+		clientIsOwner = area.isOwner(minecraft!!.player!!.uniqueID)
 
-		inputTextField = object : TextFieldWidget(font, guiLeft + 99, guiTop + 15, 56, 10, "") {
+		inputTextField = object : TextFieldWidget(font, guiLeft + 99, guiTop + 15, 56, 10, StringTextComponent("")) {
 			init {
 				setEnableBackgroundDrawing(false)
 			}
@@ -251,17 +252,17 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		inputTextField.tick()
 	}
 
-	override fun render(mouseX: Int, mouseY: Int, partialTicks: Float) {
-		super.render(mouseX, mouseY, partialTicks)
-		inputTextField.render(mouseX, mouseY, partialTicks)
+	override fun render(matrixStack: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
+		super.render(matrixStack, mouseX, mouseY, partialTicks)
+		inputTextField.render(matrixStack, mouseX, mouseY, partialTicks)
 
 		errorMessage?.let {
-			drawCenteredString(font, it.formattedText, width / 2, guiTop - 15, 0xFF0000)
+			drawCenteredString(matrixStack, font, it, width / 2, guiTop - 15, 0xFF0000)
 		}
 	}
 
-	private inner class ListButton(x: Int, y: Int, val num: Int)
-		: LMButton(x, y, 87, 11, 87, 144, "", { onListButtonPress(it as ListButton) }) {
+	private inner class ListButton(x: Int, y: Int, val num: Int) :
+		LMButton(x, y, 87, 11, 87, 144, "", { onListButtonPress(it as ListButton) }) {
 		private var isOwner: Boolean = false
 
 		init {
@@ -273,21 +274,21 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		override fun getTextColour(): Int = 14737632
 
 		fun setPlayer(player: Pair<UUID, String>?): Unit = player?.let {
-			message = it.second
+			message = StringTextComponent(it.second)
 			active = true
 			isOwner = isOwner(it.first)
 			if (isOwner) {
 				textOffset = 12
 				setTooltip(
-					TranslationTextComponent("gui.lm.home.owner").applyTextStyle(TextFormatting.GOLD),
-					StringTextComponent(message)
+					TranslationTextComponent("gui.lm.home.owner").mergeStyle(TextFormatting.GOLD),
+					message
 				)
 			} else {
 				textOffset = 1
-				setTooltip(StringTextComponent(message))
+				setTooltip(message)
 			}
 		} ?: run {
-			message = ""
+			message = StringTextComponent("")
 			active = false
 			isOwner = false
 			setTooltip()
@@ -297,12 +298,30 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 			hasIcon = selected
 		}
 
-		override fun drawText(font: FontRenderer) {
+		override fun drawText(matrixStack: MatrixStack, font: FontRenderer) {
 			if (isOwner) {
 				minecraft!!.textureManager.bindTexture(imageResLoc)
-				blit(x + 1, y + 1, ownerIcon.x.toFloat(), ownerIcon.y.toFloat(), ownerIcon.width, ownerIcon.height, imageWidth, imageHeight)
+				blit(
+					matrixStack,
+					x + 1,
+					y + 1,
+					ownerIcon.x.toFloat(),
+					ownerIcon.y.toFloat(),
+					ownerIcon.width,
+					ownerIcon.height,
+					imageWidth,
+					imageHeight
+				)
 			}
-			drawStringWithMaxWidth(message, x + textOffset, y + (height - 8) / 2, 85 - textOffset, getTextColour(), true)
+			drawStringWithMaxWidth(
+				matrixStack,
+				message,
+				x + textOffset,
+				y + (height - 8) / 2,
+				85 - textOffset,
+				getTextColour(),
+				true
+			)
 		}
 	}
 

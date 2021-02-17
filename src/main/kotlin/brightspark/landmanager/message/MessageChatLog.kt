@@ -1,14 +1,15 @@
 package brightspark.landmanager.message
 
 import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.readEnumValue
+import brightspark.ksparklib.api.extensions.appendTranslation
+import brightspark.ksparklib.api.extensions.readEnumValue
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.util.AreaChangeType
 import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer
+import net.minecraft.util.Util
 import net.minecraft.util.text.StringTextComponent
 import net.minecraft.util.text.TextFormatting
-import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.fml.network.NetworkEvent
 import java.text.SimpleDateFormat
 import java.util.*
@@ -51,12 +52,13 @@ class MessageChatLog : Message {
 	override fun consume(context: Supplier<NetworkEvent.Context>) {
 		if (!LMConfig.showChatLogs) return
 		context.get().enqueueWork {
-			Minecraft.getInstance().player.sendMessage(
+			Minecraft.getInstance().player!!.sendMessage(
 				StringTextComponent(DATE_FORMAT.format(Date(timestamp)))
-					.applyTextStyle(TextFormatting.GRAY)
-					.appendText(" ")
-					.appendSibling(TranslationTextComponent(type.unlocalisedName))
-					.appendText(": $areaName -> $playerName")
+					.mergeStyle(TextFormatting.GRAY)
+					.appendString(" ")
+					.appendTranslation(type.unlocalisedName)
+					.appendString(": $areaName -> $playerName"),
+				Util.DUMMY_UUID
 			)
 		}
 	}

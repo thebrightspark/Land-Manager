@@ -31,7 +31,7 @@ class MessageAreaRename : Message {
 
 	override fun consume(context: Supplier<NetworkEvent.Context>) {
 		context.get().enqueueWork {
-			Minecraft.getInstance().world.areasCap.renameArea(oldName, newName)
+			Minecraft.getInstance().world!!.areasCap.renameArea(oldName, newName)
 		}
 	}
 }

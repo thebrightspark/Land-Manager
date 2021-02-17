@@ -1,11 +1,14 @@
 package brightspark.landmanager.command.nonop
 
-import brightspark.ksparklib.api.*
+import brightspark.ksparklib.api.Command
+import brightspark.ksparklib.api.extensions.appendString
+import brightspark.ksparklib.api.extensions.appendStyledString
+import brightspark.ksparklib.api.extensions.sendMessage
+import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.util.getUsernameFromUuid
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.command.CommandSource
 import net.minecraft.util.math.BlockPos
@@ -14,14 +17,15 @@ import net.minecraft.util.text.StringTextComponent
 import net.minecraft.util.text.TextFormatting
 import net.minecraft.util.text.TranslationTextComponent
 
-object AreaCommand : Command {
-	override val builder: LiteralArgumentBuilder<CommandSource> = literal("area") {
+object AreaCommand : Command(
+	"area",
+	{
 		thenArgument(AREA, AreaArgument) {
 			// area <name>
-			executes { doCommand(it, AreaArgument.get(it, AREA)) }
+			executes { AreaCommand.doCommand(it, AreaArgument.get(it, AREA)) }
 		}
 	}
-
+) {
 	private fun doCommand(context: CommandContext<CommandSource>, area: Area): Int {
 		val server = context.source.server
 		val player = context.source.asPlayer()
@@ -38,28 +42,35 @@ object AreaCommand : Command {
 		}
 
 		player.sendMessage(
-			StringTextComponent("").applyTextStyle(TextFormatting.WHITE)
-				.appendSibling(TranslationTextComponent("lm.command.area.name").applyTextStyle(TextFormatting.YELLOW)).appendText(" ${area.name}")
-				.appendText("\n ").appendSibling(goldText("lm.command.area.owner")).appendText(" ").appendSibling(ownerName)
-				.appendText("\n ").appendSibling(goldText("lm.command.area.members")).appendText(" ").appendSibling(members)
-				.appendText("\n ").appendSibling(goldText("lm.command.area.dim")).appendText(" ${area.dimId}")
-				.appendText("\n ").appendSibling(goldText("lm.command.area.posmin")).appendText(" ").appendSibling(posToText(area.minPos))
-				.appendText("\n ").appendSibling(goldText("lm.command.area.posmax")).appendText(" ").appendSibling(posToText(area.maxPos))
-				.appendText("\n ").appendSibling(goldText("lm.command.area.passives")).appendText(" ").appendSibling(boolToText(area.canPassiveSpawn))
-				.appendText("\n ").appendSibling(goldText("lm.command.area.hostiles")).appendText(" ").appendSibling(boolToText(area.canHostileSpawn))
-				.appendText("\n ").appendSibling(goldText("lm.command.area.explosions")).appendText(" ").appendSibling(boolToText(area.explosions))
-				.appendText("\n ").appendSibling(goldText("lm.command.area.interactions")).appendText(" ").appendSibling(boolToText(area.interactions))
+			StringTextComponent("").mergeStyle(TextFormatting.WHITE)
+				.append(TranslationTextComponent("lm.command.area.name").mergeStyle(TextFormatting.YELLOW))
+				.appendString(" ${area.name}")
+				.appendString("\n ").append(goldText("lm.command.area.owner")).appendString(" ").append(ownerName)
+				.appendString("\n ").append(goldText("lm.command.area.members")).appendString(" ").append(members)
+				.appendString("\n ").append(goldText("lm.command.area.dim")).appendString(" ${area.dim}")
+				.appendString("\n ").append(goldText("lm.command.area.posmin")).appendString(" ")
+				.append(posToText(area.minPos))
+				.appendString("\n ").append(goldText("lm.command.area.posmax")).appendString(" ")
+				.append(posToText(area.maxPos))
+				.appendString("\n ").append(goldText("lm.command.area.passives")).appendString(" ")
+				.append(boolToText(area.canPassiveSpawn))
+				.appendString("\n ").append(goldText("lm.command.area.hostiles")).appendString(" ")
+				.append(boolToText(area.canHostileSpawn))
+				.appendString("\n ").append(goldText("lm.command.area.explosions")).appendString(" ")
+				.append(boolToText(area.explosions))
+				.appendString("\n ").append(goldText("lm.command.area.interactions")).appendString(" ")
+				.append(boolToText(area.interactions))
 		)
 		return 1
 	}
 
 	private fun goldText(langKey: String): ITextComponent =
-		TranslationTextComponent(langKey).applyTextStyle(TextFormatting.GOLD)
+		TranslationTextComponent(langKey).mergeStyle(TextFormatting.GOLD)
 
 	private fun posToText(pos: BlockPos): ITextComponent = StringTextComponent("")
-		.appendStyledText("X: ", TextFormatting.YELLOW).appendText("${pos.x}, ")
-		.appendStyledText("Y: ", TextFormatting.YELLOW).appendText("${pos.y}, ")
-		.appendStyledText("Z: ", TextFormatting.YELLOW).appendText(pos.z)
+		.appendStyledString("X: ", TextFormatting.YELLOW).appendString("${pos.x}, ")
+		.appendStyledString("Y: ", TextFormatting.YELLOW).appendString("${pos.y}, ")
+		.appendStyledString("Z: ", TextFormatting.YELLOW).appendString(pos.z)
 
 	private fun boolToText(bool: Boolean): ITextComponent =
 		TranslationTextComponent(if (bool) "message.landmanager.misc.true" else "message.landmanager.misc.false")

@@ -1,10 +1,12 @@
 package brightspark.landmanager.data.areas
 
+import brightspark.ksparklib.api.extensions.toVec3d
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.nbt.ListNBT
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.vector.Vector3d
 import net.minecraft.world.World
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.common.util.INBTSerializable
@@ -23,7 +25,7 @@ class Area : INBTSerializable<CompoundNBT> {
 	@set:JvmName("_setName")
 	lateinit var name: String
 		private set
-	var dimId: Int = 0
+	lateinit var dim: ResourceLocation
 		private set
 	lateinit var minPos: BlockPos
 		private set
@@ -31,6 +33,7 @@ class Area : INBTSerializable<CompoundNBT> {
 		private set
 	var owner: UUID? = null
 	val members = mutableSetOf<UUID>()
+
 	// TODO: Have defaults configurable?
 	var canPassiveSpawn = true
 	var canHostileSpawn = true
@@ -38,9 +41,9 @@ class Area : INBTSerializable<CompoundNBT> {
 	var interactions = false
 	private var cachedAABB: AxisAlignedBB? = null
 
-	constructor(name: String, dimensionId: Int, position1: BlockPos, position2: BlockPos) {
+	constructor(name: String, dimension: ResourceLocation, position1: BlockPos, position2: BlockPos) {
 		this.name = name
-		dimId = dimensionId
+		dim = dimension
 		minPos = BlockPos(
 			min(position1.x, position2.x),
 			min(position1.y, position2.y),
@@ -90,15 +93,15 @@ class Area : INBTSerializable<CompoundNBT> {
 
 	fun asAABB(): AxisAlignedBB {
 		if (cachedAABB == null)
-			cachedAABB = AxisAlignedBB(Vec3d(minPos).add(0.4, 0.4, 0.4), Vec3d(maxPos).add(0.6, 0.6, 0.6))
+			cachedAABB = AxisAlignedBB(minPos.toVec3d().add(0.4, 0.4, 0.4), maxPos.toVec3d().add(0.6, 0.6, 0.6))
 		return cachedAABB!!
 	}
 
 	fun intersects(area: Area): Boolean = asAABB().intersects(area.asAABB())
 
-	fun intersects(pos: Vec3d): Boolean = asAABB().contains(pos)
+	fun intersects(pos: Vector3d): Boolean = asAABB().contains(pos)
 
-	fun intersects(pos: BlockPos): Boolean = intersects(Vec3d(pos).add(0.5, 0.5, 0.5))
+	fun intersects(pos: BlockPos): Boolean = intersects(pos.toVec3d().add(0.5, 0.5, 0.5))
 
 	fun extendToMinMaxY(world: World) {
 		minPos = BlockPos(minPos.x, 0, minPos.z)
@@ -108,7 +111,7 @@ class Area : INBTSerializable<CompoundNBT> {
 
 	override fun serializeNBT(): CompoundNBT = CompoundNBT().apply {
 		putString("name", name)
-		putInt("dimension", dimId)
+		putString("dimension", dim.toString())
 		putLong("position1", minPos.toLong())
 		putLong("position2", maxPos.toLong())
 		owner?.let { putUniqueId("player", it) }
@@ -127,7 +130,7 @@ class Area : INBTSerializable<CompoundNBT> {
 
 	override fun deserializeNBT(nbt: CompoundNBT) {
 		name = nbt.getString("name")
-		dimId = nbt.getInt("dimension")
+		dim = ResourceLocation(nbt.getString("dimension"))
 		minPos = BlockPos.fromLong(nbt.getLong("position1"))
 		maxPos = BlockPos.fromLong(nbt.getLong("position2"))
 		cachedAABB = null
@@ -151,7 +154,7 @@ class Area : INBTSerializable<CompoundNBT> {
 		if (other !is Area) return false
 		return EqualsBuilder()
 			.append(name, other.name)
-			.append(dimId, other.dimId)
+			.append(dim, other.dim)
 			.append(minPos, other.minPos)
 			.append(maxPos, other.maxPos)
 			.isEquals
@@ -159,7 +162,7 @@ class Area : INBTSerializable<CompoundNBT> {
 
 	override fun hashCode(): Int {
 		var result = name.hashCode()
-		result = 31 * result + dimId
+		result = 31 * result + dim.hashCode()
 		return result
 	}
 }

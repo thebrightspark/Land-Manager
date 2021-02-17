@@ -1,9 +1,8 @@
 package brightspark.landmanager.command
 
 import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.literal
-import brightspark.ksparklib.api.thenCommand
-import brightspark.ksparklib.api.thenLiteral
+import brightspark.ksparklib.api.extensions.thenCommand
+import brightspark.ksparklib.api.extensions.thenLiteral
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.command.nonop.*
@@ -16,15 +15,15 @@ import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.data.areas.AreaUpdateType
 import brightspark.landmanager.util.canEditArea
 import brightspark.landmanager.util.getWorldCapForArea
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import net.minecraft.command.CommandSource
 import net.minecraft.util.text.ITextComponent
 import net.minecraft.util.text.TranslationTextComponent
 
-object LMCommand : Command {
-	override val builder: LiteralArgumentBuilder<CommandSource> = literal("lm") {
+object LMCommand : Command(
+	"lm",
+	{
 		// Non-op
 		thenCommand(AreaCommand)
 		thenCommand(AreasCommand)
@@ -72,7 +71,7 @@ object LMCommand : Command {
 		if (LMConfig.tool)
 			thenCommand(ToolCommand)
 	}
-
+) {
 	const val AREA = "areaName"
 	const val PAGE = "pageNum"
 	const val AREA_REGEX = "areaNameRegex"
@@ -82,7 +81,11 @@ object LMCommand : Command {
 	val ERROR_CANT_EDIT = DynamicCommandExceptionType { TranslationTextComponent("lm.command.noPerm", it) }
 	val ERROR_NO_AREA = DynamicCommandExceptionType { TranslationTextComponent("lm.command.none", it) }
 
-	fun permissionCommand(context: CommandContext<CommandSource>, action: (Area) -> Unit, feedback: (Area) -> ITextComponent): Int {
+	fun permissionCommand(
+		context: CommandContext<CommandSource>,
+		action: (Area) -> Unit,
+		feedback: (Area) -> ITextComponent
+	): Int {
 		val source = context.source
 		val area = AreaArgument.get(context, AREA)
 		val areas = source.server.getWorldCapForArea(area) ?: throw ERROR_NO_AREA.create(area.name)

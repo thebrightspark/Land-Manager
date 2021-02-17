@@ -27,7 +27,7 @@ class MessageAreaDelete : Message {
 
 	override fun consume(context: Supplier<NetworkEvent.Context>) {
 		context.get().enqueueWork {
-			Minecraft.getInstance().world.areasCap.removeArea(areaName)
+			Minecraft.getInstance().world!!.areasCap.removeArea(areaName)
 		}
 	}
 }

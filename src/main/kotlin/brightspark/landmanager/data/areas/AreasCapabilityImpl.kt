@@ -1,8 +1,8 @@
 package brightspark.landmanager.data.areas
 
-import brightspark.ksparklib.api.runWhenOnServerSide
-import brightspark.ksparklib.api.sendToAll
-import brightspark.ksparklib.api.sendToPlayer
+import brightspark.ksparklib.api.extensions.sendToAll
+import brightspark.ksparklib.api.extensions.sendToPlayer
+import brightspark.ksparklib.api.runWhenOnLogicalServer
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.message.*
@@ -11,7 +11,7 @@ import net.minecraft.nbt.CompoundNBT
 import net.minecraft.nbt.ListNBT
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.vector.Vector3d
 import net.minecraftforge.common.util.Constants
 import java.util.*
 import kotlin.math.max
@@ -46,7 +46,7 @@ class AreasCapabilityImpl : AreasCapability {
 		val area = areas.remove(oldName) ?: return false
 		area.setName(newName)
 		areas[newName] = area
-		runWhenOnServerSide { LandManager.NETWORK.sendToAll(MessageAreaRename(oldName, newName)) }
+		runWhenOnLogicalServer { LandManager.NETWORK.sendToAll(MessageAreaRename(oldName, newName)) }
 		return true
 	}
 
@@ -76,7 +76,7 @@ class AreasCapabilityImpl : AreasCapability {
 
 	override fun intersectingArea(pos: BlockPos): Area? = areas.values.find { it.intersects(pos) }
 
-	override fun intersectingAreas(pos: Vec3d): Set<Area> = areas.values.filter { it.intersects(pos) }.toSet()
+	override fun intersectingAreas(pos: Vector3d): Set<Area> = areas.values.filter { it.intersects(pos) }.toSet()
 
 	override fun intersectingAreas(pos: BlockPos): Set<Area> = areas.values.filter { it.intersects(pos) }.toSet()
 
@@ -97,14 +97,17 @@ class AreasCapabilityImpl : AreasCapability {
 		}
 	}
 
-	override fun dataChanged() = runWhenOnServerSide { LandManager.NETWORK.sendToAll(MessageUpdateAreasCap(serializeNBT())) }
+	override fun dataChanged() =
+		runWhenOnLogicalServer { LandManager.NETWORK.sendToAll(MessageUpdateAreasCap(serializeNBT())) }
 
-	override fun dataChanged(area: Area, type: AreaUpdateType) = runWhenOnServerSide {
-		LandManager.NETWORK.sendToAll(when (type) {
-			AreaUpdateType.DELETE -> MessageAreaDelete(area.name)
-			AreaUpdateType.ADD -> MessageAreaAdd(area)
-			AreaUpdateType.CHANGE -> MessageAreaChange(area)
-		})
+	override fun dataChanged(area: Area, type: AreaUpdateType) = runWhenOnLogicalServer {
+		LandManager.NETWORK.sendToAll(
+			when (type) {
+				AreaUpdateType.DELETE -> MessageAreaDelete(area.name)
+				AreaUpdateType.ADD -> MessageAreaAdd(area)
+				AreaUpdateType.CHANGE -> MessageAreaChange(area)
+			}
+		)
 	}
 
 	override fun sendDataToPlayer(player: ServerPlayerEntity) =

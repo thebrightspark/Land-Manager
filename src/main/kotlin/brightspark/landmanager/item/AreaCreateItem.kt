@@ -1,6 +1,7 @@
 package brightspark.landmanager.item
 
-import brightspark.ksparklib.api.sendToPlayer
+import brightspark.ksparklib.api.extensions.sendMessage
+import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Position
 import brightspark.landmanager.message.MessageOpenCreateAreaGui
@@ -35,16 +36,19 @@ class AreaCreateItem : Item(Properties().apply {
 		when {
 			pos1 == null -> {
 				// Store pos in item
-				setPos(stack, Position(player.dimension.id, pos2))
+				setPos(stack, Position(player.world.dimensionKey.location, pos2))
 				player.sendMessage(TranslationTextComponent("message.landmanager.tool.saved", pos2.x, pos2.y, pos2.z))
 			}
-			pos1.dimensionId != player.dimension.id -> {
+			pos1.dimension != player.world.dimensionKey.location -> {
 				//  Stored pos in different dimension! Remove stored pos
 				setPos(stack, null)
 				player.sendMessage(TranslationTextComponent("message.landmanager.tool.diffdim"))
 			}
 			else -> if (!context.world.isRemote)
-				LandManager.NETWORK.sendToPlayer(MessageOpenCreateAreaGui(pos1.position, pos2), player as ServerPlayerEntity)
+				LandManager.NETWORK.sendToPlayer(
+					MessageOpenCreateAreaGui(pos1.dimension, pos1.position, pos2),
+					player as ServerPlayerEntity
+				)
 		}
 
 		return ActionResultType.SUCCESS
@@ -68,7 +72,13 @@ class AreaCreateItem : Item(Properties().apply {
 	}
 
 	override fun addInformation(stack: ItemStack, world: World?, tooltip: MutableList<ITextComponent>, flag: ITooltipFlag) {
-		tooltip.add(getPos(stack)?.let { TranslationTextComponent("item.landmanager.area_create.tooltip.set", it.dimensionId, posToString(it.position)) }
+		tooltip.add(getPos(stack)?.let {
+			TranslationTextComponent(
+				"item.landmanager.area_create.tooltip.set",
+				it.dimension,
+				posToString(it.position)
+			)
+		}
 			?: TranslationTextComponent("item.landmanager.area_create.tooltip.notset"))
 	}
 

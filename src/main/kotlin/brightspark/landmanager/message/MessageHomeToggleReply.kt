@@ -1,7 +1,7 @@
 package brightspark.landmanager.message
 
 import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.readEnumValue
+import brightspark.ksparklib.api.extensions.readEnumValue
 import brightspark.landmanager.gui.HomeScreen
 import brightspark.landmanager.util.HomeGuiToggleType
 import net.minecraft.client.Minecraft

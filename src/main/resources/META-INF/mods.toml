@@ -1,5 +1,5 @@
-modLoader="kotlinfml"
-loaderVersion="[1,)"
+modLoader="kotlinforforge"
+loaderVersion="[1.9,)"
 issueTrackerURL="https://github.com/thebrightspark/Land-Manager/issues"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/land-manager"
 #logoFile="banner.png"
@@ -13,23 +13,30 @@ displayURL="https://www.curseforge.com/minecraft/mc-mods/land-manager"
     Manage custom sized areas of the world and allocate them to players!
     '''
 
-[[dependencies.sparkstools]]
+[[dependencies.landmanager]]
     modId="forge"
     mandatory=true
     versionRange="[28,)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.sparkstools]]
+[[dependencies.landmanager]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.14.4]"
+    versionRange="[1.16.4]"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.sparkstools]]
+[[dependencies.landmanager]]
     modId="ksparklib"
     mandatory=true
     versionRange="[1,)"
+    ordering="BEFORE"
+    side="BOTH"
+
+[[dependencies.landmanager]]
+    modId="kotlinforforge"
+    mandatory=true
+    versionRange="[1.9,)"
     ordering="BEFORE"
     side="BOTH"

@@ -1,6 +1,6 @@
 package brightspark.landmanager.block
 
-import brightspark.ksparklib.api.sendToPlayer
+import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.message.MessageOpenHomeGui
 import brightspark.landmanager.util.areasCap
@@ -11,6 +11,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.material.Material
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.ServerPlayerEntity
+import net.minecraft.util.ActionResultType
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.BlockRayTraceResult
@@ -19,9 +20,16 @@ import net.minecraft.world.World
 import net.minecraft.world.server.ServerWorld
 
 class HomeBlock : Block(Properties.create(Material.WOOD)) {
-	override fun onBlockActivated(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, hand: Hand, hit: BlockRayTraceResult): Boolean {
+	override fun onBlockActivated(
+		state: BlockState,
+		world: World,
+		pos: BlockPos,
+		player: PlayerEntity,
+		hand: Hand,
+		hit: BlockRayTraceResult
+	): ActionResultType {
 		if (world.isRemote || world !is ServerWorld || player !is ServerPlayerEntity || player.isSneaking || hand != Hand.MAIN_HAND)
-			return true
+			return ActionResultType.SUCCESS
 		world.areasCap.intersectingArea(pos)?.let { area ->
 			if (area.isMember(player.uniqueID) || player.isOp()) {
 				val server = world.server
@@ -33,6 +41,6 @@ class HomeBlock : Block(Properties.create(Material.WOOD)) {
 		} ?: run {
 			player.sendStatusMessage(TranslationTextComponent("message.landmanager.home.none"), true)
 		}
-		return true
+		return ActionResultType.SUCCESS
 	}
 }

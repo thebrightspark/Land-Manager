@@ -1,6 +1,6 @@
 package brightspark.landmanager.util
 
-import brightspark.ksparklib.api.get
+import brightspark.ksparklib.api.extensions.get
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.data.areas.AreasCapability
@@ -14,7 +14,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.management.PlayerProfileCache
-import net.minecraft.util.math.Vec3d
+import net.minecraft.util.Util
 import net.minecraft.util.text.ITextComponent
 import net.minecraft.world.World
 import java.util.*
@@ -59,7 +59,7 @@ fun MinecraftServer.getUsernameFromUuid(uuid: UUID): String? = this.playerProfil
 fun MinecraftServer.sendToOps(message: ITextComponent, excluding: PlayerEntity? = null): Unit = this.playerList.players
 	.filter { it != excluding && this.playerList.oppedPlayers.getEntry(it.gameProfile) != null }
 	.mapNotNull { this.playerList.getPlayerByUUID(it.uniqueID) }
-	.forEach { it.sendMessage(message) }
+	.forEach { it.sendMessage(message, Util.DUMMY_UUID) }
 
 fun MinecraftServer.getWorldCapForArea(area: Area): AreasCapability? = this.getWorldCapForArea(area.name)
 
@@ -88,7 +88,6 @@ fun ICommandSource.isOp(): Boolean {
 fun ICommandSource?.canEditArea(area: Area?): Boolean =
 	this != null && area != null && (this is MinecraftServer || (this is PlayerEntity && (area.isOwner(this.uniqueID) || this.isOp())))
 
-
 fun ServerPlayerEntity?.canEditArea(area: Area?): Boolean {
 	return this != null && area != null && (area.isOwner(this.uniqueID) || this.isOp())
 }
@@ -103,6 +102,6 @@ fun PlayerProfileCache.getProfileForUsername(username: String): GameProfile? =
 
 fun CommandContext<CommandSource>.getSenderName(): String = when (val sender = this.source.source) {
 	is PlayerEntity -> sender.gameProfile.name
-	is Entity -> sender.name.formattedText
+	is Entity -> sender.name.string
 	else -> this.source.server.name
 }
