@@ -1,18 +1,18 @@
 package brightspark.landmanager.command.optional
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.thenArgument
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.util.canEditArea
 import brightspark.landmanager.util.getWorldCapForArea
+import brightspark.landmanager.util.thenArgument
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
 import net.minecraft.util.text.TranslationTextComponent
 
-object RenameCommand : Command(
+object RenameCommand : AbstractCommand(
 	"rename",
 	{
 		thenArgument(AREA, AreaArgument) {

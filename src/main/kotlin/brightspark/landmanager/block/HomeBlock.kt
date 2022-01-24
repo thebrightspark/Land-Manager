@@ -1,14 +1,13 @@
 package brightspark.landmanager.block
 
-import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.message.MessageOpenHomeGui
 import brightspark.landmanager.util.areasCap
 import brightspark.landmanager.util.getUsernameFromUuid
 import brightspark.landmanager.util.isOp
+import brightspark.landmanager.util.sendToPlayer
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
-import net.minecraft.block.material.Material
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.util.ActionResultType
@@ -19,7 +18,7 @@ import net.minecraft.util.text.TranslationTextComponent
 import net.minecraft.world.World
 import net.minecraft.world.server.ServerWorld
 
-class HomeBlock : Block(Properties.create(Material.WOOD)) {
+class HomeBlock(props: Properties) : Block(props) {
 	override fun onBlockActivated(
 		state: BlockState,
 		world: World,

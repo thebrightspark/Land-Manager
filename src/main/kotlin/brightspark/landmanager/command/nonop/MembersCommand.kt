@@ -1,8 +1,6 @@
 package brightspark.landmanager.command.nonop
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.thenArgument
-import brightspark.ksparklib.api.extensions.thenLiteral
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.LMCommand.PLAYER
@@ -10,11 +8,13 @@ import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.data.areas.AreaUpdateType
 import brightspark.landmanager.util.canEditArea
 import brightspark.landmanager.util.getWorldCapForArea
+import brightspark.landmanager.util.thenArgument
+import brightspark.landmanager.util.thenLiteral
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import net.minecraft.command.arguments.EntityArgument
 import net.minecraft.util.text.TranslationTextComponent
 
-object MembersCommand : Command(
+object MembersCommand : AbstractCommand(
 	"members",
 	{
 		thenLiteral("add") {

@@ -1,10 +1,10 @@
 package brightspark.landmanager.message
 
-import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.extensions.appendTranslation
-import brightspark.ksparklib.api.extensions.readEnumValue
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.util.AreaChangeType
+import brightspark.landmanager.util.Message
+import brightspark.landmanager.util.appendTranslation
+import brightspark.landmanager.util.readEnumValue
 import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer
 import net.minecraft.util.Util

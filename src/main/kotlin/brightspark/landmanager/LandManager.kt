@@ -1,39 +1,33 @@
 package brightspark.landmanager
 
-import brightspark.ksparklib.api.*
-import brightspark.ksparklib.api.extensions.register
-import brightspark.ksparklib.api.extensions.sendToPlayer
-import brightspark.landmanager.block.HomeBlock
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.command.argumentType.RequestArgument
-import brightspark.landmanager.data.areas.AreasCapability
-import brightspark.landmanager.data.areas.AreasCapabilityImpl
-import brightspark.landmanager.data.areas.AreasCapabilityProvider
-import brightspark.landmanager.item.AreaCreateItem
+import brightspark.landmanager.init.LMBlocks
+import brightspark.landmanager.init.LMCapabilities
+import brightspark.landmanager.init.LMItems
 import brightspark.landmanager.message.*
-import brightspark.landmanager.util.AreaChangeType
-import brightspark.landmanager.util.getSenderName
+import brightspark.landmanager.util.*
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.command.CommandSource
 import net.minecraft.entity.player.ServerPlayerEntity
-import net.minecraft.item.Item
 import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.ResourceLocation
-import net.minecraft.world.World
-import net.minecraftforge.common.capabilities.Capability
-import net.minecraftforge.common.capabilities.CapabilityInject
 import net.minecraftforge.event.RegisterCommandsEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.config.ModConfig
 import net.minecraftforge.fml.config.ModConfig.ModConfigEvent
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent
+import net.minecraftforge.fml.network.NetworkRegistry
+import net.minecraftforge.fml.network.simple.SimpleChannel
 import org.apache.logging.log4j.LogManager
+import thedarkcolour.kotlinforforge.forge.FORGE_BUS
+import thedarkcolour.kotlinforforge.forge.MOD_BUS
 import thedarkcolour.kotlinforforge.forge.registerConfig
 
-@Mod("langmanager")
+@Mod(LandManager.MOD_ID)
 object LandManager {
 	const val MOD_ID = "landmanager"
 	val LOGGER = LogManager.getLogger(LandManager::class.java)
@@ -42,10 +36,14 @@ object LandManager {
 		override fun createIcon() = ItemStack(area_create!!)
 	}
 
-	val NETWORK = regSimpleChannel(
-		name = ResourceLocation(MOD_ID, "main"),
-		protocolVersion = "1",
-		messages = arrayOf(
+	private const val NETWORK_PROTOCOL = "1";
+	val NETWORK: SimpleChannel = NetworkRegistry.newSimpleChannel(
+		ResourceLocation(MOD_ID, "main"),
+		{ "1" },
+		NETWORK_PROTOCOL::equals,
+		NETWORK_PROTOCOL::equals
+	).apply {
+		arrayOf(
 			MessageAreaAdd::class,
 			MessageAreaChange::class,
 			MessageAreaDelete::class,
@@ -63,24 +61,24 @@ object LandManager {
 			MessageOpenHomeGui::class,
 			MessageShowArea::class,
 			MessageUpdateAreasCap::class
-		)
-	)
-
-	@CapabilityInject(AreasCapability::class)
-	@JvmStatic
-	var CAP_AREAS: Capability<AreasCapability>? = null
-	private val KEY_AREAS = ResourceLocation(MOD_ID, "_areas")
+		).forEachIndexed { i, kClass -> registerMessage(kClass, i) }
+	}
 
 	init {
-		addModListener<ModConfigEvent> { if (it.config.modId == MOD_ID) LMConfig.bake() }
-		registerBlocks(MOD_ID, { _, _, props -> props.group(group) }, "home" to HomeBlock())
-		registerContent<Item>(MOD_ID, "area_create" to AreaCreateItem())
+		MOD_BUS.apply {
+			addListener<ModConfigEvent> { if (it.config.modId == MOD_ID) LMConfig.bake() }
+			addListener<FMLCommonSetupEvent> { it.enqueueWork { LMCapabilities.register() } }
 
-		addModListener<FMLCommonSetupEvent> {
-			regCapability<AreasCapability, World, AreasCapabilityProvider>(::AreasCapabilityImpl, KEY_AREAS)
+			addGenericListener(LMBlocks::register)
+			addGenericListener(LMItems::register)
 		}
-
-		addForgeListener<RegisterCommandsEvent> { it.dispatcher.register(LMCommand) }
+		FORGE_BUS.apply {
+			addGenericListener(LMCapabilities::attach)
+			addListener(LMCapabilities::playerLoggedIn)
+			addListener(LMCapabilities::playerRespawn)
+			addListener(LMCapabilities::playerChangedDimension)
+			addListener<RegisterCommandsEvent> { it.dispatcher.register(LMCommand) }
+		}
 
 		regCommandArgType<AreaArgument>("area")
 		regCommandArgType<RequestArgument>("request")
@@ -92,7 +90,12 @@ object LandManager {
 	fun areaChange(context: CommandContext<CommandSource>, type: AreaChangeType, areaName: String) =
 		areaChange(context.source.server, type, areaName, context.getSenderName())
 
-	fun areaChange(server: MinecraftServer, type: AreaChangeType, areaName: String, sender: ServerPlayerEntity? = null) {
+	fun areaChange(
+		server: MinecraftServer,
+		type: AreaChangeType,
+		areaName: String,
+		sender: ServerPlayerEntity? = null
+	) {
 		val timestamp = System.currentTimeMillis()
 		val senderName = sender?.gameProfile?.name ?: server.name
 		server.playerList.oppedPlayers.keys

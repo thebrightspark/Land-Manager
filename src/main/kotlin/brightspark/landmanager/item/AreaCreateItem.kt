@@ -1,10 +1,10 @@
 package brightspark.landmanager.item
 
-import brightspark.ksparklib.api.extensions.sendMessage
-import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Position
 import brightspark.landmanager.message.MessageOpenCreateAreaGui
+import brightspark.landmanager.util.sendMessage
+import brightspark.landmanager.util.sendToPlayer
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.ServerPlayerEntity
@@ -19,10 +19,7 @@ import net.minecraft.util.text.ITextComponent
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraft.world.World
 
-class AreaCreateItem : Item(Properties().apply {
-	group(LandManager.group)
-	maxStackSize(1)
-}) {
+class AreaCreateItem(props: Properties) : Item(props) {
 	override fun hasEffect(stack: ItemStack): Boolean = true
 
 	override fun onItemUseFirst(stack: ItemStack, context: ItemUseContext): ActionResultType {

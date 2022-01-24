@@ -1,12 +1,12 @@
 package brightspark.landmanager.command.nonop
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.LandManager
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.message.MessageShowArea
+import brightspark.landmanager.util.sendToPlayer
 import net.minecraft.util.text.TranslationTextComponent
 
-object ShowOffCommand : Command(
+object ShowOffCommand : AbstractCommand(
 	"showoff",
 	{
 		// showoff

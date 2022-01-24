@@ -1,11 +1,11 @@
 package brightspark.landmanager.data.areas
 
-import brightspark.ksparklib.api.extensions.sendToAll
-import brightspark.ksparklib.api.extensions.sendToPlayer
-import brightspark.ksparklib.api.runWhenOnLogicalServer
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.message.*
+import brightspark.landmanager.util.runWhenOnLogicalServer
+import brightspark.landmanager.util.sendToAll
+import brightspark.landmanager.util.sendToPlayer
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.nbt.ListNBT

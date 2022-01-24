@@ -1,8 +1,5 @@
 package brightspark.landmanager.command
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.thenCommand
-import brightspark.ksparklib.api.extensions.thenLiteral
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.command.nonop.*
@@ -15,13 +12,15 @@ import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.data.areas.AreaUpdateType
 import brightspark.landmanager.util.canEditArea
 import brightspark.landmanager.util.getWorldCapForArea
+import brightspark.landmanager.util.thenCommand
+import brightspark.landmanager.util.thenLiteral
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import net.minecraft.command.CommandSource
 import net.minecraft.util.text.ITextComponent
 import net.minecraft.util.text.TranslationTextComponent
 
-object LMCommand : Command(
+object LMCommand : AbstractCommand(
 	"lm",
 	{
 		// Non-op

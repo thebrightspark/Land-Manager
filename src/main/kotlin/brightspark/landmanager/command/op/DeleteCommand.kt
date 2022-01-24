@@ -1,22 +1,18 @@
 package brightspark.landmanager.command.op
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.sendMessage
-import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.AreaDeletedEvent
 import brightspark.landmanager.LandManager
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.argumentType.AreaArgument
-import brightspark.landmanager.util.AreaChangeType
-import brightspark.landmanager.util.getWorldCapForArea
-import brightspark.landmanager.util.requests
+import brightspark.landmanager.util.*
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.common.MinecraftForge
 import java.util.*
 
-object DeleteCommand : Command(
+object DeleteCommand : AbstractCommand(
 	"delete",
 	{
 		thenArgument(AREA, AreaArgument) {

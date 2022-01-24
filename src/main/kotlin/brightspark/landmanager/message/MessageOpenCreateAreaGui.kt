@@ -1,7 +1,7 @@
 package brightspark.landmanager.message
 
-import brightspark.ksparklib.api.Message
 import brightspark.landmanager.gui.CreateAreaScreen
+import brightspark.landmanager.util.Message
 import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer
 import net.minecraft.util.ResourceLocation

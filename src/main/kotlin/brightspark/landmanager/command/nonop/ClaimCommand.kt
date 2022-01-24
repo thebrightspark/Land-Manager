@@ -1,18 +1,14 @@
 package brightspark.landmanager.command.nonop
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.AreaClaimEvent
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.LandManager
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.data.areas.AreaUpdateType
-import brightspark.landmanager.util.AreaChangeType
-import brightspark.landmanager.util.areasCap
-import brightspark.landmanager.util.requests
-import brightspark.landmanager.util.sendToOps
+import brightspark.landmanager.util.*
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
@@ -22,7 +18,7 @@ import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.common.MinecraftForge
 
-object ClaimCommand : Command(
+object ClaimCommand : AbstractCommand(
 	"claim",
 	{
 		// claim
@@ -52,7 +48,9 @@ object ClaimCommand : Command(
 			// Make this a "request" instead of immediately claiming
 			source.server.requests.add(area.name, player.uniqueID)?.let {
 				source.sendFeedback(TranslationTextComponent("lm.command.claim.request.success", area.name), true)
-				source.server.sendToOps(TranslationTextComponent("lm.command.claim.request.opMessage", it, player.name, area.name))
+				source.server.sendToOps(
+					TranslationTextComponent("lm.command.claim.request.opMessage", it, player.name, area.name)
+				)
 				return 1
 			} ?: run {
 				source.sendFeedback(TranslationTextComponent("lm.command.claim.request.failed", area.name), true)

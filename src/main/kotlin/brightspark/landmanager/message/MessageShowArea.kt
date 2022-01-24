@@ -1,7 +1,7 @@
 package brightspark.landmanager.message
 
-import brightspark.ksparklib.api.Message
 import brightspark.landmanager.handler.ClientEventHandler
+import brightspark.landmanager.util.Message
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
 import java.util.function.Supplier

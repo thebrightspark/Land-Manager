@@ -1,6 +1,6 @@
 package brightspark.landmanager.data.areas
 
-import brightspark.landmanager.LandManager
+import brightspark.landmanager.init.LMCapabilities
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.Direction
 import net.minecraftforge.common.capabilities.Capability
@@ -12,7 +12,7 @@ class AreasCapabilityProvider : ICapabilitySerializable<CompoundNBT> {
 
 	@Suppress("UNCHECKED_CAST")
 	override fun <T> getCapability(cap: Capability<T>, side: Direction?): LazyOptional<T> =
-		LandManager.CAP_AREAS!!.orEmpty(cap, areas)
+		LMCapabilities.AREAS.orEmpty(cap, areas)
 
 	override fun deserializeNBT(nbt: CompoundNBT) = areas.ifPresent { it.deserializeNBT(nbt) }
 

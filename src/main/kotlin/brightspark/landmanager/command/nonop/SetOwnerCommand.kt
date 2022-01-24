@@ -1,8 +1,7 @@
 package brightspark.landmanager.command.nonop
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.LandManager
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.LMCommand.PLAYER
@@ -13,13 +12,14 @@ import brightspark.landmanager.data.areas.AreasCapability
 import brightspark.landmanager.util.AreaChangeType
 import brightspark.landmanager.util.canEditArea
 import brightspark.landmanager.util.getWorldCapForArea
+import brightspark.landmanager.util.thenArgument
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.command.CommandSource
 import net.minecraft.command.arguments.EntityArgument
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.util.text.TranslationTextComponent
 
-object SetOwnerCommand : Command(
+object SetOwnerCommand : AbstractCommand(
 	"setowner",
 	{
 		thenArgument(AREA, AreaArgument) {

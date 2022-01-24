@@ -1,6 +1,6 @@
 package brightspark.landmanager.message
 
-import brightspark.ksparklib.api.Message
+import brightspark.landmanager.util.Message
 import brightspark.landmanager.util.areasCap
 import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer

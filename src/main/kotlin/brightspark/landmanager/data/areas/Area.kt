@@ -1,6 +1,6 @@
 package brightspark.landmanager.data.areas
 
-import brightspark.ksparklib.api.extensions.toVec3d
+import brightspark.landmanager.util.toVec3d
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.nbt.ListNBT
 import net.minecraft.util.ResourceLocation

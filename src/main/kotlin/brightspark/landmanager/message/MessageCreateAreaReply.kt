@@ -1,11 +1,11 @@
 package brightspark.landmanager.message
 
-import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.extensions.readEnumValue
 import brightspark.landmanager.data.areas.AddAreaResult
 import brightspark.landmanager.gui.CreateAreaScreen
 import brightspark.landmanager.handler.ClientEventHandler
 import brightspark.landmanager.item.AreaCreateItem
+import brightspark.landmanager.util.Message
+import brightspark.landmanager.util.readEnumValue
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.entity.player.PlayerEntity

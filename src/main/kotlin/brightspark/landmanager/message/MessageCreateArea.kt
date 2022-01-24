@@ -1,13 +1,13 @@
 package brightspark.landmanager.message
 
-import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.extensions.sendToPlayer
 import brightspark.landmanager.AreaCreationEvent
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.AddAreaResult
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.util.AreaChangeType
+import brightspark.landmanager.util.Message
 import brightspark.landmanager.util.areasCap
+import brightspark.landmanager.util.sendToPlayer
 import net.minecraft.network.PacketBuffer
 import net.minecraft.world.server.ServerWorld
 import net.minecraftforge.common.MinecraftForge

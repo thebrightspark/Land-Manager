@@ -1,11 +1,11 @@
 package brightspark.landmanager.command.optional
 
-import brightspark.ksparklib.api.Command
 import brightspark.landmanager.area_create
+import brightspark.landmanager.command.AbstractCommand
 import net.minecraft.item.ItemStack
 import net.minecraft.util.text.TranslationTextComponent
 
-object ToolCommand : Command(
+object ToolCommand : AbstractCommand(
 	"tool",
 	{
 		executes {

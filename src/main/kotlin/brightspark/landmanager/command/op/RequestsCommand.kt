@@ -1,11 +1,11 @@
 package brightspark.landmanager.command.op
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.thenArgument
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand.AREA_REGEX
 import brightspark.landmanager.command.LMCommand.PAGE
 import brightspark.landmanager.util.Util
 import brightspark.landmanager.util.requests
+import brightspark.landmanager.util.thenArgument
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -15,7 +15,7 @@ import net.minecraft.util.text.*
 import net.minecraft.util.text.event.ClickEvent
 import net.minecraft.util.text.event.HoverEvent
 
-object RequestsCommand : Command(
+object RequestsCommand : AbstractCommand(
 	"requests",
 	{
 		// requests

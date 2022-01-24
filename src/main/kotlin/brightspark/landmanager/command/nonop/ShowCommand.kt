@@ -1,15 +1,15 @@
 package brightspark.landmanager.command.nonop
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.sendToPlayer
-import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.LandManager
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.argumentType.AreaArgument
 import brightspark.landmanager.message.MessageShowArea
+import brightspark.landmanager.util.sendToPlayer
+import brightspark.landmanager.util.thenArgument
 import net.minecraft.util.text.TranslationTextComponent
 
-object ShowCommand : Command(
+object ShowCommand : AbstractCommand(
 	"show",
 	{
 		// show

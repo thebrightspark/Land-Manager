@@ -1,20 +1,16 @@
 package brightspark.landmanager.command.op
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.sendMessage
-import brightspark.ksparklib.api.extensions.thenArgument
 import brightspark.landmanager.AreaClaimDisapprovalEvent
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.LMCommand.REQUEST
 import brightspark.landmanager.command.argumentType.RequestArgument
-import brightspark.landmanager.util.getSenderName
-import brightspark.landmanager.util.getWorldCapForArea
-import brightspark.landmanager.util.requests
+import brightspark.landmanager.util.*
 import net.minecraft.util.text.TextFormatting
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.common.MinecraftForge
 
-object DisapproveCommand : Command(
+object DisapproveCommand : AbstractCommand(
 	"disapprove",
 	{
 		thenArgument(REQUEST, RequestArgument) {

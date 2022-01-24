@@ -1,9 +1,9 @@
 package brightspark.landmanager.message
 
-import brightspark.ksparklib.api.Message
-import brightspark.ksparklib.api.extensions.readEnumValue
 import brightspark.landmanager.gui.HomeScreen
 import brightspark.landmanager.util.HomeGuiToggleType
+import brightspark.landmanager.util.Message
+import brightspark.landmanager.util.readEnumValue
 import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent

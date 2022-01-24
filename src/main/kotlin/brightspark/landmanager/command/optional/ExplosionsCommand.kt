@@ -1,13 +1,13 @@
 package brightspark.landmanager.command.optional
 
-import brightspark.ksparklib.api.Command
-import brightspark.ksparklib.api.extensions.thenArgument
+import brightspark.landmanager.command.AbstractCommand
 import brightspark.landmanager.command.LMCommand
 import brightspark.landmanager.command.LMCommand.AREA
 import brightspark.landmanager.command.argumentType.AreaArgument
+import brightspark.landmanager.util.thenArgument
 import net.minecraft.util.text.TranslationTextComponent
 
-object ExplosionsCommand : Command(
+object ExplosionsCommand : AbstractCommand(
 	"explosions",
 	{
 		thenArgument(AREA, AreaArgument) {

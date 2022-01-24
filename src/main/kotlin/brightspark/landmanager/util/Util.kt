@@ -1,6 +1,5 @@
 package brightspark.landmanager.util
 
-import brightspark.ksparklib.api.extensions.appendStyledString
 import net.minecraft.util.text.*
 import net.minecraft.util.text.event.ClickEvent
 import net.minecraft.util.text.event.HoverEvent
