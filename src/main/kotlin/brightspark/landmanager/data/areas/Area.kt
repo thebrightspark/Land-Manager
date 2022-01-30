@@ -1,5 +1,6 @@
 package brightspark.landmanager.data.areas
 
+import brightspark.landmanager.util.Cached
 import brightspark.landmanager.util.toVec3d
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.nbt.ListNBT
@@ -39,7 +40,12 @@ class Area : INBTSerializable<CompoundNBT> {
 	var canHostileSpawn = true
 	var explosions = true
 	var interactions = false
-	private var cachedAABB: AxisAlignedBB? = null
+	var collisionAabb: Cached<AxisAlignedBB> =
+		Cached { AxisAlignedBB(minPos.toVec3d().add(0.4, 0.4, 0.4), maxPos.toVec3d().add(0.6, 0.6, 0.6)) }
+		private set
+	var displayAabb: Cached<AxisAlignedBB> =
+		Cached { AxisAlignedBB(minPos.toVec3d().subtract(0.1, 0.1, 0.1), maxPos.toVec3d().add(1.1, 1.1, 1.1)) }
+		private set
 
 	constructor(name: String, dimension: ResourceLocation, position1: BlockPos, position2: BlockPos) {
 		this.name = name
@@ -91,22 +97,17 @@ class Area : INBTSerializable<CompoundNBT> {
 		interactions = interactions.not()
 	}
 
-	fun asAABB(): AxisAlignedBB {
-		if (cachedAABB == null)
-			cachedAABB = AxisAlignedBB(minPos.toVec3d().add(0.4, 0.4, 0.4), maxPos.toVec3d().add(0.6, 0.6, 0.6))
-		return cachedAABB!!
-	}
+	fun intersects(area: Area): Boolean = collisionAabb.get().intersects(area.collisionAabb.get())
 
-	fun intersects(area: Area): Boolean = asAABB().intersects(area.asAABB())
-
-	fun intersects(pos: Vector3d): Boolean = asAABB().contains(pos)
+	fun intersects(pos: Vector3d): Boolean = collisionAabb.get().contains(pos)
 
 	fun intersects(pos: BlockPos): Boolean = intersects(pos.toVec3d().add(0.5, 0.5, 0.5))
 
 	fun extendToMinMaxY(world: World) {
 		minPos = BlockPos(minPos.x, 0, minPos.z)
 		maxPos = BlockPos(maxPos.x, world.height, maxPos.z)
-		cachedAABB = null
+		collisionAabb.clear()
+		displayAabb.clear()
 	}
 
 	override fun serializeNBT(): CompoundNBT = CompoundNBT().apply {
@@ -133,7 +134,8 @@ class Area : INBTSerializable<CompoundNBT> {
 		dim = ResourceLocation(nbt.getString("dimension"))
 		minPos = BlockPos.fromLong(nbt.getLong("position1"))
 		maxPos = BlockPos.fromLong(nbt.getLong("position2"))
-		cachedAABB = null
+		collisionAabb.clear()
+		displayAabb.clear()
 		if (nbt.hasUniqueId("player"))
 			owner = nbt.getUniqueId("player")
 		members.clear()

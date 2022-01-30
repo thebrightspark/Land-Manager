@@ -3,21 +3,21 @@ package brightspark.landmanager.util
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.data.areas.Area
 import com.mojang.blaze3d.matrix.MatrixStack
-import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.IVertexBuilder
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.IRenderTypeBuffer
 import net.minecraft.client.renderer.RenderState
 import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
-import net.minecraft.util.math.AxisAlignedBB
-import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.vector.Matrix4f
 import net.minecraft.util.math.vector.Vector3d
+import net.minecraft.util.math.vector.Vector3f
 import org.lwjgl.opengl.GL11
 import java.awt.Color
-import java.util.*
 
 object AreaRenderer {
 	private val mc = Minecraft.getInstance()
@@ -26,244 +26,283 @@ object AreaRenderer {
 		// Second is the outside offset
 		// Third is the other inside offset for the internal faces
 		UP to listOf(
-			createVecTriple(1, 1, -1, -1, 1, 1, 1, -1, -1),        // South West -> -X, +Z
-			createVecTriple(-1, 1, -1, 1, 1, 1, -1, -1, -1),    // South East -> +X, +Z
-			createVecTriple(-1, 1, 1, 1, 1, -1, -1, -1, 1),     // North East -> +X, -Z
-			createVecTriple(1, 1, 1, -1, 1, -1, 1, -1, 1)        // North West -> -X, -Z
+			createVecTriple(1, 1, -1, -1, 1, 1, 1, -1, -1),    // South West -> -X, +Z
+			createVecTriple(-1, 1, -1, 1, 1, 1, -1, -1, -1),   // South East -> +X, +Z
+			createVecTriple(-1, 1, 1, 1, 1, -1, -1, -1, 1),    // North East -> +X, -Z
+			createVecTriple(1, 1, 1, -1, 1, -1, 1, -1, 1)      // North West -> -X, -Z
 		),
 		DOWN to listOf(
-			createVecTriple(1, -1, 1, -1, -1, -1, 1, 1, 1),     // North West -> -X, -Z
-			createVecTriple(-1, -1, 1, 1, -1, -1, -1, 1, 1),    // North East -> +X, -Z
-			createVecTriple(-1, -1, -1, 1, -1, 1, -1, 1, -1),   // South East -> +X, +Z
+			createVecTriple(1, -1, 1, -1, -1, -1, 1, 1, 1),    // North West -> -X, -Z
+			createVecTriple(-1, -1, 1, 1, -1, -1, -1, 1, 1),   // North East -> +X, -Z
+			createVecTriple(-1, -1, -1, 1, -1, 1, -1, 1, -1),  // South East -> +X, +Z
 			createVecTriple(1, -1, -1, -1, -1, 1, 1, 1, -1)    // South West -> -X, +Z
 		),
 		NORTH to listOf(
-			createVecTriple(-1, 1, -1, 1, -1, -1, -1, 1, 1),    // Down East -> +X, -Y
-			createVecTriple(1, 1, -1, -1, -1, -1, 1, 1, 1),     // Down West -> -X, -Y
-			createVecTriple(1, -1, -1, -1, 1, -1, 1, -1, 1),    // Up West -> -X, +Y
-			createVecTriple(-1, -1, -1, 1, 1, -1, -1, -1, 1)    // Up East -> +X, +Y
+			createVecTriple(-1, 1, -1, 1, -1, -1, -1, 1, 1),   // Down East -> +X, -Y
+			createVecTriple(1, 1, -1, -1, -1, -1, 1, 1, 1),    // Down West -> -X, -Y
+			createVecTriple(1, -1, -1, -1, 1, -1, 1, -1, 1),   // Up West -> -X, +Y
+			createVecTriple(-1, -1, -1, 1, 1, -1, -1, -1, 1)   // Up East -> +X, +Y
 		),
 		SOUTH to listOf(
-			createVecTriple(1, 1, 1, -1, -1, 1, 1, 1, -1),      // Down West -> -X, -Y
-			createVecTriple(-1, 1, 1, 1, -1, 1, -1, 1, -1),     // Down East -> +X, -Y
-			createVecTriple(-1, -1, 1, 1, 1, 1, -1, -1, -1),    // Up East -> +X, +Y
-			createVecTriple(1, -1, 1, -1, 1, 1, 1, -1, -1)    // Up West -> -X, +Y
+			createVecTriple(1, 1, 1, -1, -1, 1, 1, 1, -1),     // Down West -> -X, -Y
+			createVecTriple(-1, 1, 1, 1, -1, 1, -1, 1, -1),    // Down East -> +X, -Y
+			createVecTriple(-1, -1, 1, 1, 1, 1, -1, -1, -1),   // Up East -> +X, +Y
+			createVecTriple(1, -1, 1, -1, 1, 1, 1, -1, -1)     // Up West -> -X, +Y
 		),
 		EAST to listOf(
-			createVecTriple(1, 1, -1, 1, -1, 1, -1, 1, -1),     // Down South -> +Z, -Y
-			createVecTriple(1, 1, 1, 1, -1, -1, -1, 1, 1),      // Down North -> -Z, -Y
-			createVecTriple(1, -1, 1, 1, 1, -1, -1, -1, 1),     // Up North -> -Z, +Y
+			createVecTriple(1, 1, -1, 1, -1, 1, -1, 1, -1),    // Down South -> +Z, -Y
+			createVecTriple(1, 1, 1, 1, -1, -1, -1, 1, 1),     // Down North -> -Z, -Y
+			createVecTriple(1, -1, 1, 1, 1, -1, -1, -1, 1),    // Up North -> -Z, +Y
 			createVecTriple(1, -1, -1, 1, 1, 1, -1, -1, -1)    // Up South -> +Z, +Y
 		),
 		WEST to listOf(
-			createVecTriple(-1, 1, 1, -1, -1, -1, 1, 1, 1),     // Down North -> -Z, -Y
-			createVecTriple(-1, 1, -1, -1, -1, 1, 1, 1, -1),    // Down South -> +Z, -Y
-			createVecTriple(-1, -1, -1, -1, 1, 1, 1, -1, -1),   // Up South -> +Z, +Y
+			createVecTriple(-1, 1, 1, -1, -1, -1, 1, 1, 1),    // Down North -> -Z, -Y
+			createVecTriple(-1, 1, -1, -1, -1, 1, 1, 1, -1),   // Down South -> +Z, -Y
+			createVecTriple(-1, -1, -1, -1, 1, 1, 1, -1, -1),  // Up South -> +Z, +Y
 			createVecTriple(-1, -1, 1, -1, 1, -1, 1, -1, 1)    // Up North -> -Z, +Y
 		)
 	)
 
-	private val noLine = RenderState.LineState(OptionalDouble.of(0.0))
 	private val renderTypeAreaEdge = RenderType.makeType(
 		"area_edge",
-		DefaultVertexFormats.POSITION,
+		DefaultVertexFormats.POSITION_COLOR,
 		GL11.GL_QUAD_STRIP,
 		256,
-		RenderType.State.getBuilder().line(noLine).build(false)
+		RenderType.State.getBuilder().build(false)
 	)
 	private val renderTypeAreaSide = RenderType.makeType(
 		"area_side",
-		DefaultVertexFormats.POSITION,
+		DefaultVertexFormats.POSITION_COLOR,
 		GL11.GL_QUADS,
 		256,
-		RenderType.State.getBuilder().line(noLine).transparency(RenderState.TRANSLUCENT_TRANSPARENCY).build(false)
+		RenderType.State.getBuilder().transparency(RenderState.TRANSLUCENT_TRANSPARENCY).build(false)
+	)
+	private val renderTypeNameBg = RenderType.makeType(
+		"name_bg",
+		DefaultVertexFormats.POSITION_COLOR,
+		GL11.GL_QUADS,
+		256,
+		RenderType.State.getBuilder().transparency(RenderState.TRANSLUCENT_TRANSPARENCY).build(false)
 	)
 
 	private fun createVecTriple(
-		x1: Int,
-		y1: Int,
-		z1: Int,
-		x2: Int,
-		y2: Int,
-		z2: Int,
-		x3: Int,
-		y3: Int,
-		z3: Int
-	): Triple<Vector3d, Vector3d, Vector3d> =
-		Triple(
-			Vector3d(x1.toDouble(), y1.toDouble(), z1.toDouble()),
-			Vector3d(x2.toDouble(), y2.toDouble(), z2.toDouble()),
-			Vector3d(x3.toDouble(), y3.toDouble(), z3.toDouble())
-		)
+		x1: Int, y1: Int, z1: Int,
+		x2: Int, y2: Int, z2: Int,
+		x3: Int, y3: Int, z3: Int
+	): Triple<Vector3f, Vector3f, Vector3f> = Triple(
+		Vector3f(x1.toFloat(), y1.toFloat(), z1.toFloat()),
+		Vector3f(x2.toFloat(), y2.toFloat(), z2.toFloat()),
+		Vector3f(x3.toFloat(), y3.toFloat(), z3.toFloat())
+	)
 
-	fun renderArea(area: Area, colour: Color, matrixStack: MatrixStack, buffer: IRenderTypeBuffer) {
+	private fun renderWithType(
+		renderType: RenderType.Type,
+		matrixStack: MatrixStack,
+		render: IVertexBuilder.(Matrix4f) -> Unit
+	) {
+		RenderSystem.color4f(1F, 1F, 1F, 1F)
+		val buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().buffer)
+		render(buffer.getBuffer(renderType), matrixStack.last.matrix)
+		buffer.finish()
+	}
+
+	fun renderArea(matrixStack: MatrixStack, view: Vector3d, area: Area, colour: Color) {
 		matrixStack.push()
 
-		val projectedView = mc.gameRenderer.activeRenderInfo.projectedView
-		matrixStack.translate(-projectedView.x, -projectedView.y, -projectedView.z)
-
 		val (r, g, b) = colour.getRGBColorComponents(null).let { Triple(it[0], it[1], it[2]) }
-		val box = AxisAlignedBB(area.minPos, area.maxPos.add(1, 1, 1)).grow(0.001)
-		if (LMConfig.areaBoxAlpha > 0F) {
-			RenderSystem.color4f(r, g, b, LMConfig.areaBoxAlpha.toFloat())
-			renderSides(box, buffer)
-		}
-		if (LMConfig.areaBoxEdgeThickness > 0F) {
-			RenderSystem.color4f(r, g, b, 1F)
-			renderBoxEdges(box, buffer)
-		}
-		RenderSystem.color4f(1F, 1F, 1F, 1F)
-		val namePos = box.center.let {
-			Vector3d(it.x, MathHelper.clamp(projectedView.y, box.minY + 0.5, box.maxY - 0.5), it.z)
-		}
-		renderName(area, namePos, matrixStack, buffer)
+		val box = area.displayAabb.get()
+		val xSize = box.xSize.toFloat()
+		val ySize = box.ySize.toFloat()
+		val zSize = box.zSize.toFloat()
+
+		// FIXME: For some reason, areas can't be seen through other areas from certain angles
+		matrixStack.translate(box.minX - view.x, box.minY - view.y, box.minZ - view.z)
+		renderSides(matrixStack, xSize, ySize, zSize, r, g, b)
+		renderBoxEdges(matrixStack, xSize, ySize, zSize, r, g, b)
+		renderName(matrixStack, area.name, box.center.subtract(box.minX, box.minY, box.minZ))
 
 		matrixStack.pop()
 	}
 
-	private fun renderSides(box: AxisAlignedBB, buffer: IRenderTypeBuffer): Unit =
-		buffer.getBuffer(renderTypeAreaSide).run {
+	private fun renderSides(
+		matrixStack: MatrixStack,
+		xSize: Float,
+		ySize: Float,
+		zSize: Float,
+		r: Float,
+		g: Float,
+		b: Float
+	) {
+		val a = LMConfig.areaBoxAlpha.toFloat()
+		if (a <= 0F)
+			return
+
+		renderWithType(renderTypeAreaSide, matrixStack) { matrix ->
 			//North inside
-			pos(box.maxX, box.minY, box.minZ).endVertex()
-			pos(box.maxX, box.maxY, box.minZ).endVertex()
-			pos(box.minX, box.maxY, box.minZ).endVertex()
-			pos(box.minX, box.minY, box.minZ).endVertex()
+			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
 
 			//South inside
-			pos(box.minX, box.minY, box.maxZ).endVertex()
-			pos(box.minX, box.maxY, box.maxZ).endVertex()
-			pos(box.maxX, box.maxY, box.maxZ).endVertex()
-			pos(box.maxX, box.minY, box.maxZ).endVertex()
+			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
 
 			//East inside
-			pos(box.minX, box.minY, box.minZ).endVertex()
-			pos(box.minX, box.maxY, box.minZ).endVertex()
-			pos(box.minX, box.maxY, box.maxZ).endVertex()
-			pos(box.minX, box.minY, box.maxZ).endVertex()
+			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
 
 			//West inside
-			pos(box.maxX, box.minY, box.maxZ).endVertex()
-			pos(box.maxX, box.maxY, box.maxZ).endVertex()
-			pos(box.maxX, box.maxY, box.minZ).endVertex()
-			pos(box.maxX, box.minY, box.minZ).endVertex()
+			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
 
 			//Down inside
-			pos(box.minX, box.minY, box.maxZ).endVertex()
-			pos(box.maxX, box.minY, box.maxZ).endVertex()
-			pos(box.maxX, box.minY, box.minZ).endVertex()
-			pos(box.minX, box.minY, box.minZ).endVertex()
+			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
 
 			//Up inside
-			pos(box.minX, box.maxY, box.minZ).endVertex()
-			pos(box.maxX, box.maxY, box.minZ).endVertex()
-			pos(box.maxX, box.maxY, box.maxZ).endVertex()
-			pos(box.minX, box.maxY, box.maxZ).endVertex()
+			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
 
 			//North outside
-			pos(box.minX, box.minY, box.minZ).endVertex()
-			pos(box.minX, box.maxY, box.minZ).endVertex()
-			pos(box.maxX, box.maxY, box.minZ).endVertex()
-			pos(box.maxX, box.minY, box.minZ).endVertex()
+			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
 
 			//South outside
-			pos(box.maxX, box.minY, box.maxZ).endVertex()
-			pos(box.maxX, box.maxY, box.maxZ).endVertex()
-			pos(box.minX, box.maxY, box.maxZ).endVertex()
-			pos(box.minX, box.minY, box.maxZ).endVertex()
+			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
 
 			//East outside
-			pos(box.minX, box.minY, box.maxZ).endVertex()
-			pos(box.minX, box.maxY, box.maxZ).endVertex()
-			pos(box.minX, box.maxY, box.minZ).endVertex()
-			pos(box.minX, box.minY, box.minZ).endVertex()
+			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
 
 			//West outside
-			pos(box.maxX, box.minY, box.minZ).endVertex()
-			pos(box.maxX, box.maxY, box.minZ).endVertex()
-			pos(box.maxX, box.maxY, box.maxZ).endVertex()
-			pos(box.maxX, box.minY, box.maxZ).endVertex()
+			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
 
 			//Down outside
-			pos(box.minX, box.minY, box.minZ).endVertex()
-			pos(box.maxX, box.minY, box.minZ).endVertex()
-			pos(box.maxX, box.minY, box.maxZ).endVertex()
-			pos(box.minX, box.minY, box.maxZ).endVertex()
+			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
 
 			//Up outside
-			pos(box.minX, box.maxY, box.maxZ).endVertex()
-			pos(box.maxX, box.maxY, box.maxZ).endVertex()
-			pos(box.maxX, box.maxY, box.minZ).endVertex()
-			pos(box.minX, box.maxY, box.minZ).endVertex()
+			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
+			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
+			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
 		}
-
-	private fun renderBoxEdges(box: AxisAlignedBB, buffer: IRenderTypeBuffer) {
-		val minXminYminZ = Vector3d(box.minX, box.minY, box.minZ)
-		val minXminYmaxZ = Vector3d(box.minX, box.minY, box.maxZ)
-		val minXmaxYminZ = Vector3d(box.minX, box.maxY, box.minZ)
-		val maxXminYminZ = Vector3d(box.maxX, box.minY, box.minZ)
-		val minXmaxYmaxZ = Vector3d(box.minX, box.maxY, box.maxZ)
-		val maxXmaxYminZ = Vector3d(box.maxX, box.maxY, box.minZ)
-		val maxXminYmaxZ = Vector3d(box.maxX, box.minY, box.maxZ)
-		val maxXmaxYmaxZ = Vector3d(box.maxX, box.maxY, box.maxZ)
-		renderBoxEdgesForSide(buffer, UP, minXmaxYmaxZ, maxXmaxYmaxZ, maxXmaxYminZ, minXmaxYminZ)
-		renderBoxEdgesForSide(buffer, DOWN, minXminYminZ, maxXminYminZ, maxXminYmaxZ, minXminYmaxZ)
-		renderBoxEdgesForSide(buffer, NORTH, maxXminYminZ, minXminYminZ, minXmaxYminZ, maxXmaxYminZ)
-		renderBoxEdgesForSide(buffer, SOUTH, minXminYmaxZ, maxXminYmaxZ, maxXmaxYmaxZ, minXmaxYmaxZ)
-		renderBoxEdgesForSide(buffer, EAST, maxXminYmaxZ, maxXminYminZ, maxXmaxYminZ, maxXmaxYmaxZ)
-		renderBoxEdgesForSide(buffer, WEST, minXminYminZ, minXminYmaxZ, minXmaxYmaxZ, minXmaxYminZ)
 	}
 
-	private fun renderBoxEdgesForSide(buffer: IRenderTypeBuffer, side: Direction, vararg corners: Vector3d) {
+	private fun renderBoxEdges(
+		matrixStack: MatrixStack,
+		xSize: Float,
+		ySize: Float,
+		zSize: Float,
+		r: Float,
+		g: Float,
+		b: Float
+	) {
+		if (LMConfig.areaBoxEdgeThickness <= 0.0)
+			return
+
+		val minXminYminZ = Vector3f(0F, 0F, 0F)
+		val minXminYmaxZ = Vector3f(0F, 0F, zSize)
+		val minXmaxYminZ = Vector3f(0F, ySize, 0F)
+		val maxXminYminZ = Vector3f(xSize, 0F, 0F)
+		val minXmaxYmaxZ = Vector3f(0F, ySize, zSize)
+		val maxXmaxYminZ = Vector3f(xSize, ySize, 0F)
+		val maxXminYmaxZ = Vector3f(xSize, 0F, zSize)
+		val maxXmaxYmaxZ = Vector3f(xSize, ySize, zSize)
+		renderBoxEdgesForSide(matrixStack, UP, r, g, b, minXmaxYmaxZ, maxXmaxYmaxZ, maxXmaxYminZ, minXmaxYminZ)
+		renderBoxEdgesForSide(matrixStack, DOWN, r, g, b, minXminYminZ, maxXminYminZ, maxXminYmaxZ, minXminYmaxZ)
+		renderBoxEdgesForSide(matrixStack, NORTH, r, g, b, maxXminYminZ, minXminYminZ, minXmaxYminZ, maxXmaxYminZ)
+		renderBoxEdgesForSide(matrixStack, SOUTH, r, g, b, minXminYmaxZ, maxXminYmaxZ, maxXmaxYmaxZ, minXmaxYmaxZ)
+		renderBoxEdgesForSide(matrixStack, EAST, r, g, b, maxXminYmaxZ, maxXminYminZ, maxXmaxYminZ, maxXmaxYmaxZ)
+		renderBoxEdgesForSide(matrixStack, WEST, r, g, b, minXminYminZ, minXminYmaxZ, minXmaxYmaxZ, minXmaxYminZ)
+	}
+
+	private fun renderBoxEdgesForSide(
+		matrixStack: MatrixStack,
+		side: Direction,
+		r: Float,
+		g: Float,
+		b: Float,
+		vararg corners: Vector3f
+	) {
 		val offsetByVertex = offsets.getValue(side)
+		val thickness = LMConfig.areaBoxEdgeThickness.toFloat()
 
 		// Outer
-		buffer.getBuffer(renderTypeAreaEdge).apply {
+		renderWithType(renderTypeAreaEdge, matrixStack) { matrix ->
 			for (i in 0..4) {
 				val actualI = if (i < 4) i else 0
-				val triple: Triple<Vector3d, Vector3d, Vector3d> = offsetByVertex[actualI]
-				var v = corners[actualI].add(triple.first.scale(LMConfig.areaBoxEdgeThickness))
-				pos(v.x, v.y, v.z).endVertex()
-				v = corners[actualI].add(triple.second.scale(LMConfig.areaBoxEdgeThickness))
-				pos(v.x, v.y, v.z).endVertex()
+				val triple: Triple<Vector3f, Vector3f, Vector3f> = offsetByVertex[actualI]
+				var v = corners[actualI].copy().also { corner ->
+					corner.add(triple.first.copy().also { it.mul(thickness) })
+				}
+				pos(matrix, v.x, v.y, v.z).color(r, g, b, 1F).endVertex()
+				v = corners[actualI].copy().also { corner ->
+					corner.add(triple.second.copy().also { it.mul(thickness) })
+				}
+				pos(matrix, v.x, v.y, v.z).color(r, g, b, 1F).endVertex()
 			}
 		}
 
 		//Inner
-		buffer.getBuffer(renderTypeAreaEdge).apply {
+		renderWithType(renderTypeAreaEdge, matrixStack) { matrix ->
 			for (i in 0..4) {
 				val actualI = if (i < 4) i else 0
-				val triple: Triple<Vector3d, Vector3d, Vector3d> = offsetByVertex[actualI]
-				var v = corners[actualI].add(triple.third.scale(LMConfig.areaBoxEdgeThickness))
-				pos(v.x, v.y, v.z).endVertex()
-				v = corners[actualI].add(triple.first.scale(LMConfig.areaBoxEdgeThickness))
-				pos(v.x, v.y, v.z).endVertex()
+				val triple: Triple<Vector3f, Vector3f, Vector3f> = offsetByVertex[actualI]
+				var v = corners[actualI].copy().also { corner ->
+					corner.add(triple.third.copy().also { it.mul(thickness) })
+				}
+				pos(matrix, v.x, v.y, v.z).color(r, g, b, 1F).endVertex()
+				v = corners[actualI].copy().also { corner ->
+					corner.add(triple.first.copy().also { it.mul(thickness) })
+				}
+				pos(matrix, v.x, v.y, v.z).color(r, g, b, 1F).endVertex()
 			}
 		}
 	}
 
-	private fun renderName(area: Area, pos: Vector3d, matrixStack: MatrixStack, buffer: IRenderTypeBuffer) {
+	// FIXME: This isn't rendering properly atm
+	private fun renderName(matrixStack: MatrixStack, name: String, pos: Vector3d) {
 		matrixStack.translate(pos.x, pos.y, pos.z)
-		RenderSystem.normal3f(0.0F, 1.0F, 0.0F)
-		val camera = mc.gameRenderer.activeRenderInfo.viewVector
-//		matrixStack.rotate(Quaternion()) // FIXME
-		GlStateManager.rotatef(-camera.y, 0.0F, 1.0F, 0.0F)
-		GlStateManager.rotatef(camera.x, 1.0F, 0.0F, 0.0F)
+//		RenderSystem.normal3f(0.0F, 1.0F, 0.0F)
+		matrixStack.rotate(mc.renderManager.cameraOrientation)
 		val scale = 0.04F * LMConfig.areaNameScale.toFloat()
 		matrixStack.scale(-scale, -scale, scale)
 
 		val fr = mc.fontRenderer
-		val name = area.name
-		val x = -(fr.getStringWidth(name) / 2).toFloat()
-		/*Tessellator.getInstance().apply {
-			buffer.apply {
-				begin(7, DefaultVertexFormats.POSITION_COLOR)
-				pos((-i - 1).toDouble(), -1.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-				pos((-i - 1).toDouble(), 8.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-				pos((i + 1).toDouble(), 8.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-				pos((i + 1).toDouble(), -1.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-			}
-			draw()
-		}*/
-		fr.renderString(name, x, 0F, -1, false, matrixStack.last.matrix, buffer, false, 0, 15728880)
+		val width = -(fr.getStringWidth(name) / 2).toFloat()
+
+		renderWithType(renderTypeNameBg, matrixStack) { matrix ->
+			pos((-width - 1).toDouble(), -1.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
+			pos((-width - 1).toDouble(), 8.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
+			pos((width + 1).toDouble(), 8.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
+			pos((width + 1).toDouble(), -1.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
+		}
+		val buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().buffer)
+		fr.renderString(name, width, 0F, -1, false, matrixStack.last.matrix, buffer, false, 0, 15728880)
+		buffer.finish()
 	}
 }

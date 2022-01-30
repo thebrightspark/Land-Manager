@@ -5,6 +5,7 @@ import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.util.AreaRenderer
 import brightspark.landmanager.util.areasCap
+import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.ResourceLocation
@@ -74,15 +75,17 @@ object ClientEventHandler {
 
 		val cap = mc.world!!.areasCap
 		val matrixStack = event.matrixStack
-		val buffer = mc.renderTypeBuffers.bufferSource
+		val view = mc.gameRenderer.activeRenderInfo.projectedView
+		RenderSystem.color4f(1F, 1F, 1F, 1F)
+
 		if (renderAll)
 			cap.getNearbyAreas(mc.player!!.position)
-				.forEach { AreaRenderer.renderArea(it, getColour(it.name), matrixStack, buffer) }
+				.forEach { AreaRenderer.renderArea(matrixStack, view, it, getColour(it.name)) }
 		else
 			areasToRender.stream()
 				.map { cap.getArea(it) }
 				.filter { it != null }
-				.forEach { AreaRenderer.renderArea(it!!, getColour(it.name), matrixStack, buffer) }
+				.forEach { AreaRenderer.renderArea(matrixStack, view, it!!, getColour(it.name)) }
 	}
 
 	@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
