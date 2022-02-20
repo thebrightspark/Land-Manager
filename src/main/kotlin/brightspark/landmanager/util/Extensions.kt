@@ -25,6 +25,7 @@ import net.minecraft.network.PacketBuffer
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.management.PlayerProfileCache
 import net.minecraft.util.Util
+import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.vector.Vector3d
 import net.minecraft.util.text.*
@@ -244,6 +245,10 @@ fun <T : ForgeRegistryEntry<T>> T.setRegName(name: String): T =
  * Overload for [Entity.sendMessage] which uses [Util.DUMMY_UUID] instead of an explicit UUID
  */
 fun Entity.sendMessage(textComponent: ITextComponent): Unit = this.sendMessage(textComponent, Util.DUMMY_UUID)
+
+fun AxisAlignedBB.minPos(): Vector3d = Vector3d(minX, minY, minZ)
+
+fun AxisAlignedBB.maxPos(): Vector3d = Vector3d(maxX, maxY, maxZ)
 
 fun BlockPos.toVec3d(): Vector3d = Vector3d(x.toDouble(), y.toDouble(), z.toDouble())
 

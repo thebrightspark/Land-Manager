@@ -7,6 +7,7 @@ import net.minecraft.nbt.ListNBT
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.vector.Vector3d
 import net.minecraft.world.World
 import net.minecraftforge.common.util.Constants
@@ -109,6 +110,12 @@ class Area : INBTSerializable<CompoundNBT> {
 		collisionAabb.clear()
 		displayAabb.clear()
 	}
+
+	fun closestPosTo(pos: BlockPos): BlockPos = BlockPos(
+		MathHelper.clamp(pos.x, minPos.x, maxPos.x),
+		MathHelper.clamp(pos.y, minPos.y, maxPos.y),
+		MathHelper.clamp(pos.z, minPos.z, maxPos.z)
+	)
 
 	override fun serializeNBT(): CompoundNBT = CompoundNBT().apply {
 		putString("name", name)

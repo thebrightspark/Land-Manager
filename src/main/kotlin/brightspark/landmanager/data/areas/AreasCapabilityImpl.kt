@@ -10,7 +10,6 @@ import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.nbt.ListNBT
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.vector.Vector3d
 import net.minecraftforge.common.util.Constants
 import java.util.*
@@ -61,16 +60,9 @@ class AreasCapabilityImpl : AreasCapability {
 
 	override fun getAllAreaNames(): List<String> = areas.keys.toList()
 
-	override fun getNearbyAreas(pos: BlockPos): Set<Area> = areas.values.filter {
-		if (it.intersects(pos))
-			return@filter true
-		val min = it.minPos
-		val max = it.maxPos
-		val closestX = MathHelper.clamp(pos.x, min.x, max.x)
-		val closestY = MathHelper.clamp(pos.y, min.y, max.y)
-		val closestZ = MathHelper.clamp(pos.z, min.z, max.z)
-		return@filter BlockPos(closestX, closestY, closestZ).withinDistance(pos, LMConfig.showAllRadius.toDouble())
-	}.toSet()
+	override fun getNearbyAreas(pos: BlockPos): List<Area> = areas.values
+		.filter { it.intersects(pos) || it.closestPosTo(pos).withinDistance(pos, LMConfig.showAllRadius.toDouble()) }
+		.sortedByDescending { it.closestPosTo(pos).distanceSq(pos) }
 
 	override fun intersectsAnArea(area: Area): Boolean = areas.values.any { area.intersects(it) }
 

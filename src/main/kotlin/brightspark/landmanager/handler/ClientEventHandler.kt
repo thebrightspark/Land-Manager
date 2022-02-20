@@ -80,12 +80,12 @@ object ClientEventHandler {
 
 		if (renderAll)
 			cap.getNearbyAreas(mc.player!!.position)
-				.forEach { AreaRenderer.renderArea(matrixStack, view, it, getColour(it.name)) }
+				.forEach { AreaRenderer.renderArea(matrixStack, view, it, getColour(it.name), true) }
 		else
 			areasToRender.stream()
 				.map { cap.getArea(it) }
 				.filter { it != null }
-				.forEach { AreaRenderer.renderArea(matrixStack, view, it!!, getColour(it.name)) }
+				.forEach { AreaRenderer.renderArea(matrixStack, view, it!!, getColour(it.name), true) }
 	}
 
 	@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")

@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
+import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.vector.Matrix4f
 import net.minecraft.util.math.vector.Vector3d
 import net.minecraft.util.math.vector.Vector3f
@@ -63,27 +64,33 @@ object AreaRenderer {
 		)
 	)
 
-	private val renderTypeAreaEdge = RenderType.makeType(
+	private val renderTypeAreaEdge = createRenderType(
 		"area_edge",
-		DefaultVertexFormats.POSITION_COLOR,
 		GL11.GL_QUAD_STRIP,
-		256,
-		RenderType.State.getBuilder().build(false)
+		RenderType.State.getBuilder()
+			.layer(RenderState.field_239235_M_)
+			.cull(RenderState.CULL_DISABLED)
+			.writeMask(RenderState.COLOR_WRITE)
+			.build(true)
 	)
-	private val renderTypeAreaSide = RenderType.makeType(
+	private val renderTypeAreaSide = createRenderType(
 		"area_side",
-		DefaultVertexFormats.POSITION_COLOR,
 		GL11.GL_QUADS,
-		256,
-		RenderType.State.getBuilder().transparency(RenderState.TRANSLUCENT_TRANSPARENCY).build(false)
+		RenderType.State.getBuilder()
+			.layer(RenderState.field_239235_M_)
+			.transparency(RenderState.TRANSLUCENT_TRANSPARENCY)
+			.cull(RenderState.CULL_DISABLED)
+			.writeMask(RenderState.COLOR_WRITE)
+			.build(true)
 	)
-	private val renderTypeNameBg = RenderType.makeType(
+	private val renderTypeNameBg = createRenderType(
 		"name_bg",
-		DefaultVertexFormats.POSITION_COLOR,
 		GL11.GL_QUADS,
-		256,
 		RenderType.State.getBuilder().transparency(RenderState.TRANSLUCENT_TRANSPARENCY).build(false)
 	)
+
+	private fun createRenderType(name: String, drawMode: Int, state: RenderType.State): RenderType.Type =
+		RenderType.makeType(name, DefaultVertexFormats.POSITION_COLOR, drawMode, 256, state)
 
 	private fun createVecTriple(
 		x1: Int, y1: Int, z1: Int,
@@ -101,12 +108,13 @@ object AreaRenderer {
 		render: IVertexBuilder.(Matrix4f) -> Unit
 	) {
 		RenderSystem.color4f(1F, 1F, 1F, 1F)
-		val buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().buffer)
+//		val buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().buffer)
+		val buffer = mc.renderTypeBuffers.bufferSource
 		render(buffer.getBuffer(renderType), matrixStack.last.matrix)
 		buffer.finish()
 	}
 
-	fun renderArea(matrixStack: MatrixStack, view: Vector3d, area: Area, colour: Color) {
+	fun renderArea(matrixStack: MatrixStack, view: Vector3d, area: Area, colour: Color, renderSides: Boolean) {
 		matrixStack.push()
 
 		val (r, g, b) = colour.getRGBColorComponents(null).let { Triple(it[0], it[1], it[2]) }
@@ -115,11 +123,15 @@ object AreaRenderer {
 		val ySize = box.ySize.toFloat()
 		val zSize = box.zSize.toFloat()
 
-		// FIXME: For some reason, areas can't be seen through other areas from certain angles
 		matrixStack.translate(box.minX - view.x, box.minY - view.y, box.minZ - view.z)
-		renderSides(matrixStack, xSize, ySize, zSize, r, g, b)
+		if (renderSides)
+			renderSides(matrixStack, xSize, ySize, zSize, r, g, b)
 		renderBoxEdges(matrixStack, xSize, ySize, zSize, r, g, b)
-		renderName(matrixStack, area.name, box.center.subtract(box.minX, box.minY, box.minZ))
+
+		val eyePos = mc.player!!.getEyePosition(mc.renderPartialTicks)
+		val boxCenter = box.center
+		val nameY = Vector3d(boxCenter.x, MathHelper.clamp(eyePos.y, box.minY + 0.5, box.maxY - 0.5), boxCenter.z)
+		renderName(matrixStack, area.name, nameY)
 
 		matrixStack.pop()
 	}
@@ -138,42 +150,43 @@ object AreaRenderer {
 			return
 
 		renderWithType(renderTypeAreaSide, matrixStack) { matrix ->
-			//North inside
+			//North
 			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
 
-			//South inside
+			//South
 			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
 
-			//East inside
+			//East
 			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
 
-			//West inside
+			//West
 			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
 
-			//Down inside
+			//Down
 			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
 
-			//Up inside
+			//Up
 			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
 
+			/*
 			//North outside
 			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
@@ -209,6 +222,7 @@ object AreaRenderer {
 			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
+			*/
 		}
 	}
 
@@ -286,6 +300,7 @@ object AreaRenderer {
 
 	// FIXME: This isn't rendering properly atm
 	private fun renderName(matrixStack: MatrixStack, name: String, pos: Vector3d) {
+		matrixStack.push()
 		matrixStack.translate(pos.x, pos.y, pos.z)
 //		RenderSystem.normal3f(0.0F, 1.0F, 0.0F)
 		matrixStack.rotate(mc.renderManager.cameraOrientation)
@@ -296,13 +311,16 @@ object AreaRenderer {
 		val width = -(fr.getStringWidth(name) / 2).toFloat()
 
 		renderWithType(renderTypeNameBg, matrixStack) { matrix ->
-			pos((-width - 1).toDouble(), -1.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-			pos((-width - 1).toDouble(), 8.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-			pos((width + 1).toDouble(), 8.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-			pos((width + 1).toDouble(), -1.0, 0.0).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
+			pos(matrix, -width - 1F, -1F, 0F).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
+			pos(matrix, -width - 1F, 8F, 0F).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
+			pos(matrix, width + 1F, 8F, 0F).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
+			pos(matrix, width + 1F, -1F, 0F).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
 		}
 		val buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().buffer)
 		fr.renderString(name, width, 0F, -1, false, matrixStack.last.matrix, buffer, false, 0, 15728880)
+//		val bgColour = (mc.gameSettings.getTextBackgroundColor(0.25F) * 255F).toInt() shl 24
+//		fr.func_243247_a(StringTextComponent(name), width, 0F, -1, false, matrixStack.last.matrix, buffer, false, bgColour, 15728880)
 		buffer.finish()
+		matrixStack.pop()
 	}
 }

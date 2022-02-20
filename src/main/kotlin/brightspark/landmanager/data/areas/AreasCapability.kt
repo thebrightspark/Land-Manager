@@ -32,7 +32,7 @@ interface AreasCapability : INBTSerializable<CompoundNBT> {
 
 	fun getAllAreaNames(): List<String>
 
-	fun getNearbyAreas(pos: BlockPos): Set<Area>
+	fun getNearbyAreas(pos: BlockPos): List<Area>
 
 	fun intersectsAnArea(area: Area): Boolean
 
