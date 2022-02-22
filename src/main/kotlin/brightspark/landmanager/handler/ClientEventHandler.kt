@@ -5,7 +5,6 @@ import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.util.AreaRenderer
 import brightspark.landmanager.util.areasCap
-import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.ResourceLocation
@@ -76,11 +75,11 @@ object ClientEventHandler {
 		val cap = mc.world!!.areasCap
 		val matrixStack = event.matrixStack
 		val view = mc.gameRenderer.activeRenderInfo.projectedView
-		RenderSystem.color4f(1F, 1F, 1F, 1F)
 
 		if (renderAll)
-			cap.getNearbyAreas(mc.player!!.position)
-				.forEach { AreaRenderer.renderArea(matrixStack, view, it, getColour(it.name), true) }
+			cap.getNearbyAreas(mc.player!!.position).forEach {
+				AreaRenderer.renderArea(matrixStack, view, it, getColour(it.name), LMConfig.areaBoxNearbySides)
+			}
 		else
 			areasToRender.stream()
 				.map { cap.getArea(it) }

@@ -3,7 +3,6 @@ package brightspark.landmanager.util
 import brightspark.landmanager.LMConfig
 import brightspark.landmanager.data.areas.Area
 import com.mojang.blaze3d.matrix.MatrixStack
-import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.IVertexBuilder
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.IRenderTypeBuffer
@@ -107,7 +106,6 @@ object AreaRenderer {
 		matrixStack: MatrixStack,
 		render: IVertexBuilder.(Matrix4f) -> Unit
 	) {
-		RenderSystem.color4f(1F, 1F, 1F, 1F)
 //		val buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().buffer)
 		val buffer = mc.renderTypeBuffers.bufferSource
 		render(buffer.getBuffer(renderType), matrixStack.last.matrix)
