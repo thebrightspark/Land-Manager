@@ -5,10 +5,8 @@ import brightspark.landmanager.data.areas.Area
 import com.mojang.blaze3d.matrix.MatrixStack
 import com.mojang.blaze3d.vertex.IVertexBuilder
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.IRenderTypeBuffer
 import net.minecraft.client.renderer.RenderState
 import net.minecraft.client.renderer.RenderType
-import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
@@ -16,6 +14,7 @@ import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.vector.Matrix4f
 import net.minecraft.util.math.vector.Vector3d
 import net.minecraft.util.math.vector.Vector3f
+import net.minecraft.util.text.StringTextComponent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 
@@ -82,11 +81,6 @@ object AreaRenderer {
 			.writeMask(RenderState.COLOR_WRITE)
 			.build(true)
 	)
-	private val renderTypeNameBg = createRenderType(
-		"name_bg",
-		GL11.GL_QUADS,
-		RenderType.State.getBuilder().transparency(RenderState.TRANSLUCENT_TRANSPARENCY).build(false)
-	)
 
 	private fun createRenderType(name: String, drawMode: Int, state: RenderType.State): RenderType.Type =
 		RenderType.makeType(name, DefaultVertexFormats.POSITION_COLOR, drawMode, 256, state)
@@ -106,7 +100,6 @@ object AreaRenderer {
 		matrixStack: MatrixStack,
 		render: IVertexBuilder.(Matrix4f) -> Unit
 	) {
-//		val buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().buffer)
 		val buffer = mc.renderTypeBuffers.bufferSource
 		render(buffer.getBuffer(renderType), matrixStack.last.matrix)
 		buffer.finish()
@@ -114,6 +107,7 @@ object AreaRenderer {
 
 	fun renderArea(matrixStack: MatrixStack, view: Vector3d, area: Area, colour: Color, renderSides: Boolean) {
 		matrixStack.push()
+		matrixStack.translate(-view.x, -view.y, -view.z)
 
 		val (r, g, b) = colour.getRGBColorComponents(null).let { Triple(it[0], it[1], it[2]) }
 		val box = area.displayAabb.get()
@@ -121,15 +115,16 @@ object AreaRenderer {
 		val ySize = box.ySize.toFloat()
 		val zSize = box.zSize.toFloat()
 
-		matrixStack.translate(box.minX - view.x, box.minY - view.y, box.minZ - view.z)
+		matrixStack.push()
+		matrixStack.translate(box.minX, box.minY, box.minZ)
 		if (renderSides)
 			renderSides(matrixStack, xSize, ySize, zSize, r, g, b)
 		renderBoxEdges(matrixStack, xSize, ySize, zSize, r, g, b)
+		matrixStack.pop()
 
 		val eyePos = mc.player!!.getEyePosition(mc.renderPartialTicks)
-		val boxCenter = box.center
-		val nameY = Vector3d(boxCenter.x, MathHelper.clamp(eyePos.y, box.minY + 0.5, box.maxY - 0.5), boxCenter.z)
-		renderName(matrixStack, area.name, nameY)
+		val namePos = box.center.run { Vector3d(x, MathHelper.clamp(eyePos.y, box.minY + 0.5, box.maxY - 0.5), z) }
+		renderName(matrixStack, area.name, namePos)
 
 		matrixStack.pop()
 	}
@@ -183,44 +178,6 @@ object AreaRenderer {
 			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
 			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
 			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
-
-			/*
-			//North outside
-			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
-
-			//South outside
-			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
-
-			//East outside
-			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
-
-			//West outside
-			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
-
-			//Down outside
-			pos(matrix, 0F, 0F, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, 0F, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, 0F, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, 0F, 0F, zSize).color(r, g, b, a).endVertex()
-
-			//Up outside
-			pos(matrix, 0F, ySize, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, ySize, zSize).color(r, g, b, a).endVertex()
-			pos(matrix, xSize, ySize, 0F).color(r, g, b, a).endVertex()
-			pos(matrix, 0F, ySize, 0F).color(r, g, b, a).endVertex()
-			*/
 		}
 	}
 
@@ -296,28 +253,29 @@ object AreaRenderer {
 		}
 	}
 
-	// FIXME: This isn't rendering properly atm
 	private fun renderName(matrixStack: MatrixStack, name: String, pos: Vector3d) {
 		matrixStack.push()
 		matrixStack.translate(pos.x, pos.y, pos.z)
-//		RenderSystem.normal3f(0.0F, 1.0F, 0.0F)
 		matrixStack.rotate(mc.renderManager.cameraOrientation)
 		val scale = 0.04F * LMConfig.areaNameScale.toFloat()
 		matrixStack.scale(-scale, -scale, scale)
 
 		val fr = mc.fontRenderer
 		val width = -(fr.getStringWidth(name) / 2).toFloat()
-
-		renderWithType(renderTypeNameBg, matrixStack) { matrix ->
-			pos(matrix, -width - 1F, -1F, 0F).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-			pos(matrix, -width - 1F, 8F, 0F).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-			pos(matrix, width + 1F, 8F, 0F).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-			pos(matrix, width + 1F, -1F, 0F).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex()
-		}
-		val buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().buffer)
-		fr.renderString(name, width, 0F, -1, false, matrixStack.last.matrix, buffer, false, 0, 15728880)
-//		val bgColour = (mc.gameSettings.getTextBackgroundColor(0.25F) * 255F).toInt() shl 24
-//		fr.func_243247_a(StringTextComponent(name), width, 0F, -1, false, matrixStack.last.matrix, buffer, false, bgColour, 15728880)
+		val bgColour = (mc.gameSettings.getTextBackgroundOpacity(0.25F) * 255F).toInt() shl 24
+		val buffer = mc.renderTypeBuffers.bufferSource
+		fr.func_243247_a(
+			StringTextComponent(name),
+			width,
+			0F,
+			-1,
+			false,
+			matrixStack.last.matrix,
+			buffer,
+			false,
+			bgColour,
+			15728880
+		)
 		buffer.finish()
 		matrixStack.pop()
 	}
