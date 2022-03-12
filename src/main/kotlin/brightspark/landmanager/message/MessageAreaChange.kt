@@ -6,7 +6,6 @@ import brightspark.landmanager.util.areasCap
 import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageAreaChange : Message {
 	private lateinit var area: Area
@@ -26,8 +25,8 @@ class MessageAreaChange : Message {
 		area = Area(readCompoundTag()!!)
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
 			Minecraft.getInstance().world!!.areasCap.updateArea(area)
 		}
 	}

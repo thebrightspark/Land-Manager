@@ -10,7 +10,6 @@ import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.network.PacketBuffer
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageHomeToggle : Message {
 	private lateinit var pos: BlockPos
@@ -34,9 +33,9 @@ class MessageHomeToggle : Message {
 		type = readEnumValue()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
-			val player = context.get().sender ?: return@enqueueWork
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
+			val player = context.sender ?: return@enqueueWork
 			val world = player.world
 			val cap = world.areasCap
 			val area = cap.intersectingArea(pos) ?: return@enqueueWork
@@ -44,9 +43,30 @@ class MessageHomeToggle : Message {
 				return@enqueueWork
 			val playerIsOp = player.isOp()
 			when (type) {
-				HomeGuiToggleType.INTERACTIONS -> handleType(cap, player, area, playerIsOp, LMConfig.interactions, { it.toggleInteractions() }, { it.interactions })
-				HomeGuiToggleType.PASSIVES -> handleType(cap, player, area, playerIsOp, LMConfig.passiveSpawning, { it.togglePassiveSpawning() }, { it.canPassiveSpawn })
-				HomeGuiToggleType.HOSTILES -> handleType(cap, player, area, playerIsOp, LMConfig.hostileSpawning, { it.toggleHostileSpawning() }, { it.canHostileSpawn })
+				HomeGuiToggleType.INTERACTIONS -> handleType(
+					cap,
+					player,
+					area,
+					playerIsOp,
+					LMConfig.interactions,
+					{ it.toggleInteractions() },
+					{ it.interactions })
+				HomeGuiToggleType.PASSIVES -> handleType(
+					cap,
+					player,
+					area,
+					playerIsOp,
+					LMConfig.passiveSpawning,
+					{ it.togglePassiveSpawning() },
+					{ it.canPassiveSpawn })
+				HomeGuiToggleType.HOSTILES -> handleType(
+					cap,
+					player,
+					area,
+					playerIsOp,
+					LMConfig.hostileSpawning,
+					{ it.toggleHostileSpawning() },
+					{ it.canHostileSpawn })
 				HomeGuiToggleType.EXPLOSIONS -> handleType(cap, player, area, playerIsOp, LMConfig.explosions, { it.toggleExplosions() }, { it.explosions })
 				else -> Unit
 			}

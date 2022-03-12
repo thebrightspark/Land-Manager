@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageHomeActionReplyError : Message {
 	private lateinit var errorMessage: String
@@ -31,8 +30,8 @@ class MessageHomeActionReplyError : Message {
 		args = Array(readInt()) { readString() }
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
 			val gui = Minecraft.getInstance().currentScreen
 			if (gui is HomeScreen)
 				gui.errorMessage = TranslationTextComponent(errorMessage, *args)

@@ -36,10 +36,10 @@ object LandManager {
 		override fun createIcon() = ItemStack(area_create!!)
 	}
 
-	private const val NETWORK_PROTOCOL = "1";
+	private const val NETWORK_PROTOCOL = "1"
 	val NETWORK: SimpleChannel = NetworkRegistry.newSimpleChannel(
 		ResourceLocation(MOD_ID, "main"),
-		{ "1" },
+		{ NETWORK_PROTOCOL },
 		NETWORK_PROTOCOL::equals,
 		NETWORK_PROTOCOL::equals
 	).apply {

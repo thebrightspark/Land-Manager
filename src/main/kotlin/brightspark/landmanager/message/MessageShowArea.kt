@@ -4,7 +4,6 @@ import brightspark.landmanager.handler.ClientEventHandler
 import brightspark.landmanager.util.Message
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageShowArea : Message {
 	private var toggleShowAll: Boolean = false
@@ -30,7 +29,7 @@ class MessageShowArea : Message {
 			showArea = readString()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
+	override fun consume(context: NetworkEvent.Context) {
 		if (toggleShowAll)
 			ClientEventHandler.toggleRenderAll()
 		else

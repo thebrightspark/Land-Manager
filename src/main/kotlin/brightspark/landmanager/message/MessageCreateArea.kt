@@ -12,7 +12,6 @@ import net.minecraft.network.PacketBuffer
 import net.minecraft.world.server.ServerWorld
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageCreateArea : Message {
 	private lateinit var area: Area
@@ -32,9 +31,9 @@ class MessageCreateArea : Message {
 		area = Area(readCompoundTag()!!)
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
-			val player = context.get().sender ?: return@enqueueWork
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
+			val player = context.sender ?: return@enqueueWork
 			val world = player.world
 			var result = AddAreaResult.INVALID
 			if (area.dim == player.world.dimensionKey.location && area.minPos.y >= 0 && area.maxPos.y <= world.height) {

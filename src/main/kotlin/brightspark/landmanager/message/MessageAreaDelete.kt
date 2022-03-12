@@ -5,7 +5,6 @@ import brightspark.landmanager.util.areasCap
 import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageAreaDelete : Message {
 	private lateinit var areaName: String
@@ -25,8 +24,8 @@ class MessageAreaDelete : Message {
 		areaName = readString()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
 			Minecraft.getInstance().world!!.areasCap.removeArea(areaName)
 		}
 	}

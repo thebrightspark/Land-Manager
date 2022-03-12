@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
 import java.util.*
-import java.util.function.Supplier
 
 class MessageHomeActionReply : Message {
 	private lateinit var type: HomeGuiActionType
@@ -36,8 +35,8 @@ class MessageHomeActionReply : Message {
 		name = readString()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
 			val mc = Minecraft.getInstance()
 			val gui = mc.currentScreen
 			if (gui !is HomeScreen)

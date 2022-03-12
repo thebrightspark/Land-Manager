@@ -13,7 +13,6 @@ import net.minecraft.network.PacketBuffer
 import net.minecraft.util.text.TextFormatting
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageCreateAreaReply : Message {
 	private lateinit var areaName: String
@@ -37,8 +36,8 @@ class MessageCreateAreaReply : Message {
 		result = readEnumValue()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
 			val mc = Minecraft.getInstance()
 			val player = mc.player!!
 			val gui = mc.currentScreen
@@ -73,8 +72,7 @@ class MessageCreateAreaReply : Message {
 		colour: TextFormatting,
 		translationKey: String,
 		vararg args: String
-	) =
-		player.sendStatusMessage(TranslationTextComponent(translationKey, *args).mergeStyle(colour), true)
+	) = player.sendStatusMessage(TranslationTextComponent(translationKey, *args).mergeStyle(colour), true)
 
 	private fun closeScreen(gui: Screen?, player: PlayerEntity) {
 		if (gui is CreateAreaScreen)

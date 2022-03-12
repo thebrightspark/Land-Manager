@@ -8,7 +8,6 @@ import net.minecraft.network.PacketBuffer
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.fml.network.NetworkEvent
 import java.util.*
-import java.util.function.Supplier
 
 class MessageOpenHomeGui : Message {
 	private lateinit var pos: BlockPos
@@ -51,8 +50,8 @@ class MessageOpenHomeGui : Message {
 		}.toList()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
 			val mc = Minecraft.getInstance()
 			mc.displayGuiScreen(HomeScreen(mc.player!!, pos).apply {
 				setMembersData(owner, members)

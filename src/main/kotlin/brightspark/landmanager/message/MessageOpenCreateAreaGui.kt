@@ -7,7 +7,6 @@ import net.minecraft.network.PacketBuffer
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageOpenCreateAreaGui : Message {
 	private lateinit var dim: ResourceLocation
@@ -35,8 +34,8 @@ class MessageOpenCreateAreaGui : Message {
 		pos2 = readBlockPos()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
 			val mc = Minecraft.getInstance()
 			mc.displayGuiScreen(CreateAreaScreen(dim, pos1, pos2))
 		}

@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageUpdateAreasCap : Message {
 	private lateinit var nbt: CompoundNBT
@@ -26,8 +25,8 @@ class MessageUpdateAreasCap : Message {
 		nbt = readCompoundTag()!!
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
 			Minecraft.getInstance().world!!.areasCap.deserializeNBT(nbt)
 		}
 	}

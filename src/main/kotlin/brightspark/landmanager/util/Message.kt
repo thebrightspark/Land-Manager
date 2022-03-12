@@ -3,7 +3,6 @@ package brightspark.landmanager.util
 import net.minecraft.network.PacketBuffer
 import net.minecraftforge.fml.network.NetworkEvent
 import net.minecraftforge.fml.network.simple.SimpleChannel
-import java.util.function.Supplier
 
 /**
  * Interface for a network message that can be registered with the custom overload of [SimpleChannel.registerMessage]
@@ -25,5 +24,5 @@ interface Message {
 	/**
 	 * Handles this [Message]
 	 */
-	fun consume(context: Supplier<NetworkEvent.Context>)
+	fun consume(context: NetworkEvent.Context)
 }

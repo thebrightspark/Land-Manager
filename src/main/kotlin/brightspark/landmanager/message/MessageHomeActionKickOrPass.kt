@@ -7,7 +7,6 @@ import net.minecraft.network.PacketBuffer
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.fml.network.NetworkEvent
 import java.util.*
-import java.util.function.Supplier
 
 class MessageHomeActionKickOrPass : Message {
 	private lateinit var pos: BlockPos
@@ -35,19 +34,25 @@ class MessageHomeActionKickOrPass : Message {
 		uuid = readUniqueId()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
-			val player = context.get().sender ?: return@enqueueWork
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
+			val player = context.sender ?: return@enqueueWork
 			val world = player.world
 			val server = world.server ?: return@enqueueWork
 			val cap = world.areasCap
 			val area = cap.intersectingArea(pos)
 			if (!player.canEditArea(area)) {
-				LandManager.NETWORK.sendToPlayer(MessageHomeActionReplyError("message.landmanager.error.noPerm"), player)
+				LandManager.NETWORK.sendToPlayer(
+					MessageHomeActionReplyError("message.landmanager.error.noPerm"),
+					player
+				)
 				return@enqueueWork
 			}
 			val profile = server.playerProfileCache.getProfileByUUID(uuid) ?: run {
-				LandManager.NETWORK.sendToPlayer(MessageHomeActionReplyError("message.landmanager.error.noPlayer"), player)
+				LandManager.NETWORK.sendToPlayer(
+					MessageHomeActionReplyError("message.landmanager.error.noPlayer"),
+					player
+				)
 				return@enqueueWork
 			}
 

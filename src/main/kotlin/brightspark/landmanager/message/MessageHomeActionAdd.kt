@@ -7,7 +7,6 @@ import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.network.PacketBuffer
 import net.minecraft.util.math.BlockPos
 import net.minecraftforge.fml.network.NetworkEvent
-import java.util.function.Supplier
 
 class MessageHomeActionAdd : Message {
 	private lateinit var pos: BlockPos
@@ -31,9 +30,9 @@ class MessageHomeActionAdd : Message {
 		name = readString()
 	}
 
-	override fun consume(context: Supplier<NetworkEvent.Context>) {
-		context.get().enqueueWork {
-			val player = context.get().sender ?: return@enqueueWork
+	override fun consume(context: NetworkEvent.Context) {
+		context.enqueueWork {
+			val player = context.sender ?: return@enqueueWork
 			val world = player.world
 			val server = world.server ?: return@enqueueWork
 			val cap = world.areasCap

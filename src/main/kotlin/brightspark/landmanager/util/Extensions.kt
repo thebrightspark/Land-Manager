@@ -57,7 +57,10 @@ fun <T : Message> SimpleChannel.registerMessage(messageClass: KClass<T>, index: 
 		messageClass.java,
 		{ message, buffer -> message.encode(buffer) },
 		{ message -> messageClass.createInstance().apply { decode(message) } },
-		{ message, context -> message.consume(context) }
+		{ message, context ->
+			message.consume(context.get())
+			context.get().packetHandled = true
+		}
 	)
 }
 
