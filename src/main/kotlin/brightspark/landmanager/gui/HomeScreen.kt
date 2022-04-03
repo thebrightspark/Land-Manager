@@ -85,7 +85,8 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 
 	private fun updateActionButtons() {
 		addButton.active = inputTextField.text.isNotBlank()
-		kickButton.active = selectedMemberIndex >= 0 && !isOwner(members[selectedMemberIndex].first)
+		kickButton.active =
+			selectedMemberIndex >= 0 && members.getOrNull(selectedMemberIndex)?.let { !isOwner(it.first) } ?: false
 		passButton.active = kickButton.active
 	}
 
@@ -239,7 +240,13 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		passButton = addButton(ActionButton(111, 53, "gui.lm.home.pass", PASS))
 		updateActionButtons()
 
-		boundariesToggle = addButton(HomeToggleButton(6, 70, ClientEventHandler.isAreaBeingRendered(area.name), BOUNDARIES).apply { active = true })
+		boundariesToggle = addButton(
+			HomeToggleButton(
+				6,
+				70,
+				ClientEventHandler.isAreaBeingRendered(area.name),
+				BOUNDARIES
+			).apply { active = true })
 		interactionsToggle = addButton(HomeToggleButton(6, 84, area.interactions, INTERACTIONS))
 		passivesToggle = addButton(HomeToggleButton(6, 98, area.canPassiveSpawn, PASSIVES))
 		hostilesToggle = addButton(HomeToggleButton(6, 112, area.canHostileSpawn, HOSTILES))
@@ -325,13 +332,13 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		}
 	}
 
-	private inner class ArrowButton(x: Int, y: Int, val isUp: Boolean)
-		: LMButton(x, y, 10, 13, 162, 84, "", { onArrowButtonPress(it as ArrowButton) }) {
+	private inner class ArrowButton(x: Int, y: Int, val isUp: Boolean) :
+		LMButton(x, y, 10, 13, 162, 84, "", { onArrowButtonPress(it as ArrowButton) }) {
 		override fun getIconY(): Int = if (isUp) iconY else iconY + height
 	}
 
-	private inner class ActionButton(x: Int, y: Int, text: String, val type: HomeGuiActionType)
-		: LMButton(x, y, 45, 12, 162, 0, I18n.format(text), { onActionButtonPress(it as ActionButton) }) {
+	private inner class ActionButton(x: Int, y: Int, text: String, val type: HomeGuiActionType) :
+		LMButton(x, y, 45, 12, 162, 0, I18n.format(text), { onActionButtonPress(it as ActionButton) }) {
 		init {
 			textOffset = 12
 		}
@@ -339,8 +346,14 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		override fun getIconY(): Int = iconY + (type.ordinal * height)
 	}
 
-	private inner class HomeToggleButton(x: Int, y: Int, isOn: Boolean, val type: HomeGuiToggleType)
-		: ToggleButton(x, y, 162, 36, I18n.format("gui.lm.home.${type.name.toLowerCase()}"), { onToggleButtonPress(it as HomeToggleButton) }) {
+	private inner class HomeToggleButton(x: Int, y: Int, isOn: Boolean, val type: HomeGuiToggleType) : ToggleButton(
+		x,
+		y,
+		162,
+		36,
+		I18n.format("gui.lm.home.${type.name.toLowerCase()}"),
+		{ onToggleButtonPress(it as HomeToggleButton) }
+	) {
 		init {
 			this.isOn = isOn
 			active = false
