@@ -6,12 +6,12 @@ import brightspark.landmanager.handler.ClientEventHandler
 import brightspark.landmanager.item.AreaCreateItem
 import brightspark.landmanager.util.Message
 import brightspark.landmanager.util.readEnumValue
+import brightspark.landmanager.util.sendActionBarMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.PacketBuffer
 import net.minecraft.util.text.TextFormatting
-import net.minecraft.util.text.TranslationTextComponent
 import net.minecraftforge.fml.network.NetworkEvent
 
 class MessageCreateAreaReply : Message {
@@ -43,36 +43,29 @@ class MessageCreateAreaReply : Message {
 			val gui = mc.currentScreen
 			when (result) {
 				AddAreaResult.SUCCESS -> {
-					sendStatusMessage(player, TextFormatting.GREEN, "message.landmanager.create.added", areaName)
+					player.sendActionBarMessage("message.landmanager.create.added", TextFormatting.GREEN, areaName)
 					closeScreen(gui, player)
 					ClientEventHandler.setRenderArea(areaName)
 				}
 				AddAreaResult.NAME_EXISTS -> {
-					sendStatusMessage(player, TextFormatting.RED, "message.landmanager.create.name", areaName)
+					player.sendActionBarMessage("message.landmanager.create.name", TextFormatting.RED, areaName)
 					clearTextField(gui)
 				}
 				AddAreaResult.AREA_INTERSECTS -> {
-					sendStatusMessage(player, TextFormatting.RED, "message.landmanager.create.intersects")
+					player.sendActionBarMessage("message.landmanager.create.intersects", TextFormatting.RED)
 					closeScreen(gui, player)
 				}
 				AddAreaResult.INVALID_NAME -> {
-					sendStatusMessage(player, TextFormatting.RED, "message.landmanager.create.invalid_name")
+					player.sendActionBarMessage("message.landmanager.create.invalid_name", TextFormatting.RED)
 					clearTextField(gui)
 				}
 				AddAreaResult.INVALID -> {
-					sendStatusMessage(player, TextFormatting.RED, "message.landmanager.create.invalid")
+					player.sendActionBarMessage("message.landmanager.create.invalid", TextFormatting.RED)
 					closeScreen(gui, player)
 				}
 			}
 		}
 	}
-
-	private fun sendStatusMessage(
-		player: PlayerEntity,
-		colour: TextFormatting,
-		translationKey: String,
-		vararg args: String
-	) = player.sendStatusMessage(TranslationTextComponent(translationKey, *args).mergeStyle(colour), true)
 
 	private fun closeScreen(gui: Screen?, player: PlayerEntity) {
 		if (gui is CreateAreaScreen)

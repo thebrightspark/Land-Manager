@@ -246,6 +246,16 @@ fun <T : ForgeRegistryEntry<T>> T.setRegName(name: String): T =
  */
 fun Entity.sendMessage(textComponent: ITextComponent): Unit = this.sendMessage(textComponent, Util.DUMMY_UUID)
 
+fun Entity.sendMessage(langKey: String, vararg args: Any): Unit =
+	this.sendMessage(TranslationTextComponent(langKey, *args))
+
+fun PlayerEntity.sendActionBarMessage(
+	langKey: String,
+	colour: TextFormatting? = null,
+	vararg args: Any
+): Unit =
+	this.sendStatusMessage(TranslationTextComponent(langKey, *args).apply { colour?.let { mergeStyle(it) } }, true)
+
 fun AxisAlignedBB.minPos(): Vector3d = Vector3d(minX, minY, minZ)
 
 fun AxisAlignedBB.maxPos(): Vector3d = Vector3d(maxX, maxY, maxZ)

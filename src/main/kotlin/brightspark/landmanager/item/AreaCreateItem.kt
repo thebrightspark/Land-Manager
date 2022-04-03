@@ -1,9 +1,11 @@
 package brightspark.landmanager.item
 
 import brightspark.landmanager.LandManager
+import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.data.areas.Position
 import brightspark.landmanager.message.MessageOpenCreateAreaGui
-import brightspark.landmanager.util.sendMessage
+import brightspark.landmanager.util.areasCap
+import brightspark.landmanager.util.sendActionBarMessage
 import brightspark.landmanager.util.sendToPlayer
 import net.minecraft.client.util.ITooltipFlag
 import net.minecraft.entity.player.PlayerEntity
@@ -16,6 +18,7 @@ import net.minecraft.util.ActionResultType
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.ITextComponent
+import net.minecraft.util.text.TextFormatting
 import net.minecraft.util.text.TranslationTextComponent
 import net.minecraft.world.World
 
@@ -27,6 +30,7 @@ class AreaCreateItem(props: Properties) : Item(props) {
 		if (context.hand != Hand.MAIN_HAND)
 			return super.onItemUseFirst(stack, context)
 
+		val world = context.world
 		val player = context.player!!
 		val pos1 = getPos(stack)
 		val pos2 = if (player.isSneaking) context.pos else context.pos.offset(context.face)
@@ -34,18 +38,35 @@ class AreaCreateItem(props: Properties) : Item(props) {
 			pos1 == null -> {
 				// Store pos in item
 				setPos(stack, Position(player.world.dimensionKey.location, pos2))
-				player.sendMessage(TranslationTextComponent("message.landmanager.tool.saved", pos2.x, pos2.y, pos2.z))
+				if (world.isRemote)
+					player.sendActionBarMessage(
+						"message.landmanager.tool.saved",
+						TextFormatting.GREEN,
+						pos2.x,
+						pos2.y,
+						pos2.z
+					)
 			}
 			pos1.dimension != player.world.dimensionKey.location -> {
 				//  Stored pos in different dimension! Remove stored pos
 				setPos(stack, null)
-				player.sendMessage(TranslationTextComponent("message.landmanager.tool.diffdim"))
+				if (world.isRemote)
+					player.sendActionBarMessage("message.landmanager.tool.diffdim", TextFormatting.RED)
 			}
-			else -> if (!context.world.isRemote)
-				LandManager.NETWORK.sendToPlayer(
-					MessageOpenCreateAreaGui(pos1.dimension, pos1.position, pos2),
-					player as ServerPlayerEntity
-				)
+			else -> {
+				if (!world.isRemote) {
+					val area = Area("", pos1.dimension, pos1.position, pos2)
+					val cap = world.areasCap
+					if (cap.intersectsAnArea(area))
+						player.sendActionBarMessage("message.landmanager.create.intersects", TextFormatting.RED)
+					else {
+						LandManager.NETWORK.sendToPlayer(
+							MessageOpenCreateAreaGui(pos1.dimension, pos1.position, pos2),
+							player as ServerPlayerEntity
+						)
+					}
+				}
+			}
 		}
 
 		return ActionResultType.SUCCESS
@@ -61,22 +82,29 @@ class AreaCreateItem(props: Properties) : Item(props) {
 			// Clear position
 			setPos(stack, null)
 			if (world.isRemote)
-				player.sendMessage(TranslationTextComponent("message.landmanager.tool.cleared"))
+				player.sendActionBarMessage("message.landmanager.tool.cleared")
 			return ActionResult(ActionResultType.SUCCESS, stack)
 		}
 
 		return super.onItemRightClick(world, player, hand)
 	}
 
-	override fun addInformation(stack: ItemStack, world: World?, tooltip: MutableList<ITextComponent>, flag: ITooltipFlag) {
-		tooltip.add(getPos(stack)?.let {
-			TranslationTextComponent(
-				"item.landmanager.area_create.tooltip.set",
-				it.dimension,
-				posToString(it.position)
-			)
-		}
-			?: TranslationTextComponent("item.landmanager.area_create.tooltip.notset"))
+	override fun addInformation(
+		stack: ItemStack,
+		world: World?,
+		tooltip: MutableList<ITextComponent>,
+		flag: ITooltipFlag
+	) {
+		tooltip.add(getPos(stack)
+			?.let {
+				TranslationTextComponent(
+					"item.landmanager.area_create.tooltip.set",
+					it.dimension,
+					posToString(it.position)
+				)
+			}
+			?: TranslationTextComponent("item.landmanager.area_create.tooltip.notset")
+		)
 	}
 
 	private fun posToString(pos: BlockPos) = "${pos.x}, ${pos.y}, ${pos.z}"

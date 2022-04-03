@@ -98,7 +98,9 @@ class Area : INBTSerializable<CompoundNBT> {
 		interactions = interactions.not()
 	}
 
-	fun intersects(area: Area): Boolean = collisionAabb.get().intersects(area.collisionAabb.get())
+	fun intersects(aabb: AxisAlignedBB): Boolean = collisionAabb.get().intersects(aabb)
+
+	fun intersects(area: Area): Boolean = intersects(area.collisionAabb.get())
 
 	fun intersects(pos: Vector3d): Boolean = collisionAabb.get().contains(pos)
 

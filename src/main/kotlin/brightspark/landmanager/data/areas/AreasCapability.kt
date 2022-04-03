@@ -4,6 +4,7 @@ import brightspark.landmanager.LandManager
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.vector.Vector3d
 import net.minecraftforge.common.util.INBTSerializable
@@ -33,6 +34,8 @@ interface AreasCapability : INBTSerializable<CompoundNBT> {
 	fun getAllAreaNames(): List<String>
 
 	fun getNearbyAreas(pos: BlockPos): List<Area>
+
+	fun intersectsAnArea(aabb: AxisAlignedBB): Boolean
 
 	fun intersectsAnArea(area: Area): Boolean
 

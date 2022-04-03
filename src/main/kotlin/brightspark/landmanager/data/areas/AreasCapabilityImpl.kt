@@ -9,6 +9,7 @@ import brightspark.landmanager.util.sendToPlayer
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.nbt.CompoundNBT
 import net.minecraft.nbt.ListNBT
+import net.minecraft.util.math.AxisAlignedBB
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.vector.Vector3d
 import net.minecraftforge.common.util.Constants
@@ -64,7 +65,11 @@ class AreasCapabilityImpl : AreasCapability {
 		.filter { it.intersects(pos) || it.closestPosTo(pos).withinDistance(pos, LMConfig.showAllRadius.toDouble()) }
 		.sortedByDescending { it.closestPosTo(pos).distanceSq(pos) }
 
-	override fun intersectsAnArea(area: Area): Boolean = areas.values.any { area.intersects(it) }
+	override fun intersectsAnArea(aabb: AxisAlignedBB): Boolean = areas.values.any { it.intersects(aabb) }
+
+	override fun intersectsAnArea(area: Area): Boolean = areas.values.any {
+		it.intersects(area)
+	}
 
 	override fun intersectingArea(pos: BlockPos): Area? = areas.values.find { it.intersects(pos) }
 
