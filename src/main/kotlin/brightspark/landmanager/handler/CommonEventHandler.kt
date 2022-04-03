@@ -4,6 +4,7 @@ import brightspark.landmanager.LMConfig
 import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.util.areasCap
+import brightspark.landmanager.util.sendActionBarMessage
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.ServerPlayerEntity
 import net.minecraft.item.BlockItem
@@ -11,7 +12,6 @@ import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.vector.Vector3d
 import net.minecraft.util.text.TextFormatting
-import net.minecraft.util.text.TranslationTextComponent
 import net.minecraft.world.World
 import net.minecraftforge.event.entity.living.LivingSpawnEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
@@ -36,21 +36,20 @@ object CommonEventHandler {
 			player.world.areasCap.sendDataToPlayer(player)
 	}
 
-	private fun warnPlayer(player: PlayerEntity, langKey: String): Unit =
-		player.sendStatusMessage(TranslationTextComponent(langKey).mergeStyle(TextFormatting.RED), true)
-
 	@SubscribeEvent
 	fun onBlockStartBreak(event: PlayerEvent.BreakSpeed) = event.run {
 		val world = player.world
 		val area = getArea(world, pos)
 		if ((area != null && area.isMember(player.uniqueID)) ||
 			isCreativeOrOp(player) ||
-			(area == null && LMConfig.canPlayersBreakBlocks))
+			(area == null && LMConfig.canPlayersBreakBlocks)
+		) {
 			return
+		}
 
 		// Stop players from breaking blocks
 		if (world.isRemote && world.gameTime - lastTimeHitProtectedBlock > 10)
-			warnPlayer(player, "message.landmanager.protection.break")
+			player.sendActionBarMessage("message.landmanager.protection.break", TextFormatting.RED)
 		newSpeed = 0F
 		isCanceled = true
 	}
@@ -64,11 +63,12 @@ object CommonEventHandler {
 		if ((area != null && area.isMember(player.uniqueID)) ||
 			isCreativeOrOp(player) ||
 			(area == null && LMConfig.canPlayersBreakBlocks)
-		)
+		) {
 			return
+		}
 
 		// Stop players from placing blocks
-		warnPlayer(player, "message.landmanager.protection.place")
+		player.sendActionBarMessage("message.landmanager.protection.place", TextFormatting.RED)
 		isCanceled = true
 	}
 
@@ -79,12 +79,15 @@ object CommonEventHandler {
 			isCreativeOrOp(player) ||
 			(area == null && LMConfig.canPlayersInteract) ||
 			// If player is holding shift with an itemblock, then allow it for block placing checks
-			(player.isSneaking && itemStack.item is BlockItem))
+			(player.isSneaking && itemStack.item is BlockItem)
+		) {
 			return
+		}
+		// If player is holding shift with an itemblock, then allow it for block placing checks
 
 		// Stop players from right clicking blocks
 		if (world.isRemote && hand == Hand.MAIN_HAND)
-			warnPlayer(player, "message.landmanager.protection.interact")
+			player.sendActionBarMessage("message.landmanager.protection.interact", TextFormatting.RED)
 		useBlock = Event.Result.DENY
 	}
 
