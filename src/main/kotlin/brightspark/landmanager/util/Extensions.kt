@@ -196,12 +196,9 @@ val MinecraftServer.allAreaNames: List<String>
 		}
 	}
 
-fun MinecraftServer.getAreaNames(startsWith: String): Stream<String> = Stream.builder<String>().also { stream ->
+fun MinecraftServer.getAreaNames(): Stream<String> = Stream.builder<String>().also { stream ->
 	this.worlds.forEach { world ->
-		world.areasCap.getAllAreaNames().forEach {
-			if (it.startsWith(startsWith))
-				stream.accept(it)
-		}
+		world.areasCap.getAllAreaNames().forEach { stream.accept(it) }
 	}
 }.build()
 
