@@ -4,7 +4,6 @@ import brightspark.landmanager.LandManager
 import brightspark.landmanager.data.areas.Area
 import brightspark.landmanager.message.MessageCreateArea
 import com.mojang.blaze3d.matrix.MatrixStack
-import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.widget.TextFieldWidget
 import net.minecraft.client.gui.widget.button.Button
 import net.minecraft.client.resources.I18n
@@ -33,10 +32,7 @@ class CreateAreaScreen(
 		}
 		children += nameInputField
 		extendCheckBox = addButton(object : ToggleButton(4, 26, 118, 0, I18n.format("gui.lm.create.checkbox")) {
-			override fun getTextColour(): Int = 4210752
-
-			override fun drawText(matrixStack: MatrixStack, font: FontRenderer) =
-				drawString(matrixStack, font, message, x + textOffset, y + (height - 8) / 2, getTextColour())
+			override fun getTextColour(): Int = TEXT_COLOUR_TITLE
 		})
 		addButton(object : Button(
 			guiLeft + 71,
@@ -46,7 +42,7 @@ class CreateAreaScreen(
 			TranslationTextComponent("gui.lm.create.confirm"),
 			{ complete() }) {
 			override fun renderButton(matrixStack: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) =
-				drawCenteredString(matrixStack, font, message, x + width / 2, y + 2, 14737632)
+				drawCenteredString(matrixStack, font, message, x + width / 2, y + 2, TEXT_COLOUR_ACTIVE)
 		})
 	}
 
@@ -58,7 +54,7 @@ class CreateAreaScreen(
 	override fun render(matrixStack: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
 		super.render(matrixStack, mouseX, mouseY, partialTicks)
 		nameInputField.render(matrixStack, mouseX, mouseY, partialTicks)
-		drawLangString(matrixStack, "gui.lm.create.area", 5 + guiLeft, 5 + guiTop, 4210752)
+		drawLangString(matrixStack, "gui.lm.create.area", 5 + guiLeft, 5 + guiTop)
 	}
 
 	override fun keyPressed(keyCode: Int, p2: Int, p3: Int): Boolean {

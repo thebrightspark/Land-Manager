@@ -17,10 +17,16 @@ open class LMScreen(
 	imageName: String,
 	protected val guiWidth: Int,
 	protected val guiHeight: Int,
-	protected val imageWidth: Int = 256,
-	protected val imageHeight: Int = 256
+	protected val textureWidth: Int = 256,
+	protected val textureHeight: Int = 256
 ) : Screen(StringTextComponent(title)) {
-	protected val imageResLoc = ResourceLocation(LandManager.MOD_ID, "textures/gui/$imageName.png")
+	companion object {
+		const val TEXT_COLOUR_TITLE = 0x404040
+		const val TEXT_COLOUR_ACTIVE = 0xE0E0E0
+		const val TEXT_COLOUR_INACTIVE = 0xA0A0A0
+	}
+
+	protected val textureResLoc = ResourceLocation(LandManager.MOD_ID, "textures/gui/$imageName.png")
 	protected var guiLeft = 0
 	protected var guiTop = 0
 
@@ -31,10 +37,10 @@ open class LMScreen(
 	}
 
 	override fun render(matrixStack: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-		renderBackground(matrixStack)
 		RenderSystem.color3f(1F, 1F, 1F)
-		minecraft!!.textureManager.bindTexture(imageResLoc)
-		blit(matrixStack, guiLeft, guiTop, guiWidth, guiHeight, imageWidth, imageHeight)
+		renderBackground(matrixStack)
+		minecraft!!.textureManager.bindTexture(textureResLoc)
+		blit(matrixStack, guiLeft, guiTop, blitOffset, 0F, 0F, guiWidth, guiHeight, textureHeight, textureWidth)
 		super.render(matrixStack, mouseX, mouseY, partialTicks)
 		buttons.firstOrNull { it is LMButton && it.isHovered && it.tooltip.isNotEmpty() }?.let { button ->
 			renderToolTip(
@@ -52,7 +58,7 @@ open class LMScreen(
 		text: String,
 		x: Int,
 		y: Int,
-		colour: Int = 4210752,
+		colour: Int = TEXT_COLOUR_TITLE,
 		shadow: Boolean = false
 	) {
 		if (shadow)
@@ -66,7 +72,7 @@ open class LMScreen(
 		key: String,
 		x: Int,
 		y: Int,
-		colour: Int = 4210752,
+		colour: Int = TEXT_COLOUR_TITLE,
 		shadow: Boolean = false
 	): Unit = drawString(matrixStack, I18n.format(key), x, y, colour, shadow)
 
@@ -76,7 +82,7 @@ open class LMScreen(
 		x: Int,
 		y: Int,
 		maxWidth: Int,
-		colour: Int = 4210752,
+		colour: Int = TEXT_COLOUR_TITLE,
 		shadow: Boolean = false
 	) {
 //		val textWidth = font.getStringWidth(text)
@@ -108,7 +114,7 @@ open class LMScreen(
 
 		protected open fun getIconY(): Int = iconY
 
-		protected open fun getTextColour(): Int = if (active) 14737632 else 10526880
+		protected open fun getTextColour(): Int = if (active) TEXT_COLOUR_ACTIVE else TEXT_COLOUR_INACTIVE
 
 		protected fun setTooltip(vararg textComponents: ITextComponent) {
 			tooltip.clear()
@@ -116,16 +122,26 @@ open class LMScreen(
 		}
 
 		protected open fun drawText(matrixStack: MatrixStack, font: FontRenderer): Unit =
-			drawString(matrixStack, font, message, x + textOffset, y + (height - 8) / 2, getTextColour())
+			drawString(matrixStack, message.string, x + textOffset, y + (height - 8) / 2, getTextColour())
 
 		override fun renderButton(matrixStack: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
 			if (!visible || (!drawWhenDisabled && !active))
 				return
 			val mc = Minecraft.getInstance()
 			if (hasIcon) {
-				mc.textureManager.bindTexture(imageResLoc)
+				mc.textureManager.bindTexture(textureResLoc)
 				RenderSystem.color3f(1F, 1F, 1F)
-				blit(matrixStack, x, y, iconX.toFloat(), getIconY().toFloat(), width, height, imageWidth, imageHeight)
+				blit(
+					matrixStack,
+					x,
+					y,
+					iconX.toFloat(),
+					getIconY().toFloat(),
+					width,
+					height,
+					textureWidth,
+					textureHeight
+				)
 			}
 			if (message.unformattedComponentText.isNotBlank())
 				drawText(matrixStack, mc.fontRenderer)
@@ -145,9 +161,6 @@ open class LMScreen(
 		init {
 			textOffset = width + 2
 		}
-
-		override fun drawText(matrixStack: MatrixStack, font: FontRenderer): Unit =
-			drawString(matrixStack, font, message, x + textOffset, y + (height - 8) / 2, getTextColour())
 
 		override fun getIconY(): Int = if (isOn) iconY + height else iconY
 

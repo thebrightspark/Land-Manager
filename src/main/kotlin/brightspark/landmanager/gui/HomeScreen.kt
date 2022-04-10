@@ -278,7 +278,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 			hasIcon = false
 		}
 
-		override fun getTextColour(): Int = 14737632
+		override fun getTextColour(): Int = TEXT_COLOUR_ACTIVE
 
 		fun setPlayer(player: Pair<UUID, String>?): Unit = player?.let {
 			message = StringTextComponent(it.second)
@@ -307,7 +307,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 
 		override fun drawText(matrixStack: MatrixStack, font: FontRenderer) {
 			if (isOwner) {
-				minecraft!!.textureManager.bindTexture(imageResLoc)
+				minecraft!!.textureManager.bindTexture(textureResLoc)
 				blit(
 					matrixStack,
 					x + 1,
@@ -316,8 +316,8 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 					ownerIcon.y.toFloat(),
 					ownerIcon.width,
 					ownerIcon.height,
-					imageWidth,
-					imageHeight
+					textureWidth,
+					textureHeight
 				)
 			}
 			drawStringWithMaxWidth(
@@ -327,7 +327,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 				y + (height - 8) / 2,
 				85 - textOffset,
 				getTextColour(),
-				true
+				false
 			)
 		}
 	}
@@ -360,7 +360,7 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 			drawWhenDisabled = true
 		}
 
-		override fun getTextColour(): Int = 4210752
+		override fun getTextColour(): Int = TEXT_COLOUR_TITLE
 
 		override fun getIconY(): Int {
 			var y = iconY
