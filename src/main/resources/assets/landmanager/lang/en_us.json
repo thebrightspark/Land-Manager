@@ -113,6 +113,7 @@
 	"lm.command.requests.approve": "Approve request %s",
 	"lm.command.requests.disapprove": "Disapprove request %s",
 	"lm.command.requests.not_exist": "There is no request with the ID %s!",
+	"lm.command.requests.invalid": "The given ID '%s' is not a number!",
 
 	"lm.command.explosions.usage": "Use '/lm explosions <areaName>' to toggle explosion damage",
 	"lm.command.explosions.usage.op": "Use '/lm op explosions <areaName>' to toggle explosion damage",
