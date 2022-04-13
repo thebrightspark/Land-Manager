@@ -35,8 +35,11 @@ object AreaArgument : LMCommandArgType<Area>(Area::class) {
 		return builder.buildFuture()
 	}
 
-	private fun getArea(name: String): Area? =
-		ServerLifecycleHooks.getCurrentServer()?.let { getAreaServer(name) } ?: getAreaClient(name)
+	// Need to use an `if` statement rather than `?.let {} ?:` to avoid NoSuchMethodError on dedicated server
+	private fun getArea(name: String): Area? = if (ServerLifecycleHooks.getCurrentServer() != null)
+		getAreaServer(name)
+	else
+		getAreaClient(name)
 
 	@OnlyIn(Dist.CLIENT)
 	private fun getAreaClient(name: String): Area? = Minecraft.getInstance().world!!.areasCap.getArea(name)
