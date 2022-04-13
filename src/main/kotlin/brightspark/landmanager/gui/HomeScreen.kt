@@ -13,6 +13,7 @@ import brightspark.landmanager.util.HomeGuiToggleType
 import brightspark.landmanager.util.HomeGuiToggleType.*
 import brightspark.landmanager.util.areasCap
 import com.mojang.blaze3d.matrix.MatrixStack
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.widget.TextFieldWidget
 import net.minecraft.client.resources.I18n
@@ -347,6 +348,14 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 		}
 
 		override fun getIconY(): Int = iconY + (type.ordinal * height)
+
+		override fun renderButton(matrixStack: MatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
+			if (!active) {
+				// Manually rendering text when inactive to avoid modifying the texture with inactive states
+				drawText(matrixStack, Minecraft.getInstance().fontRenderer)
+			} else
+				super.renderButton(matrixStack, mouseX, mouseY, partialTicks)
+		}
 	}
 
 	private inner class HomeToggleButton(x: Int, y: Int, isOn: Boolean, val type: HomeGuiToggleType) : ToggleButton(
