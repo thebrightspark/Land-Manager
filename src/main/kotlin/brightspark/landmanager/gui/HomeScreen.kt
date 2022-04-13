@@ -201,6 +201,9 @@ class HomeScreen(player: PlayerEntity, val pos: BlockPos) : LMScreen("Home", "gu
 				setEnableBackgroundDrawing(false)
 			}
 
+			override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean =
+				super.keyPressed(keyCode, scanCode, modifiers).also { if (it) updateActionButtons() }
+
 			override fun charTyped(char: Char, keyCode: Int): Boolean {
 				val result = super.charTyped(char, keyCode)
 				if (result) {
